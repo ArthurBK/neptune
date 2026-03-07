@@ -1,8 +1,6 @@
 import { DocumentTextIcon, ImageIcon } from '@sanity/icons'
 import { defineArrayMember, defineField, defineType } from 'sanity'
 
-import { GalleryUploadInput } from '../components/GalleryUploadInput'
-
 // Portable Text block: image with caption and alt
 const pteImageBlock = defineType({
   name: 'pteImageBlock',
@@ -122,33 +120,6 @@ export const article = defineType({
         }),
       ],
       validation: (rule) => rule.required(),
-    }),
-    defineField({
-      name: 'gallery',
-      title: 'Gallery',
-      type: 'array',
-      description: 'Additional images for the article. Drop multiple images or click to select.',
-      options: { layout: 'grid' },
-      components: { input: GalleryUploadInput },
-      of: [
-        defineArrayMember({
-          type: 'image',
-          options: { hotspot: true },
-          fields: [
-            defineField({
-              name: 'alt',
-              title: 'Alt text',
-              type: 'string',
-              description: 'Optional — add later for accessibility',
-            }),
-            defineField({
-              name: 'caption',
-              title: 'Caption',
-              type: 'string',
-            }),
-          ],
-        }),
-      ],
     }),
     defineField({
       name: 'author',

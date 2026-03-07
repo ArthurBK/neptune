@@ -111,7 +111,7 @@ export default async function ArtsArticlePage({ params }: ArticlePageProps) {
 
         {/* Article body — text → 3 images row → text → full-width hero → repeat */}
         <div className="pt-2 pb-8">
-          <ArticleBody value={article.body} gallery={article.gallery} />
+          <ArticleBody value={article.body} />
         </div>
 
         {/* Ad banner mid */}
@@ -182,7 +182,6 @@ type ArticleData = {
   slug: { current: string }
   subcategory?: string | null
   coverImage?: { asset?: { _ref: string }; alt?: string }
-  gallery?: Array<{ asset?: { _ref: string }; alt?: string; caption?: string }>
   body: unknown
   author?: { name: string; slug: string } | null
   photographer?: { name: string } | null

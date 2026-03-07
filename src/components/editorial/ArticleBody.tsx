@@ -3,52 +3,6 @@ import Image from 'next/image'
 
 import { urlFor } from '@/sanity/lib/image'
 
-type GalleryImage = { asset?: { _ref?: string }; alt?: string; caption?: string }
-
-/** Merge gallery: text → 3 images row → text → full-width hero → repeat */
-function mergeBodyWithGallery(
-  body: unknown[],
-  gallery: GalleryImage[]
-): unknown[] {
-  if (!gallery?.length) return body
-  const result: unknown[] = []
-  let galleryIndex = 0
-  let blocksSinceLastInsert = 0
-  let nextInsert: 'row3' | 'hero' = 'row3'
-
-  for (const block of body) {
-    result.push(block)
-    const b = block as { _type?: string }
-    const isTextBlock = b?._type === 'block'
-    if (isTextBlock) {
-      blocksSinceLastInsert++
-      if (blocksSinceLastInsert >= 2 && galleryIndex < gallery.length) {
-        if (nextInsert === 'row3' && galleryIndex + 3 <= gallery.length) {
-          result.push({
-            _type: 'galleryRow3Block',
-            _key: `gallery-row-${galleryIndex}`,
-            images: gallery.slice(galleryIndex, galleryIndex + 3),
-          })
-          galleryIndex += 3
-        } else {
-          result.push({
-            _type: 'galleryHeroBlock',
-            _key: `gallery-hero-${galleryIndex}`,
-            image: gallery[galleryIndex],
-          })
-          galleryIndex += 1
-        }
-        blocksSinceLastInsert = 0
-        nextInsert = nextInsert === 'row3' ? 'hero' : 'row3'
-      }
-    } else {
-      blocksSinceLastInsert = 0
-    }
-  }
-
-  return result
-}
-
 const TextWrapper = ({
   children,
   className = '',
@@ -166,63 +120,6 @@ function createComponents(isFirstParagraph: { current: boolean }): PortableTextC
         </figure>
       )
     },
-    galleryRow3Block: ({ value }) => {
-      const images = (value?.images as GalleryImage[]) ?? []
-      if (images.length === 0) return null
-      return (
-        <div className="my-6 md:my-8 max-w-[1400px] mx-auto px-4 md:px-8">
-          <div className="grid grid-cols-3 gap-3 md:gap-6">
-            {images.map((img, i) => {
-              const imageUrl = img?.asset ? urlFor(img).width(600).height(450).quality(90).url() : null
-              if (!imageUrl) return null
-              return (
-                <figure key={`${(value as { _key?: string })?._key}-${i}`} className="group overflow-hidden">
-                  <div className="relative aspect-[4/3] bg-[#E5E5E5] overflow-hidden">
-                    <Image
-                      src={imageUrl}
-                      alt={img.alt ?? ''}
-                      fill
-                      sizes="(max-width: 768px) 33vw, 400px"
-                      className="object-cover transition-transform duration-300 group-hover:scale-[1.02]"
-                    />
-                  </div>
-                  {img.caption && (
-                    <figcaption className="mt-1 text-sm text-[#6B6B6B] line-clamp-2">
-                      {img.caption}
-                    </figcaption>
-                  )}
-                </figure>
-              )
-            })}
-          </div>
-        </div>
-      )
-    },
-    galleryHeroBlock: ({ value }) => {
-      const img = value?.image as GalleryImage | undefined
-      if (!img?.asset) return null
-      const imageUrl = urlFor(img).width(1400).height(900).quality(90).url()
-      return (
-        <figure className="my-6 md:my-8">
-          <div className="w-full px-0">
-            <div className="relative aspect-[4/3] md:aspect-[16/9] bg-[#E5E5E5] overflow-hidden">
-              <Image
-                src={imageUrl}
-                alt={img.alt ?? ''}
-                fill
-                sizes="100vw"
-                className="object-cover"
-              />
-            </div>
-          </div>
-          {img.caption && (
-            <figcaption className="mt-2 text-sm text-[#6B6B6B] max-w-[720px] mx-auto px-4 md:px-8">
-              {img.caption}
-            </figcaption>
-          )}
-        </figure>
-      )
-    },
     adBannerEmbedBlock: ({ value }) => {
       if (!value?.adBanner?.image) return null
       const imageUrl = urlFor(value.adBanner.image).width(1200).url()
@@ -256,17 +153,15 @@ function createComponents(isFirstParagraph: { current: boolean }): PortableTextC
 
 interface ArticleBodyProps {
   value: unknown
-  gallery?: GalleryImage[]
 }
 
-export function ArticleBody({ value, gallery }: ArticleBodyProps) {
+export function ArticleBody({ value }: ArticleBodyProps) {
   const isFirstParagraph = { current: true }
   if (!value || !Array.isArray(value)) return null
-  const content = gallery?.length ? mergeBodyWithGallery(value, gallery) : value
   return (
     <div className="w-full">
       <article className="overflow-x-visible">
-        <PortableText value={content} components={createComponents(isFirstParagraph)} />
+        <PortableText value={value} components={createComponents(isFirstParagraph)} />
       </article>
     </div>
   )

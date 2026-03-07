@@ -83,7 +83,7 @@ export default async function ClientPage({ params }: ClientPageProps) {
         )}
 
         <div className="pt-2 pb-8">
-          <ArticleBody value={clientData.body} gallery={clientData.gallery} />
+          <ArticleBody value={clientData.body} />
         </div>
 
         {adMid?.image && (
@@ -139,7 +139,6 @@ type ClientData = {
   slug: { current: string }
   subcategory?: string | null
   coverImage?: { asset?: { _ref: string }; alt?: string }
-  gallery?: Array<{ asset?: { _ref: string }; alt?: string; caption?: string }>
   body: unknown
   relatedClients?: unknown[]
 }

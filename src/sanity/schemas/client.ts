@@ -1,8 +1,6 @@
 import { DocumentTextIcon } from '@sanity/icons'
 import { defineArrayMember, defineField, defineType } from 'sanity'
 
-import { GalleryUploadInput } from '../components/GalleryUploadInput'
-
 const CLIENT_CATEGORIES = [
   { title: 'Interiors', value: 'interiors' },
   { title: 'Gardens', value: 'gardens' },
@@ -65,33 +63,6 @@ export const client = defineType({
         }),
       ],
       validation: (rule) => rule.required(),
-    }),
-    defineField({
-      name: 'gallery',
-      title: 'Gallery',
-      type: 'array',
-      description: 'Additional images. Drop multiple images or click to select.',
-      options: { layout: 'grid' },
-      components: { input: GalleryUploadInput },
-      of: [
-        defineArrayMember({
-          type: 'image',
-          options: { hotspot: true },
-          fields: [
-            defineField({
-              name: 'alt',
-              title: 'Alt text',
-              type: 'string',
-              description: 'Optional — add later for accessibility',
-            }),
-            defineField({
-              name: 'caption',
-              title: 'Caption',
-              type: 'string',
-            }),
-          ],
-        }),
-      ],
     }),
     defineField({
       name: 'publishedAt',
