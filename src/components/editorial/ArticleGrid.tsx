@@ -7,7 +7,6 @@ interface Article {
   category: string
   subcategory?: string | null
   coverImage: { asset?: { _ref: string }; alt?: string }
-  excerpt?: string | null
   author?: { name: string; slug: string } | null
 }
 
@@ -34,7 +33,6 @@ export function ArticleGrid({ articles }: ArticleGridProps) {
           category={article.category}
           subcategory={article.subcategory}
           coverImage={article.coverImage}
-          excerpt={article.excerpt}
           author={article.author}
         />
       ))}

@@ -12,7 +12,6 @@ interface ClientCardProps {
     asset?: { _ref: string }
     alt?: string
   }
-  excerpt?: string | null
 }
 
 export function ClientCard({

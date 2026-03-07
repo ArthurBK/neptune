@@ -122,7 +122,6 @@ export default async function ClientPage({ params }: ClientPageProps) {
                     category={c.category}
                     subcategory={c.subcategory}
                     coverImage={c.coverImage}
-                    excerpt={c.excerpt}
                   />
                 ))}
               </div>
@@ -156,5 +155,4 @@ type ClientCardData = {
   category: string
   subcategory?: string | null
   coverImage: { asset?: { _ref: string }; alt?: string }
-  excerpt?: string | null
 }

@@ -19,7 +19,6 @@ export const ARTICLES_BY_CATEGORY_QUERY = `
     category,
     subcategory,
     coverImage,
-    excerpt,
     publishedAt,
     "author": author->{ name, "slug": slug.current }
   }
@@ -32,7 +31,7 @@ export const ARTICLE_BY_SLUG_QUERY = `
     "author": author->{ name, "slug": slug.current, bio, portrait },
     "photographer": photographer->{ name, "slug": slug.current },
     "affiliateProducts": affiliateProducts[]->{ title, brand, price, image, affiliateUrl },
-    "relatedArticles": relatedArticles[]->{ _id, title, "slug": slug.current, category, subcategory, coverImage, excerpt, "author": author->{ name, "slug": slug.current } },
+    "relatedArticles": relatedArticles[]->{ _id, title, "slug": slug.current, category, subcategory, coverImage, "author": author->{ name, "slug": slug.current } },
     "body": body[] {
       ...,
       _type == "adBannerEmbedBlock" => {
@@ -69,7 +68,7 @@ export const CLIENTS_QUERY = `
 export const CLIENT_BY_SLUG_QUERY = `
   *[_type == "client" && slug.current == $slug][0] {
     ...,
-    "relatedClients": relatedClients[]->{ _id, title, "slug": slug.current, category, subcategory, coverImage, excerpt },
+    "relatedClients": relatedClients[]->{ _id, title, "slug": slug.current, category, subcategory, coverImage },
     "body": body[] {
       ...,
       _type == "adBannerEmbedBlock" => {

@@ -38,7 +38,6 @@ export default async function InteriorsPage() {
     category: string
     subcategory?: string | null
     coverImage: { asset?: { _ref: string }; alt?: string }
-    excerpt?: string | null
     author?: { name: string; slug: string } | null
   }>
 

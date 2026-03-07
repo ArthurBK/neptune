@@ -71,12 +71,6 @@ export const client = defineType({
       validation: (rule) => rule.required(),
     }),
     defineField({
-      name: 'excerpt',
-      title: 'Excerpt',
-      type: 'text',
-      description: 'Used for client cards',
-    }),
-    defineField({
       name: 'body',
       title: 'Body',
       type: 'array',

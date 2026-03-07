@@ -141,12 +141,6 @@ export const article = defineType({
       validation: (rule) => rule.required(),
     }),
     defineField({
-      name: 'excerpt',
-      title: 'Excerpt',
-      type: 'text',
-      description: 'Used for article cards',
-    }),
-    defineField({
       name: 'body',
       title: 'Body',
       type: 'array',

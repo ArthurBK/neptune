@@ -154,7 +154,6 @@ export default async function GardensArticlePage({ params }: ArticlePageProps) {
                     category={a.category}
                     subcategory={a.subcategory}
                     coverImage={a.coverImage}
-                    excerpt={a.excerpt}
                     author={a.author}
                   />
                 ))}
@@ -202,6 +201,5 @@ type ArticleCardData = {
   category: string
   subcategory?: string | null
   coverImage: { asset?: { _ref: string }; alt?: string }
-  excerpt?: string | null
   author?: { name: string; slug: string } | null
 }

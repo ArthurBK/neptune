@@ -12,7 +12,6 @@ interface ArticleCardProps {
     asset?: { _ref: string }
     alt?: string
   }
-  excerpt?: string | null
   author?: { name: string; slug: string } | null
 }
 
