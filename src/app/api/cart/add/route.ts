@@ -29,6 +29,7 @@ export async function POST(request: Request) {
       const data = await shopifyFetch<CartLinesAddResponse>({
         query: CART_LINES_ADD_MUTATION,
         variables: { cartId, lines },
+        cache: 'no-store',
       })
       const result = data.cartLinesAdd
       const userErrors = result?.userErrors ?? []
@@ -46,12 +47,14 @@ export async function POST(request: Request) {
       return NextResponse.json({
         cartId: cart.id,
         checkoutUrl: cart.checkoutUrl,
+        cart,
       })
     }
 
     const data = await shopifyFetch<CartCreateResponse>({
       query: CART_CREATE_MUTATION,
       variables: { input: { lines } },
+      cache: 'no-store',
     })
     const result = data.cartCreate
     const userErrors = result?.userErrors ?? []
@@ -69,6 +72,7 @@ export async function POST(request: Request) {
     return NextResponse.json({
       cartId: cart.id,
       checkoutUrl: cart.checkoutUrl,
+      cart,
     })
   } catch (err) {
     console.error('Cart API error:', err)

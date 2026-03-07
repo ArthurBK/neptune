@@ -8,9 +8,11 @@ const DEBUG = process.env.NODE_ENV === 'development'
 export async function shopifyFetch<T>({
   query,
   variables,
+  cache = 'force-cache',
 }: {
   query: string
   variables?: Record<string, unknown>
+  cache?: RequestCache
 }): Promise<T> {
   const url = `https://${domain}/api/${apiVersion}/graphql.json`
 
@@ -33,7 +35,8 @@ export async function shopifyFetch<T>({
       'X-Shopify-Storefront-Access-Token': token,
     },
     body: JSON.stringify({ query, variables }),
-    next: { revalidate: 3600 },
+    cache,
+    ...(cache === 'force-cache' && { next: { revalidate: 3600 } }),
   })
 
   const json = await res.json()

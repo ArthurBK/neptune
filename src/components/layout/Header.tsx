@@ -3,7 +3,12 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
+
+import { CART_OPEN_EVENT, getCartId } from '@/lib/cart'
+
+import { CartPreview } from '@/components/commerce/CartPreview'
+import { SearchModal } from './SearchModal'
 
 const NAV_ITEMS = [
   { label: 'NEWSSTAND', href: '/newsstand' },
@@ -49,6 +54,46 @@ function NavLink({
 
 export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const [isSearchOpen, setIsSearchOpen] = useState(false)
+  const [isCartOpen, setIsCartOpen] = useState(false)
+  const [cartCount, setCartCount] = useState<number | null>(null)
+
+  const fetchCartCount = useCallback(async () => {
+    const cartId = getCartId()
+    if (!cartId) {
+      setCartCount(null)
+      return
+    }
+    try {
+      const res = await fetch(
+        `/api/cart?cartId=${encodeURIComponent(cartId)}&_t=${Date.now()}`,
+        { cache: 'no-store' }
+      )
+      const data = await res.json()
+      setCartCount(data.cart?.totalQuantity ?? null)
+    } catch {
+      setCartCount(null)
+    }
+  }, [])
+
+  useEffect(() => {
+    fetchCartCount()
+    const cartUpdatedHandler = (e: Event) => {
+      const cart = (e as CustomEvent<{ cart?: { totalQuantity?: number } | null }>)?.detail?.cart
+      if (cart !== undefined && typeof cart?.totalQuantity === 'number') {
+        setCartCount(cart.totalQuantity)
+      } else {
+        fetchCartCount()
+      }
+    }
+    const openCartHandler = () => setIsCartOpen(true)
+    window.addEventListener('neptune-cart-updated', cartUpdatedHandler)
+    window.addEventListener(CART_OPEN_EVENT, openCartHandler)
+    return () => {
+      window.removeEventListener('neptune-cart-updated', cartUpdatedHandler)
+      window.removeEventListener(CART_OPEN_EVENT, openCartHandler)
+    }
+  }, [fetchCartCount])
 
   return (
     <header className="sticky top-0 z-50 bg-white border-b border-[#E5E5E5]">
@@ -68,7 +113,57 @@ export function Header() {
               priority
             />
           </Link>
-          <div className="flex-1 flex justify-end md:justify-center">
+          <div className="flex flex-1 justify-end items-center gap-2 md:justify-center">
+            <button
+              type="button"
+              aria-label="Cart"
+              onClick={() => setIsCartOpen(true)}
+              className="relative w-10 h-10 flex items-center justify-center text-[#6B6B6B] hover:text-black transition-colors"
+            >
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden
+              >
+                <title>Cart</title>
+                <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
+                <line x1="3" y1="6" x2="21" y2="6" />
+                <path d="M16 10a4 4 0 0 1-8 0" />
+              </svg>
+              {cartCount != null && cartCount > 0 && (
+                <span className="absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-black px-1 text-[10px] font-medium text-white">
+                  {cartCount > 99 ? '99+' : cartCount}
+                </span>
+              )}
+            </button>
+            <button
+              type="button"
+              aria-label="Search"
+              onClick={() => setIsSearchOpen(true)}
+              className="w-10 h-10 flex items-center justify-center text-[#6B6B6B] hover:text-black transition-colors"
+            >
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden
+              >
+                <title>Search</title>
+                <circle cx="11" cy="11" r="8" />
+                <path d="m21 21-4.35-4.35" />
+              </svg>
+            </button>
             <button
               type="button"
               aria-label={isMenuOpen ? 'Close menu' : 'Open menu'}
@@ -111,6 +206,26 @@ export function Header() {
           aria-modal="true"
         >
           <nav className="flex flex-col items-center justify-center h-full gap-8 py-16">
+            <button
+              type="button"
+              onClick={() => {
+                setIsMenuOpen(false)
+                setIsSearchOpen(true)
+              }}
+              className="text-base tracking-[0.2em] uppercase text-[#6B6B6B] hover:text-black transition-colors"
+            >
+              Search
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setIsMenuOpen(false)
+                setIsCartOpen(true)
+              }}
+              className="text-base tracking-[0.2em] uppercase text-[#6B6B6B] hover:text-black transition-colors"
+            >
+              Cart {cartCount != null && cartCount > 0 && `(${cartCount})`}
+            </button>
             {NAV_ITEMS.map((item) => (
               <NavLink
                 key={item.href}
@@ -122,6 +237,9 @@ export function Header() {
           </nav>
         </div>
       )}
+
+      <SearchModal isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
+      <CartPreview isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
     </header>
   )
 }

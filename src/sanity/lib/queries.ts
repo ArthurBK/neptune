@@ -103,6 +103,18 @@ export const AFFILIATE_PRODUCTS_QUERY = `
   }
 `
 
+// Search articles by title
+export const ARTICLES_SEARCH_QUERY = `
+  *[_type == "article" && title match $query] | order(publishedAt desc)[0...10] {
+    _id,
+    title,
+    "slug": slug.current,
+    category,
+    coverImage,
+    "author": author->{ name }
+  }
+`
+
 // Active ad banner by placement
 export const AD_BANNER_BY_PLACEMENT_QUERY = `
   *[_type == "adBanner" && active == true && placement == $placement][0] {

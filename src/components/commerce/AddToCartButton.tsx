@@ -2,6 +2,13 @@
 
 import { useState } from 'react'
 
+import {
+  dispatchCartUpdated,
+  dispatchOpenCart,
+  getCartId,
+  setCartId,
+  setCheckoutUrl,
+} from '@/lib/cart'
 import type { ProductVariant } from '@/lib/shopify/types'
 
 interface AddToCartButtonProps {
@@ -25,26 +32,38 @@ export function AddToCartButton({
 }: AddToCartButtonProps) {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [added, setAdded] = useState(false)
+  const [checkoutUrl, setCheckoutUrl] = useState<string | null>(null)
 
   async function handleAddToCart() {
     if (!variant.availableForSale || isLoading) return
     setIsLoading(true)
     setError(null)
+    setAdded(false)
     try {
+      const cartId = getCartId()
       const res = await fetch('/api/cart/add', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           variantId: variant.id,
           quantity: 1,
+          ...(cartId && { cartId }),
         }),
       })
       const data = await res.json()
       if (!res.ok) throw new Error(data.error ?? 'Failed to add to cart')
-      if (data.checkoutUrl) {
-        window.location.href = data.checkoutUrl
+      if (data.cartId && data.checkoutUrl) {
+        if (typeof window !== 'undefined') {
+          setCartId(data.cartId)
+          setCheckoutUrl(data.checkoutUrl)
+        }
+        setCheckoutUrl(data.checkoutUrl)
+        setAdded(true)
+        dispatchCartUpdated(data.cart)
+        dispatchOpenCart()
       } else {
-        throw new Error('No checkout URL received')
+        throw new Error('No cart data received')
       }
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Failed to add to cart'
@@ -73,8 +92,18 @@ export function AddToCartButton({
         disabled={!variant.availableForSale || isLoading}
         className={`bg-black text-white px-4 py-2 text-sm uppercase tracking-[0.2em] transition-opacity hover:opacity-80 disabled:opacity-50 disabled:cursor-not-allowed ${className}`}
       >
-        {isLoading ? 'Adding…' : label}
+        {isLoading ? 'Adding…' : added ? 'Added' : label}
       </button>
+      {added && checkoutUrl && (
+        <p className="text-sm text-[#6B6B6B]">
+          <a
+            href={checkoutUrl}
+            className="underline hover:text-black transition-colors"
+          >
+            View cart & checkout →
+          </a>
+        </p>
+      )}
       {error && (
         <p className="text-sm text-red-600">{error}</p>
       )}
