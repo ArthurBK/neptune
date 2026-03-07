@@ -6,7 +6,6 @@ import { GalleryUploadInput } from '../components/GalleryUploadInput'
 const CLIENT_CATEGORIES = [
   { title: 'Interiors', value: 'interiors' },
   { title: 'Gardens', value: 'gardens' },
-  { title: 'Fashion', value: 'fashion' },
   { title: 'Arts', value: 'arts' },
 ]
 

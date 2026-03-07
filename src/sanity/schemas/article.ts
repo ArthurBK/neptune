@@ -58,7 +58,6 @@ const adBannerEmbedBlock = defineType({
 const ARTICLE_CATEGORIES = [
   { title: 'Interiors', value: 'interiors' },
   { title: 'Gardens', value: 'gardens' },
-  { title: 'Fashion', value: 'fashion' },
   { title: 'Arts', value: 'arts' },
 ]
 
