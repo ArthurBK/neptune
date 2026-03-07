@@ -100,10 +100,10 @@ export default async function ClientPage({ params }: ClientPageProps) {
 
         <div className="mt-20 max-w-[580px] mx-auto px-6 md:px-12 text-center">
           <Link
-            href="/the-studio"
+            href="/"
             className="text-xs tracking-[0.25em] uppercase text-[#6B6B6B] hover:text-black transition-colors"
           >
-            ← Back to Studio
+            ← ← Back to home
           </Link>
         </div>
 
