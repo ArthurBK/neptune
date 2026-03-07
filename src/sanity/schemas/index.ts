@@ -9,6 +9,7 @@ import { adBanner } from './adBanner'
 import { client } from './client'
 import { affiliateProduct } from './affiliateProduct'
 import { contributor } from './contributor'
+import { photographer } from './photographer'
 import { siteSettings } from './siteSettings'
 
 export const schema: { types: SchemaTypeDefinition[] } = {
@@ -16,6 +17,7 @@ export const schema: { types: SchemaTypeDefinition[] } = {
     article,
     client,
     contributor,
+    photographer,
     affiliateProduct,
     adBanner,
     siteSettings,

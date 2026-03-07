@@ -125,12 +125,12 @@ export default async function NewsstandProductPage({ params }: ProductPageProps)
       <div className="max-w-screen-xl mx-auto px-6 md:px-12 lg:px-16 py-12 md:py-16">
 
         {/* You May Also Like */}
-        <div className="mt-16 pt-16 border-t border-[#E5E5E5]">
+        <div className="mt-16 pt-16 border-t border-[#E5E5E5] text-center">
           <h2 className="font-serif text-4xl text-[#1A1A1A] mb-8">
             You May Also Like
           </h2>
           {relatedProducts.length > 0 ? (
-            <div className="flex flex-wrap gap-6 md:gap-8">
+            <div className="flex flex-wrap justify-center gap-6 md:gap-8">
               {relatedProducts.map((p) => (
                 <ProductCard key={p.id} product={p} compact />
               ))}

@@ -146,7 +146,7 @@ export const article = defineType({
       name: 'photographer',
       title: 'Photographer',
       type: 'reference',
-      to: [{ type: 'contributor' }],
+      to: [{ type: 'photographer' }],
     }),
     defineField({
       name: 'publishedAt',
