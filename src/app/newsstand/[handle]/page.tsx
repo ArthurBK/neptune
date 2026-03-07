@@ -3,12 +3,18 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 
 import { shopifyFetch } from '@/lib/shopify/client'
-import { NEWSSTAND_PRODUCTS_QUERY, PRODUCT_BY_HANDLE_QUERY } from '@/lib/shopify/queries'
+import {
+  ALL_PRODUCTS_QUERY,
+  NEWSSTAND_PRODUCTS_QUERY,
+  PRODUCT_BY_HANDLE_QUERY,
+} from '@/lib/shopify/queries'
 import type {
+  AllProductsResponse,
   NewsstandProductsResponse,
   ProductByHandleResponse,
 } from '@/lib/shopify/types'
 
+import { ProductCard } from '@/components/commerce/ProductCard'
 import { ProductForm } from '@/components/commerce/ProductForm'
 
 export const revalidate = 3600
@@ -32,13 +38,30 @@ interface ProductPageProps {
 export default async function NewsstandProductPage({ params }: ProductPageProps) {
   const { handle } = await params
 
-  const data = await shopifyFetch<ProductByHandleResponse>({
-    query: PRODUCT_BY_HANDLE_QUERY,
-    variables: { handle },
-  })
+  const [productData, collectionData, allProductsData] = await Promise.all([
+    shopifyFetch<ProductByHandleResponse>({
+      query: PRODUCT_BY_HANDLE_QUERY,
+      variables: { handle },
+    }),
+    shopifyFetch<NewsstandProductsResponse>({
+      query: NEWSSTAND_PRODUCTS_QUERY,
+    }),
+    shopifyFetch<AllProductsResponse>({
+      query: ALL_PRODUCTS_QUERY,
+    }),
+  ])
 
-  const product = data.product
+  const product = productData.product
   if (!product) notFound()
+
+  const collectionProducts =
+    collectionData.collection?.products.edges.map((e) => e.node) ?? []
+  const allProductsList = allProductsData.products?.edges.map((e) => e.node) ?? []
+  const allProducts =
+    collectionProducts.length > 0 ? collectionProducts : allProductsList
+  const relatedProducts = allProducts
+    .filter((p) => p.handle !== handle)
+    .slice(0, 3)
 
   const images = product.images.edges.map((e) => e.node)
   const variants = product.variants.edges.map((e) => e.node)
@@ -64,7 +87,7 @@ export default async function NewsstandProductPage({ params }: ProductPageProps)
               ))}
             </div>
             {images.length > 1 && (
-              <p className="mt-6 text-xs tracking-[0.2em] uppercase text-[#6B6B6B] flex items-center gap-2">
+              <p className="mt-6 text-base tracking-[0.2em] uppercase text-[#6B6B6B] flex items-center gap-2">
                 <span className="inline-block">↓</span>
                 Scroll to see other images from the issue
               </p>
@@ -73,7 +96,7 @@ export default async function NewsstandProductPage({ params }: ProductPageProps)
 
           {/* Product details */}
           <div className="lg:sticky lg:top-24 lg:self-start">
-            <h1 className="font-serif text-3xl md:text-4xl text-[#1A1A1A] uppercase tracking-wide">
+            <h1 className="font-serif text-5xl md:text-6xl text-[#1A1A1A] uppercase tracking-wide">
               {product.title}
             </h1>
 
@@ -84,7 +107,7 @@ export default async function NewsstandProductPage({ params }: ProductPageProps)
             {(product.description || product.descriptionHtml) && (
               <div className="mt-12 pt-8 border-t border-[#E5E5E5]">
                 <div
-                  className="text-[#6B6B6B] text-sm leading-relaxed [&_p]:mb-4 [&_p:last-child]:mb-0 [&_a]:underline [&_a]:hover:text-black"
+                  className="text-[#6B6B6B] text-base leading-relaxed [&_p]:mb-4 [&_p:last-child]:mb-0 [&_a]:underline [&_a]:hover:text-black"
                   // biome-ignore lint/security/noDangerouslySetInnerHtml: Shopify product HTML from trusted source
                   dangerouslySetInnerHTML={{ __html: product.descriptionHtml }}
                 />
@@ -95,12 +118,19 @@ export default async function NewsstandProductPage({ params }: ProductPageProps)
 
         {/* You May Also Like */}
         <div className="mt-24 pt-16 border-t border-[#E5E5E5]">
-          <h2 className="font-serif text-2xl text-[#1A1A1A] mb-8">
+          <h2 className="font-serif text-4xl text-[#1A1A1A] mb-8">
             You May Also Like
           </h2>
+          {relatedProducts.length > 0 ? (
+            <div className="flex flex-wrap gap-6 md:gap-8">
+              {relatedProducts.map((p) => (
+                <ProductCard key={p.id} product={p} compact />
+              ))}
+            </div>
+          ) : null}
           <Link
             href="/newsstand"
-            className="text-xs tracking-[0.2em] uppercase text-[#6B6B6B] hover:text-black transition-colors"
+            className="mt-8 inline-block text-base tracking-[0.2em] uppercase text-[#6B6B6B] hover:text-black transition-colors"
           >
             ← Discover all available issues
           </Link>

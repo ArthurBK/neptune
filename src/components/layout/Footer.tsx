@@ -15,7 +15,7 @@ export function Footer() {
             <Link
               key={item.href}
               href={item.href}
-              className="text-xs tracking-[0.2em] uppercase text-[#6B6B6B] hover:text-black transition-colors"
+              className="text-base tracking-[0.2em] uppercase text-[#6B6B6B] hover:text-black transition-colors"
             >
               {item.label}
             </Link>

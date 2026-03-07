@@ -32,10 +32,10 @@ export const NEWSSTAND_PRODUCTS_QUERY = `
   }
 `
 
-/** Fallback when "newsstand" collection doesn't exist yet */
+/** All products (Shopify allows up to 250) */
 export const ALL_PRODUCTS_QUERY = `
   query AllProducts {
-    products(first: 20) {
+    products(first: 100) {
       edges {
         node {
           ${PRODUCT_FIELDS}

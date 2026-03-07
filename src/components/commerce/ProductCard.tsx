@@ -7,43 +7,52 @@ import { formatPrice } from '@/lib/shopify/types'
 
 interface ProductCardProps {
   product: ShopifyProduct
+  compact?: boolean
 }
 
-export function ProductCard({ product }: ProductCardProps) {
+export function ProductCard({ product, compact = false }: ProductCardProps) {
   const { title, handle, priceRange, featuredImage, variants } = product
   const price = priceRange.minVariantPrice
   const firstVariant = variants.edges[0]?.node
 
   return (
-    <article className="group">
+    <article className={`group ${compact ? 'max-w-[200px]' : ''}`}>
       <Link href={`/newsstand/${handle}`} className="block overflow-hidden">
-        <div className="aspect-[3/4] bg-[#E5E5E5] overflow-hidden">
+        <div className="aspect-3/4 bg-[#E5E5E5] overflow-hidden">
           {featuredImage?.url ? (
             <Image
               src={featuredImage.url}
               alt={featuredImage.altText ?? title}
-              width={400}
-              height={533}
-              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+              width={compact ? 200 : 400}
+              height={compact ? 267 : 533}
+              sizes={
+                compact
+                  ? '(max-width: 640px) 50vw, 200px'
+                  : '(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw'
+              }
               className="w-full h-full object-cover transition-transform duration-300 ease-out group-hover:scale-[1.02]"
             />
           ) : (
-            <div className="w-full h-full flex items-center justify-center text-[#6B6B6B] text-sm">
+            <div className="w-full h-full flex items-center justify-center text-[#6B6B6B] text-base">
               No image
             </div>
           )}
         </div>
       </Link>
-      <div className="mt-4">
+      <div className={compact ? 'mt-2' : 'mt-4'}>
         <Link href={`/newsstand/${handle}`}>
-          <h3 className="font-serif text-lg text-[#1A1A1A] group-hover:underline">
+          <h3
+            className={`font-serif text-[#1A1A1A] group-hover:underline line-clamp-2 ${
+              compact ? 'text-base' : 'text-2xl'
+            }`}
+          >
             {title}
           </h3>
         </Link>
-        <p className="mt-1 text-sm text-[#1A1A1A]">
+        <p className={`mt-1 text-[#1A1A1A] ${compact ? 'text-sm' : 'text-base'}`}>
           {formatPrice(price.amount, price.currencyCode)}
         </p>
-        {firstVariant?.availableForSale && (
+        {!compact && firstVariant?.availableForSale && (
           <div className="mt-3 opacity-0 group-hover:opacity-100 transition-opacity">
             <AddToCartButton
               variant={firstVariant}

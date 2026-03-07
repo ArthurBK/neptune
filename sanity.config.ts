@@ -7,6 +7,7 @@
 import {visionTool} from '@sanity/vision'
 import {defineConfig} from 'sanity'
 import {structureTool} from 'sanity/structure'
+import {media} from 'sanity-plugin-media'
 
 // Go to https://www.sanity.io/docs/api-versioning to learn how API versioning works
 import {apiVersion, dataset, projectId} from './src/sanity/env'
@@ -21,6 +22,9 @@ export default defineConfig({
   schema,
   plugins: [
     structureTool({structure}),
+    // Media: browse assets, bulk upload, select multiple at once
+    // Use "Select" → "From Media" when adding gallery images
+    media(),
     // Vision is for querying with GROQ from inside the Studio
     // https://www.sanity.io/docs/the-vision-plugin
     visionTool({defaultApiVersion: apiVersion}),

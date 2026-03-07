@@ -58,10 +58,10 @@ export default async function InteriorsPage() {
 
         {/* Category header */}
         <header className="mb-12 md:mb-16 text-center">
-          <h1 className="font-serif text-4xl md:text-5xl text-[#1A1A1A] uppercase tracking-wide">
+          <h1 className="font-serif text-6xl md:text-7xl text-[#1A1A1A] uppercase tracking-wide">
             Interiors
           </h1>
-          <p className="mt-4 text-[#6B6B6B] max-w-2xl mx-auto">
+          <p className="mt-4 text-base text-[#6B6B6B] max-w-2xl mx-auto">
             {CATEGORY_DESCRIPTION.interiors}
           </p>
         </header>
@@ -73,7 +73,7 @@ export default async function InteriorsPage() {
         <div className="mt-16 md:mt-24 pt-16 border-t border-[#E5E5E5] text-center">
           <Link
             href="/newsstand"
-            className="text-xs tracking-[0.2em] uppercase text-[#6B6B6B] hover:text-black transition-colors"
+            className="text-sm tracking-[0.2em] uppercase text-[#6B6B6B] hover:text-black transition-colors"
           >
             Discover all available issues →
           </Link>

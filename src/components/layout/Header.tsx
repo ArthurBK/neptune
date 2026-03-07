@@ -10,6 +10,7 @@ const NAV_ITEMS = [
   { label: 'GARDENS', href: '/gardens' },
   { label: 'FASHION', href: '/fashion' },
   { label: 'ARTS', href: '/arts' },
+  { label: 'STUDIO', href: '/the-studio' },
   { label: 'NEWSSTAND', href: '/newsstand' },
   { label: 'THE MARKET', href: '/the-market' },
 ] as const
@@ -33,7 +34,7 @@ function NavLink({
     <Link
       href={href}
       onClick={onClick}
-      className={`text-xs tracking-[0.2em] uppercase transition-colors hover:text-black ${
+      className={`text-base tracking-[0.2em] uppercase transition-colors hover:text-black ${
         isActive ? 'text-black font-medium' : 'text-[#6B6B6B]'
       }`}
     >
@@ -51,7 +52,7 @@ export function Header() {
         {/* Logo — centered on mobile, left on desktop */}
         <Link
           href="/"
-          className="font-serif text-xl tracking-[0.15em] uppercase text-black absolute left-1/2 -translate-x-1/2 md:static md:translate-x-0 md:mr-12 md:flex-shrink-0"
+          className="font-serif text-3xl tracking-[0.15em] uppercase text-black absolute left-1/2 -translate-x-1/2 md:static md:translate-x-0 md:mr-12 md:flex-shrink-0"
         >
           NEPTUNE
         </Link>

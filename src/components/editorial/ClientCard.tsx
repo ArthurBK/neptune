@@ -3,7 +3,7 @@ import Link from 'next/link'
 
 import { urlFor } from '@/sanity/lib/image'
 
-interface ArticleCardProps {
+interface ClientCardProps {
   title: string
   slug: string
   category: string
@@ -13,25 +13,22 @@ interface ArticleCardProps {
     alt?: string
   }
   excerpt?: string | null
-  author?: { name: string; slug: string } | null
 }
 
-export function ArticleCard({
+export function ClientCard({
   title,
   slug,
-  category,
   subcategory,
   coverImage,
-  author,
-}: ArticleCardProps) {
+}: ClientCardProps) {
   const imageUrl = coverImage?.asset
     ? urlFor(coverImage).width(600).height(800).url()
     : null
 
   return (
     <article className="group">
-      <Link href={`/${category}/${slug}`} className="block overflow-hidden">
-        <div className="aspect-[3/4] bg-[#E5E5E5] overflow-hidden">
+      <Link href={`/clients/${slug}`} className="block overflow-hidden">
+        <div className="aspect-3/4 bg-[#E5E5E5] overflow-hidden">
           {imageUrl ? (
             <Image
               src={imageUrl}
@@ -54,19 +51,11 @@ export function ArticleCard({
             {subcategory}
           </p>
         )}
-        <Link href={`/${category}/${slug}`}>
+        <Link href={`/clients/${slug}`}>
           <h3 className="font-serif text-2xl text-[#1A1A1A] group-hover:underline line-clamp-2">
             {title}
           </h3>
         </Link>
-        {author && (
-          <Link
-            href={`/contributors/${author.slug}`}
-            className="mt-1 block text-base text-[#6B6B6B] hover:text-black transition-colors"
-          >
-            By {author.name}
-          </Link>
-        )}
       </div>
     </article>
   )

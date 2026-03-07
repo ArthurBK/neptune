@@ -1,70 +1,18 @@
-import { DocumentTextIcon, ImageIcon } from '@sanity/icons'
+import { DocumentTextIcon } from '@sanity/icons'
 import { defineArrayMember, defineField, defineType } from 'sanity'
 
 import { GalleryUploadInput } from '../components/GalleryUploadInput'
 
-// Portable Text block: image with caption and alt
-const pteImageBlock = defineType({
-  name: 'pteImageBlock',
-  title: 'Image',
-  type: 'object',
-  icon: ImageIcon,
-  fields: [
-    defineField({
-      name: 'image',
-      title: 'Image',
-      type: 'image',
-      options: { hotspot: true },
-      validation: (rule) => rule.required(),
-    }),
-    defineField({
-      name: 'caption',
-      title: 'Caption',
-      type: 'string',
-    }),
-    defineField({
-      name: 'alt',
-      title: 'Alt text',
-      type: 'string',
-      validation: (rule) => rule.required(),
-    }),
-  ],
-  preview: {
-    select: { title: 'caption', media: 'image' },
-  },
-})
-
-// Portable Text block: ad banner embed
-const adBannerEmbedBlock = defineType({
-  name: 'adBannerEmbedBlock',
-  title: 'Ad Banner',
-  type: 'object',
-  icon: ImageIcon,
-  fields: [
-    defineField({
-      name: 'adBanner',
-      title: 'Ad Banner',
-      type: 'reference',
-      to: [{ type: 'adBanner' }],
-      validation: (rule) => rule.required(),
-    }),
-  ],
-  preview: {
-    select: { title: 'adBanner.title' },
-    prepare: ({ title }) => ({ title: title || 'Ad Banner' }),
-  },
-})
-
-const ARTICLE_CATEGORIES = [
+const CLIENT_CATEGORIES = [
   { title: 'Interiors', value: 'interiors' },
   { title: 'Gardens', value: 'gardens' },
   { title: 'Fashion', value: 'fashion' },
   { title: 'Arts', value: 'arts' },
 ]
 
-export const article = defineType({
-  name: 'article',
-  title: 'Article',
+export const client = defineType({
+  name: 'client',
+  title: 'Client',
   type: 'document',
   icon: DocumentTextIcon,
   fields: [
@@ -85,7 +33,7 @@ export const article = defineType({
       name: 'category',
       title: 'Category',
       type: 'string',
-      options: { list: ARTICLE_CATEGORIES },
+      options: { list: CLIENT_CATEGORIES },
       validation: (rule) => rule.required(),
     }),
     defineField({
@@ -93,6 +41,16 @@ export const article = defineType({
       title: 'Subcategory',
       type: 'string',
       description: 'e.g. "Interior Design Legend"',
+    }),
+    defineField({
+      name: 'services',
+      title: 'Services',
+      type: 'array',
+      of: [{ type: 'string' }],
+      description: 'e.g. Art Direction, Communication, Copywriting, Photography',
+      options: {
+        layout: 'tags',
+      },
     }),
     defineField({
       name: 'coverImage',
@@ -113,7 +71,7 @@ export const article = defineType({
       name: 'gallery',
       title: 'Gallery',
       type: 'array',
-      description: 'Additional images for the article. Drop multiple images or click to select.',
+      description: 'Additional images. Drop multiple images or click to select.',
       options: { layout: 'grid' },
       components: { input: GalleryUploadInput },
       of: [
@@ -137,19 +95,6 @@ export const article = defineType({
       ],
     }),
     defineField({
-      name: 'author',
-      title: 'Author',
-      type: 'reference',
-      to: [{ type: 'contributor' }],
-      validation: (rule) => rule.required(),
-    }),
-    defineField({
-      name: 'photographer',
-      title: 'Photographer',
-      type: 'reference',
-      to: [{ type: 'contributor' }],
-    }),
-    defineField({
       name: 'publishedAt',
       title: 'Published At',
       type: 'datetime',
@@ -159,7 +104,7 @@ export const article = defineType({
       name: 'excerpt',
       title: 'Excerpt',
       type: 'text',
-      description: 'Used for article cards',
+      description: 'Used for client cards',
     }),
     defineField({
       name: 'body',
@@ -205,16 +150,10 @@ export const article = defineType({
       validation: (rule) => rule.required(),
     }),
     defineField({
-      name: 'affiliateProducts',
-      title: 'Affiliate Products',
+      name: 'relatedClients',
+      title: 'Related Clients',
       type: 'array',
-      of: [defineArrayMember({ type: 'reference', to: [{ type: 'affiliateProduct' }] })],
-    }),
-    defineField({
-      name: 'relatedArticles',
-      title: 'Related Articles',
-      type: 'array',
-      of: [defineArrayMember({ type: 'reference', to: [{ type: 'article' }] })],
+      of: [defineArrayMember({ type: 'reference', to: [{ type: 'client' }] })],
       validation: (rule) => rule.max(3),
     }),
     defineField({
@@ -228,6 +167,3 @@ export const article = defineType({
     select: { title: 'title', subtitle: 'category', media: 'coverImage' },
   },
 })
-
-export { pteImageBlock, adBannerEmbedBlock }
-

@@ -22,7 +22,7 @@ export function ProductForm({ variants, productTitle }: ProductFormProps) {
     <div className="space-y-6">
       {variants.length > 1 && (
         <div>
-          <p className="text-xs tracking-[0.2em] uppercase text-[#6B6B6B] mb-3">
+          <p className="text-sm tracking-[0.2em] uppercase text-[#6B6B6B] mb-3">
             Cover
           </p>
           <div className="flex flex-wrap gap-2">
@@ -32,7 +32,7 @@ export function ProductForm({ variants, productTitle }: ProductFormProps) {
                 type="button"
                 onClick={() => setSelectedVariantId(variant.id)}
                 disabled={!variant.availableForSale}
-                className={`px-4 py-2 text-xs uppercase tracking-[0.15em] border transition-colors ${
+                className={`px-4 py-2 text-sm uppercase tracking-[0.15em] border transition-colors ${
                   selectedVariantId === variant.id
                     ? 'border-black bg-black text-white'
                     : 'border-[#E5E5E5] text-[#1A1A1A] hover:border-black disabled:opacity-50 disabled:cursor-not-allowed'
@@ -45,7 +45,7 @@ export function ProductForm({ variants, productTitle }: ProductFormProps) {
         </div>
       )}
 
-      <p className="text-lg text-[#1A1A1A]">
+      <p className="text-2xl text-[#1A1A1A]">
         {formatPrice(selectedVariant.price.amount, selectedVariant.price.currencyCode)}
       </p>
 

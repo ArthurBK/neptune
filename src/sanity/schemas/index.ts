@@ -1,4 +1,4 @@
-import { type SchemaTypeDefinition } from 'sanity'
+import type { SchemaTypeDefinition } from 'sanity'
 
 import {
   adBannerEmbedBlock,
@@ -6,6 +6,7 @@ import {
   pteImageBlock,
 } from './article'
 import { adBanner } from './adBanner'
+import { client } from './client'
 import { affiliateProduct } from './affiliateProduct'
 import { contributor } from './contributor'
 import { siteSettings } from './siteSettings'
@@ -13,6 +14,7 @@ import { siteSettings } from './siteSettings'
 export const schema: { types: SchemaTypeDefinition[] } = {
   types: [
     article,
+    client,
     contributor,
     affiliateProduct,
     adBanner,

@@ -71,15 +71,15 @@ export function AddToCartButton({
         type="button"
         onClick={handleAddToCart}
         disabled={!variant.availableForSale || isLoading}
-        className={`bg-black text-white px-4 py-2 text-xs uppercase tracking-[0.2em] transition-opacity hover:opacity-80 disabled:opacity-50 disabled:cursor-not-allowed ${className}`}
+        className={`bg-black text-white px-4 py-2 text-sm uppercase tracking-[0.2em] transition-opacity hover:opacity-80 disabled:opacity-50 disabled:cursor-not-allowed ${className}`}
       >
         {isLoading ? 'Adding…' : label}
       </button>
       {error && (
-        <p className="text-xs text-red-600">{error}</p>
+        <p className="text-sm text-red-600">{error}</p>
       )}
       {!variant.availableForSale && (
-        <p className="text-xs text-[#6B6B6B]">This item is currently unavailable</p>
+        <p className="text-sm text-[#6B6B6B]">This item is currently unavailable</p>
       )}
     </div>
   )

@@ -1,3 +1,15 @@
+// Featured articles for home page carousel (latest across all categories)
+export const FEATURED_ARTICLES_HOME_QUERY = `
+  *[_type == "article"] | order(publishedAt desc)[0...8] {
+    _id,
+    title,
+    "slug": slug.current,
+    category,
+    coverImage,
+    "author": author->{ name }
+  }
+`
+
 // Articles by category (for category landing pages)
 export const ARTICLES_BY_CATEGORY_QUERY = `
   *[_type == "article" && category == $category] | order(publishedAt desc) {
@@ -39,6 +51,43 @@ export const ARTICLE_BY_SLUG_QUERY = `
 // Article slugs for generateStaticParams
 export const ARTICLE_SLUGS_BY_CATEGORY_QUERY = `
   *[_type == "article" && category == $category] { "slug": slug.current }
+`
+
+// All clients (for Studio page)
+export const CLIENTS_QUERY = `
+  *[_type == "client"] | order(publishedAt desc) {
+    _id,
+    title,
+    "slug": slug.current,
+    category,
+    services,
+    coverImage
+  }
+`
+
+// Single client by slug
+export const CLIENT_BY_SLUG_QUERY = `
+  *[_type == "client" && slug.current == $slug][0] {
+    ...,
+    "relatedClients": relatedClients[]->{ _id, title, "slug": slug.current, category, subcategory, coverImage, excerpt },
+    "body": body[] {
+      ...,
+      _type == "adBannerEmbedBlock" => {
+        "adBanner": adBanner->{ image, linkUrl, title }
+      },
+      markDefs[] {
+        ...,
+        _type == "affiliateProductEmbed" => {
+          "product": product->{ title, affiliateUrl }
+        }
+      }
+    }
+  }
+`
+
+// Client slugs for generateStaticParams
+export const CLIENT_SLUGS_QUERY = `
+  *[_type == "client"] { "slug": slug.current }
 `
 
 // Active ad banner by placement
