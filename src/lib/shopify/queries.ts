@@ -1,0 +1,120 @@
+const PRODUCT_FIELDS = `
+  id
+  title
+  handle
+  priceRange {
+    minVariantPrice { amount currencyCode }
+  }
+  featuredImage { url altText }
+  variants(first: 10) {
+    edges {
+      node {
+        id
+        title
+        price { amount currencyCode }
+        availableForSale
+      }
+    }
+  }
+`
+
+export const NEWSSTAND_PRODUCTS_QUERY = `
+  query NewsstandProducts {
+    collection(handle: "newsstand") {
+      products(first: 20) {
+        edges {
+          node {
+            ${PRODUCT_FIELDS}
+          }
+        }
+      }
+    }
+  }
+`
+
+/** Fallback when "newsstand" collection doesn't exist yet */
+export const ALL_PRODUCTS_QUERY = `
+  query AllProducts {
+    products(first: 20) {
+      edges {
+        node {
+          ${PRODUCT_FIELDS}
+        }
+      }
+    }
+  }
+`
+
+export const PRODUCT_BY_HANDLE_QUERY = `
+  query ProductByHandle($handle: String!) {
+    product(handle: $handle) {
+      id
+      title
+      handle
+      description
+      descriptionHtml
+      images(first: 10) {
+        edges {
+          node { url altText width height }
+        }
+      }
+      variants(first: 10) {
+        edges {
+          node {
+            id
+            title
+            price { amount currencyCode }
+            availableForSale
+          }
+        }
+      }
+    }
+  }
+`
+
+export const CART_CREATE_MUTATION = `
+  mutation CartCreate($input: CartInput!) {
+    cartCreate(input: $input) {
+      cart {
+        id
+        checkoutUrl
+        lines(first: 10) {
+          edges {
+            node {
+              id
+              quantity
+              merchandise {
+                ... on ProductVariant {
+                  id
+                  title
+                  price { amount currencyCode }
+                  product { title featuredImage { url } }
+                }
+              }
+            }
+          }
+        }
+      }
+      userErrors {
+        field
+        message
+      }
+    }
+  }
+`
+
+export const CART_LINES_ADD_MUTATION = `
+  mutation CartLinesAdd($cartId: ID!, $lines: [CartLineInput!]!) {
+    cartLinesAdd(cartId: $cartId, lines: $lines) {
+      cart {
+        id
+        checkoutUrl
+        totalQuantity
+      }
+      userErrors {
+        field
+        message
+      }
+    }
+  }
+`
