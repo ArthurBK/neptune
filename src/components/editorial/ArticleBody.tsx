@@ -6,15 +6,11 @@ import { urlFor } from '@/sanity/lib/image'
 const TextWrapper = ({
   children,
   className = '',
-  wide = false,
 }: {
   children: React.ReactNode
   className?: string
-  wide?: boolean
 }) => (
-  <div
-    className={`mx-auto px-4 md:px-8 ${wide ? 'max-w-[900px]' : 'max-w-[720px]'} ${className}`}
-  >
+  <div className={`w-full px-4 md:px-8 ${className}`}>
     {children}
   </div>
 )
@@ -26,7 +22,7 @@ function createComponents(isFirstParagraph: { current: boolean }): PortableTextC
       const isFirst = isFirstParagraph.current
       if (isFirst) isFirstParagraph.current = false
       return (
-        <TextWrapper wide={isFirst} className={isFirst ? 'mt-10 mb-8' : 'mb-4'}>
+        <TextWrapper className={isFirst ? 'mt-10 mb-8' : 'mb-4'}>
           <p
             className={
               isFirst
@@ -61,7 +57,7 @@ function createComponents(isFirstParagraph: { current: boolean }): PortableTextC
       </TextWrapper>
     ),
     pullQuote: ({ children }) => (
-      <div className="max-w-[720px] mx-auto px-4 md:px-8 my-8">
+      <div className="w-full px-4 md:px-8 my-8">
         <blockquote className="font-serif text-4xl md:text-5xl text-center leading-snug text-[#1A1A1A]">
           {children}
         </blockquote>
@@ -92,16 +88,16 @@ function createComponents(isFirstParagraph: { current: boolean }): PortableTextC
       if (!value?.image) return null
       const layout = (value.layout as string) ?? 'full'
       const layoutClasses: Record<string, string> = {
-        full: 'w-full my-6 md:my-8',
+        full: 'w-full px-4 md:px-8 my-6 md:my-8',
         wide: 'w-full -mx-4 md:-mx-8 my-6 md:my-8',
         left: 'float-left mr-6 mb-4 w-full md:w-[45%]',
-        right: 'float-right ml-6 mb-4 w-full md:w-[45%]',
+        right: 'float-right clear-left ml-6 mb-4 w-full md:w-[45%]',
       }
       const figureClass = layoutClasses[layout] ?? layoutClasses.full
       const imageUrl = urlFor(value.image).width(1400).height(1050).quality(90).url()
       return (
         <figure className={figureClass}>
-          <div className="w-full px-0 md:px-4">
+          <div className="w-full">
             <div className="relative aspect-[4/3] md:aspect-[16/10] bg-[#E5E5E5] overflow-hidden">
               <Image
                 src={imageUrl}
@@ -113,11 +109,44 @@ function createComponents(isFirstParagraph: { current: boolean }): PortableTextC
             </div>
           </div>
           {value.caption && (
-            <figcaption className="mt-2 text-sm text-[#6B6B6B] max-w-[720px] mx-auto px-4 md:px-8">
+            <figcaption className="mt-2 text-sm text-[#6B6B6B] px-4 md:px-8">
               {value.caption}
             </figcaption>
           )}
         </figure>
+      )
+    },
+    pteImageGridBlock: ({ value }) => {
+      const images = (value?.images as Array<{ asset?: { _ref?: string }; alt?: string; caption?: string }>) ?? []
+      if (images.length === 0) return null
+      return (
+        <div className="px-4 md:px-8 my-6 md:my-8">
+          <div className="grid grid-cols-3 gap-3 md:gap-6">
+            {images.map((img, i) => {
+              const imageUrl = img?.asset ? urlFor(img).width(600).height(450).quality(90).url() : null
+              if (!imageUrl) return null
+              const key = (img as { _key?: string })._key ?? `grid-img-${i}`
+              return (
+                <figure key={key} className="group overflow-hidden">
+                  <div className="relative aspect-[4/3] bg-[#E5E5E5] overflow-hidden">
+                    <Image
+                      src={imageUrl}
+                      alt={img.alt ?? ''}
+                      fill
+                      sizes="(max-width: 768px) 33vw, 400px"
+                      className="object-cover transition-transform duration-300 group-hover:scale-[1.02]"
+                    />
+                  </div>
+                  {img.caption && (
+                    <figcaption className="mt-1 text-sm text-[#6B6B6B] line-clamp-2">
+                      {img.caption}
+                    </figcaption>
+                  )}
+                </figure>
+              )
+            })}
+          </div>
+        </div>
       )
     },
     adBannerEmbedBlock: ({ value }) => {
@@ -136,7 +165,7 @@ function createComponents(isFirstParagraph: { current: boolean }): PortableTextC
         </div>
       )
       return (
-        <figure className="my-8">
+        <figure className="px-4 md:px-8 my-8">
           {linkUrl ? (
             <a href={linkUrl} target="_blank" rel="noopener noreferrer" className="block">
               {content}

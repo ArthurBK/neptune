@@ -4,6 +4,7 @@ import {
   adBannerEmbedBlock,
   article,
   pteImageBlock,
+  pteImageGridBlock,
 } from './article'
 import { adBanner } from './adBanner'
 import { client } from './client'
@@ -22,6 +23,7 @@ export const schema: { types: SchemaTypeDefinition[] } = {
     adBanner,
     siteSettings,
     pteImageBlock,
+    pteImageGridBlock,
     adBannerEmbedBlock,
   ],
 }

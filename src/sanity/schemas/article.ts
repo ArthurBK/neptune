@@ -47,6 +47,49 @@ const pteImageBlock = defineType({
   },
 })
 
+// Portable Text block: image grid (n images)
+const pteImageGridBlock = defineType({
+  name: 'pteImageGridBlock',
+  title: 'Image Grid',
+  type: 'object',
+  icon: ImageIcon,
+  fields: [
+    defineField({
+      name: 'images',
+      title: 'Images',
+      type: 'array',
+      description: 'Images displayed in a grid (3 columns)',
+      of: [
+        defineArrayMember({
+          type: 'image',
+          options: { hotspot: true },
+          fields: [
+            defineField({
+              name: 'alt',
+              title: 'Alt text',
+              type: 'string',
+              validation: (rule) => rule.required(),
+            }),
+            defineField({
+              name: 'caption',
+              title: 'Caption',
+              type: 'string',
+            }),
+          ],
+        }),
+      ],
+      validation: (rule) => rule.required().min(1),
+    }),
+  ],
+  preview: {
+    select: { media: 'images.0', images: 'images' },
+    prepare: ({ media, images }) => ({
+      title: `Image Grid (${Array.isArray(images) ? images.length : 0})`,
+      media,
+    }),
+  },
+})
+
 // Portable Text block: ad banner embed
 const adBannerEmbedBlock = defineType({
   name: 'adBannerEmbedBlock',
@@ -179,6 +222,7 @@ export const article = defineType({
           },
         },
         defineArrayMember({ type: 'pteImageBlock' }),
+        defineArrayMember({ type: 'pteImageGridBlock' }),
         defineArrayMember({ type: 'adBannerEmbedBlock' }),
       ],
       validation: (rule) => rule.required(),
@@ -208,5 +252,5 @@ export const article = defineType({
   },
 })
 
-export { pteImageBlock, adBannerEmbedBlock }
+export { pteImageBlock, pteImageGridBlock, adBannerEmbedBlock }
 

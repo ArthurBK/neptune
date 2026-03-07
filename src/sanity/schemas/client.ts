@@ -109,6 +109,7 @@ export const client = defineType({
           },
         },
         defineArrayMember({ type: 'pteImageBlock' }),
+        defineArrayMember({ type: 'pteImageGridBlock' }),
         defineArrayMember({ type: 'adBannerEmbedBlock' }),
       ],
       validation: (rule) => rule.required(),
