@@ -5,7 +5,7 @@ import {
   FIRST_PRODUCT_QUERY,
   LATEST_NEWSSTAND_PRODUCT_QUERY,
 } from '@/lib/shopify/queries'
-import { HeroCarousel } from '@/components/home/HeroCarousel'
+import { HomeScrollContainer } from '@/components/home/HomeScrollContainer'
 import { NewsletterSection } from '@/components/home/NewsletterSection'
 
 export const revalidate = 3600
@@ -66,9 +66,11 @@ export default async function Home() {
   }
 
   return (
-    <div className="min-h-screen">
-      <HeroCarousel articles={articles} featuredProduct={featuredProduct} />
-      <NewsletterSection />
+    <div className="min-h-[calc(100vh-var(--header-height))]">
+      <HomeScrollContainer
+        articles={articles}
+        featuredProduct={featuredProduct}
+      />
     </div>
   )
 }

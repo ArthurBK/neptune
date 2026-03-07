@@ -33,8 +33,11 @@ export function NewsletterSection() {
   }
 
   return (
-    <section id="newsletter" className="bg-[#E8E6E3] py-20 md:py-28">
-      <div className="max-w-[680px] mx-auto px-6 md:px-12 text-center">
+    <section
+      id="newsletter"
+      className="sticky top-0 z-[100] h-[calc(100vh-var(--header-height))] min-h-[480px] snap-start overflow-y-auto bg-[#E8E6E3]"
+    >
+      <div className="max-w-[680px] mx-auto px-6 md:px-12 py-20 md:py-28 text-center">
         <h2 className="font-serif text-3xl md:text-4xl text-[#1A1A1A] mb-8">
           Neptune
         </h2>
