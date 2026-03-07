@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
-import { Inter, Playfair_Display } from 'next/font/google'
+import { Inter } from 'next/font/google'
+import localFont from 'next/font/local'
 
 import { Footer } from '@/components/layout/Footer'
 import { Header } from '@/components/layout/Header'
@@ -7,13 +8,36 @@ import { Header } from '@/components/layout/Header'
 import './globals.css'
 
 const inter = Inter({
-  variable: '--font-sans-ui',
   subsets: ['latin'],
+  variable: '--font-inter',
+  display: 'swap',
 })
 
-const playfair = Playfair_Display({
-  variable: '--font-serif-editorial',
-  subsets: ['latin'],
+const cormorantGaramond = localFont({
+  src: [
+    {
+      path: '../../public/fonts/Cormorant_Garamond/static/CormorantGaramond-Light.ttf',
+      weight: '300',
+      style: 'normal',
+    },
+    {
+      path: '../../public/fonts/Cormorant_Garamond/static/CormorantGaramond-Regular.ttf',
+      weight: '400',
+      style: 'normal',
+    },
+    {
+      path: '../../public/fonts/Cormorant_Garamond/static/CormorantGaramond-Bold.ttf',
+      weight: '700',
+      style: 'normal',
+    },
+    {
+      path: '../../public/fonts/Cormorant_Garamond/CormorantGaramond-Italic-VariableFont_wght.ttf',
+      weight: '300 700',
+      style: 'italic',
+    },
+  ],
+  variable: '--font-cormorant',
+  display: 'swap',
 })
 
 export const metadata: Metadata = {
@@ -27,8 +51,8 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" className={`${inter.variable} ${playfair.variable}`} suppressHydrationWarning>
-      <body className="min-h-screen flex flex-col bg-white text-[#1A1A1A] antialiased font-sans" suppressHydrationWarning>
+    <html lang="en" className={`${cormorantGaramond.variable} ${inter.variable}`} suppressHydrationWarning>
+      <body className="min-h-screen flex flex-col bg-white text-[#1A1A1A] antialiased font-sans font-light" suppressHydrationWarning>
         <Header />
         <main className="flex-1">{children}</main>
         <Footer />
