@@ -34,7 +34,7 @@ export function SearchModal({ isOpen, onClose }: SearchModalProps) {
   const [products, setProducts] = useState<SearchProduct[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
-  const debounceRef = useRef<ReturnType<typeof setTimeout>>()
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
 
   const fetchResults = useCallback(async (q: string) => {
     if (q.length < 2) {

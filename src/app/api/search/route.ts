@@ -36,7 +36,7 @@ export async function GET(request: Request) {
       category: string
       coverImage?: { asset?: { _ref: string }; alt?: string }
       author?: { name: string } | null
-    }>>(ARTICLES_SEARCH_QUERY, { query: sanityPattern }),
+    }>>(ARTICLES_SEARCH_QUERY, { query: sanityPattern } as Record<string, string>),
     shopifyFetch<{ search?: { nodes: Array<{ title: string; handle: string; featuredImage?: { url: string; altText: string | null } }> } }>({
       query: SHOPIFY_SEARCH_QUERY,
       variables: { query: q },
