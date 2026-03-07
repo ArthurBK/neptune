@@ -28,6 +28,21 @@ const pteImageBlock = defineType({
       type: 'string',
       validation: (rule) => rule.required(),
     }),
+    defineField({
+      name: 'layout',
+      title: 'Layout',
+      type: 'string',
+      options: {
+        list: [
+          { title: 'Full width', value: 'full' },
+          { title: 'Wide (bleed)', value: 'wide' },
+          { title: 'Float left', value: 'left' },
+          { title: 'Float right', value: 'right' },
+        ],
+        layout: 'radio',
+      },
+      initialValue: 'full',
+    }),
   ],
   preview: {
     select: { title: 'caption', media: 'image' },

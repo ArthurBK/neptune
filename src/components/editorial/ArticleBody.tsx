@@ -136,9 +136,17 @@ function createComponents(isFirstParagraph: { current: boolean }): PortableTextC
   types: {
     pteImageBlock: ({ value }) => {
       if (!value?.image) return null
+      const layout = (value.layout as string) ?? 'full'
+      const layoutClasses: Record<string, string> = {
+        full: 'w-full my-6 md:my-8',
+        wide: 'w-full -mx-4 md:-mx-8 my-6 md:my-8',
+        left: 'float-left mr-6 mb-4 w-full md:w-[45%]',
+        right: 'float-right ml-6 mb-4 w-full md:w-[45%]',
+      }
+      const figureClass = layoutClasses[layout] ?? layoutClasses.full
       const imageUrl = urlFor(value.image).width(1400).height(1050).quality(90).url()
       return (
-        <figure className="my-6 md:my-8">
+        <figure className={figureClass}>
           <div className="w-full px-0 md:px-4">
             <div className="relative aspect-[4/3] md:aspect-[16/10] bg-[#E5E5E5] overflow-hidden">
               <Image
@@ -257,7 +265,7 @@ export function ArticleBody({ value, gallery }: ArticleBodyProps) {
   const content = gallery?.length ? mergeBodyWithGallery(value, gallery) : value
   return (
     <div className="w-full">
-      <article className="overflow-hidden">
+      <article className="overflow-x-visible">
         <PortableText value={content} components={createComponents(isFirstParagraph)} />
       </article>
     </div>
