@@ -90,6 +90,19 @@ export const CLIENT_SLUGS_QUERY = `
   *[_type == "client"] { "slug": slug.current }
 `
 
+// All affiliate products (for neptune market)
+export const AFFILIATE_PRODUCTS_QUERY = `
+  *[_type == "affiliateProduct"] | order(publishedAt desc) {
+    _id,
+    title,
+    brand,
+    price,
+    image,
+    affiliateUrl,
+    category
+  }
+`
+
 // Active ad banner by placement
 export const AD_BANNER_BY_PLACEMENT_QUERY = `
   *[_type == "adBanner" && active == true && placement == $placement][0] {

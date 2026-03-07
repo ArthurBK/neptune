@@ -15,30 +15,39 @@ export interface CarouselArticle {
   author?: { name: string } | null
 }
 
-interface HeroCarouselProps {
-  articles: CarouselArticle[]
+export interface FeaturedProduct {
+  handle: string
+  title: string
+  imageUrl: string | null
+  imageAlt: string | null
 }
 
-export function HeroCarousel({ articles }: HeroCarouselProps) {
+interface HeroCarouselProps {
+  articles: CarouselArticle[]
+  featuredProduct?: FeaturedProduct | null
+}
+
+export function HeroCarousel({ articles, featuredProduct }: HeroCarouselProps) {
+  const slidesCount = articles.length + (featuredProduct ? 1 : 0)
   const [current, setCurrent] = useState(0)
 
   const goTo = useCallback(
     (index: number) => {
-      setCurrent(((index % articles.length) + articles.length) % articles.length)
+      setCurrent(((index % slidesCount) + slidesCount) % slidesCount)
     },
-    [articles.length]
+    [slidesCount]
   )
 
   const next = useCallback(() => goTo(current + 1), [current, goTo])
   const prev = useCallback(() => goTo(current - 1), [current, goTo])
 
   useEffect(() => {
-    if (articles.length <= 1) return
+    if (slidesCount <= 1) return
     const id = setInterval(next, 6000)
     return () => clearInterval(id)
-  }, [articles.length, next])
+  }, [slidesCount, next])
 
-  if (articles.length === 0) return null
+  if (slidesCount === 0) return null
 
   return (
     <section className="relative h-[100vh] min-h-[480px] overflow-hidden bg-[#0a0a0a]">
@@ -126,8 +135,65 @@ export function HeroCarousel({ articles }: HeroCarouselProps) {
         )
       })}
 
+      {/* Product slide — latest issue, Order now */}
+      {featuredProduct && (
+        <div
+          className={`absolute inset-0 transition-opacity duration-700 ease-out ${
+            current === articles.length ? 'z-10 opacity-100' : 'z-0 opacity-0'
+          }`}
+          aria-hidden={current !== articles.length}
+        >
+          <Link
+            href={`/newsstand/${featuredProduct.handle}`}
+            className="block h-full w-full relative"
+          >
+            {featuredProduct.imageUrl ? (
+              <>
+                <div className="absolute inset-0 overflow-hidden">
+                  <div className="absolute inset-0 scale-[1.15]">
+                    <Image
+                      src={featuredProduct.imageUrl}
+                      alt=""
+                      fill
+                      className="object-cover blur-2xl"
+                      sizes="100vw"
+                      priority={false}
+                    />
+                  </div>
+                </div>
+                <Image
+                  src={featuredProduct.imageUrl}
+                  alt={featuredProduct.imageAlt ?? featuredProduct.title}
+                  fill
+                  className="object-contain"
+                  sizes="100vw"
+                />
+              </>
+            ) : (
+              <div className="h-full w-full bg-[#1a1a1a]" />
+            )}
+            <div
+              className="absolute inset-0 bg-linear-to-t from-black/70 via-black/40 to-black/50"
+              aria-hidden
+            />
+            <div
+              className="absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_50%,rgba(0,0,0,0.5),transparent)]"
+              aria-hidden
+            />
+            <div className="absolute inset-0 flex flex-col items-center justify-center px-6 text-center">
+              <h2 className="font-serif text-5xl md:text-6xl lg:text-8xl text-white tracking-wide max-w-4xl [text-shadow:0_2px_20px_rgba(0,0,0,0.8),0_0_40px_rgba(0,0,0,0.6)]">
+                {featuredProduct.title}
+              </h2>
+              <p className="mt-4 font-accent text-sm tracking-[0.2em] lowercase text-white [text-shadow:0_2px_8px_rgba(0,0,0,0.8)]">
+                order now
+              </p>
+            </div>
+          </Link>
+        </div>
+      )}
+
       {/* Navigation */}
-      {articles.length > 1 && (
+      {slidesCount > 1 && (
         <>
           {/* Flèches */}
           <button
@@ -181,9 +247,9 @@ export function HeroCarousel({ articles }: HeroCarouselProps) {
 
           {/* Dots */}
           <div className="absolute bottom-8 left-1/2 z-20 flex -translate-x-1/2 gap-2">
-            {articles.map((article, i) => (
+            {[...articles.map((a) => a._id), ...(featuredProduct ? ['product'] : [])].map((id, i) => (
               <button
-                key={article._id}
+                key={id}
                 type="button"
                 onClick={(e) => {
                   e.preventDefault()

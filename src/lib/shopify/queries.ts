@@ -32,6 +32,48 @@ export const NEWSSTAND_PRODUCTS_QUERY = `
   }
 `
 
+/** Newest product from newsstand collection (for homepage hero) */
+export const LATEST_NEWSSTAND_PRODUCT_QUERY = `
+  query LatestNewsstandProduct {
+    collection(handle: "newsstand") {
+      products(first: 1, sortKey: CREATED, reverse: true) {
+        edges {
+          node {
+            handle
+            title
+            featuredImage { url altText }
+            images(first: 5) {
+              edges {
+                node { url altText }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+`
+
+/** Newest product from all products (fallback when newsstand collection is empty) */
+export const FIRST_PRODUCT_QUERY = `
+  query FirstProduct {
+    products(first: 1, sortKey: CREATED_AT, reverse: true) {
+      edges {
+        node {
+          handle
+          title
+          featuredImage { url altText }
+          images(first: 5) {
+            edges {
+              node { url altText }
+            }
+          }
+        }
+      }
+    }
+  }
+`
+
 /** All products (Shopify allows up to 250) */
 export const ALL_PRODUCTS_QUERY = `
   query AllProducts {

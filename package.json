@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "check-shopify": "tsx scripts/check-shopify-product.ts",
     "dev": "next dev",
     "build": "npx sanity manifest extract --path public/static && next build",
     "start": "next start",

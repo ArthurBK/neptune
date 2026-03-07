@@ -5,14 +5,11 @@ import { usePathname } from 'next/navigation'
 import { useState } from 'react'
 
 const NAV_ITEMS = [
-  { label: 'NEWSLETTERS', href: '/newsletters' },
+  { label: 'NEWSLETTERS', href: '/#newsletter' },
   { label: 'INTERIORS', href: '/interiors' },
-  { label: 'GARDENS', href: '/gardens' },
-  { label: 'FASHION', href: '/fashion' },
-  { label: 'ARTS', href: '/arts' },
   { label: 'STUDIO', href: '/the-studio' },
   { label: 'NEWSSTAND', href: '/newsstand' },
-  { label: 'THE MARKET', href: '/the-market' },
+  { label: 'neptune market', href: '/the-market' },
 ] as const
 
 function NavLink({
@@ -25,10 +22,13 @@ function NavLink({
   onClick?: () => void
 }) {
   const pathname = usePathname()
+  const baseHref = href.replace(/#.*/, '')
   const isActive =
     href === '/'
       ? pathname === '/'
-      : pathname === href || pathname.startsWith(`${href}/`)
+      : href === '/#newsletter'
+        ? pathname === '/'
+        : pathname === baseHref || pathname.startsWith(`${baseHref}/`)
 
   return (
     <Link
