@@ -13,8 +13,9 @@ import { SearchModal } from './SearchModal'
 const NAV_ITEMS = [
   { label: 'NEWSSTAND', href: '/newsstand' },
   { label: 'INTERIORS', href: '/interiors' },
-  { label: 'ARTS', href: '/arts' },
   { label: 'GARDENS', href: '/gardens' },
+  { label: 'ARTS', href: '/arts' },
+  { label: 'FASHION', href: '/fashion' },
   { label: 'neptune market', href: '/the-market' },
 ] as const
 

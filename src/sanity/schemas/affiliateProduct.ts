@@ -6,6 +6,7 @@ const CATEGORIES = [
   { title: 'Furniture', value: 'furniture' },
   { title: 'Books', value: 'books' },
   { title: 'Clothing', value: 'clothing' },
+  { title: 'Fashion', value: 'fashion' },
   { title: 'Scents', value: 'scents' },
 ]
 

@@ -139,6 +139,19 @@ export const AFFILIATE_PRODUCTS_QUERY = `
   }
 `
 
+// Affiliate products by category (e.g. fashion)
+export const AFFILIATE_PRODUCTS_BY_CATEGORY_QUERY = `
+  *[_type == "affiliateProduct" && category == $category] | order(publishedAt desc) {
+    _id,
+    title,
+    brand,
+    price,
+    image,
+    affiliateUrl,
+    category
+  }
+`
+
 // Search articles by title
 export const ARTICLES_SEARCH_QUERY = `
   *[_type == "article" && title match $query] | order(publishedAt desc)[0...10] {
@@ -183,12 +196,13 @@ export const ARTICLES_BY_CONTRIBUTOR_QUERY = `
   }
 `
 
-// Category page images (Interiors, Arts, Gardens)
+// Category page images (Interiors, Arts, Gardens, Fashion)
 export const CATEGORY_PAGE_QUERY = `
   *[_type == "categoryPage" && _id == "categoryPage"][0] {
     interiorsImage,
     artsImage,
-    gardensImage
+    gardensImage,
+    fashionImage
   }
 `
 

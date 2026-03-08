@@ -37,6 +37,16 @@ export const categoryPage = defineType({
         { name: 'alt', title: 'Alt text', type: 'string' },
       ],
     }),
+    defineField({
+      name: 'fashionImage',
+      title: 'Fashion — bottom image',
+      type: 'image',
+      options: { hotspot: true },
+      description: 'Full-screen image shown at the bottom of the Fashion page',
+      fields: [
+        { name: 'alt', title: 'Alt text', type: 'string' },
+      ],
+    }),
   ],
   preview: {
     prepare: () => ({ title: 'Category Pages' }),
