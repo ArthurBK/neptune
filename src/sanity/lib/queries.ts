@@ -192,6 +192,16 @@ export const CATEGORY_PAGE_QUERY = `
   }
 `
 
+// Site settings (for newsletter page, footer, etc.)
+export const SITE_SETTINGS_QUERY = `
+  *[_type == "siteSettings" && _id == "siteSettings"][0] {
+    newsletterHeadline,
+    newsletterSubtitle,
+    newsletterImage,
+    instagramUrl
+  }
+`
+
 // Active ad banner by placement
 export const AD_BANNER_BY_PLACEMENT_QUERY = `
   *[_type == "adBanner" && active == true && placement == $placement][0] {

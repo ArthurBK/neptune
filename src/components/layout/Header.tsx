@@ -11,7 +11,6 @@ import { CartPreview } from '@/components/commerce/CartPreview'
 import { SearchModal } from './SearchModal'
 
 const NAV_ITEMS = [
-  { label: 'NEWSLETTERS', href: '/newsletters' },
   { label: 'NEWSSTAND', href: '/newsstand' },
   { label: 'INTERIORS', href: '/interiors' },
   { label: 'ARTS', href: '/arts' },

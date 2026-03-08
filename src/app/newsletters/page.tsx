@@ -1,9 +1,28 @@
+import { client } from '@/sanity/lib/client'
+import { urlFor } from '@/sanity/lib/image'
+import { SITE_SETTINGS_QUERY } from '@/sanity/lib/queries'
+
+import { NewsletterPageContent } from '@/components/newsletter/NewsletterPageContent'
+
 export const revalidate = 3600
 
 export default async function NewslettersPage() {
+  const settings = await client.fetch<{
+    newsletterHeadline?: string | null
+    newsletterSubtitle?: string | null
+    newsletterImage?: { asset?: { _ref: string } } | null
+  } | null>(SITE_SETTINGS_QUERY)
+
+  const imageUrl =
+    settings?.newsletterImage?.asset
+      ? urlFor(settings.newsletterImage).width(1920).quality(85).url()
+      : null
+
   return (
-    <main>
-      {/* Newsletter signup */}
-    </main>
+    <NewsletterPageContent
+      headline={settings?.newsletterHeadline}
+      subtitle={settings?.newsletterSubtitle}
+      imageUrl={imageUrl}
+    />
   )
 }

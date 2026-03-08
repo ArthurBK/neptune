@@ -1,26 +1,79 @@
+import Image from 'next/image'
 import Link from 'next/link'
+
+import { client } from '@/sanity/lib/client'
+import { SITE_SETTINGS_QUERY } from '@/sanity/lib/queries'
 
 const FOOTER_LINKS = [
   { label: 'ABOUT', href: '/about' },
   { label: 'CONTACT', href: '/contact' },
   { label: 'ADVERTISING', href: '/contact#advertising' },
+  { label: 'NEWSLETTERS', href: '/newsletters' },
 ] as const
 
-export function Footer() {
+export async function Footer() {
+  const settings = await client.fetch<{ instagramUrl?: string | null } | null>(
+    SITE_SETTINGS_QUERY
+  )
+
   return (
     <footer className="border-t border-[#E5E5E5] bg-white">
       <div className="max-w-screen-xl mx-auto px-6 md:px-12 lg:px-16 py-12 md:py-16">
-        <nav className="flex flex-wrap items-center justify-center md:justify-start gap-6 md:gap-8">
-          {FOOTER_LINKS.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className="text-base tracking-[0.2em] uppercase text-[#6B6B6B] hover:text-black transition-colors"
+        <div className="flex flex-col items-center text-center gap-6">
+          <Link href="/" className="shrink-0">
+            <Image
+              src="/neptune_logo.png"
+              alt="Neptune"
+              width={120}
+              height={32}
+              className="h-6 w-auto md:h-8"
+            />
+          </Link>
+
+          <nav className="flex flex-col sm:flex-row flex-wrap items-center justify-center gap-4 sm:gap-6 md:gap-8">
+            {FOOTER_LINKS.map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                className="text-base tracking-[0.2em] uppercase text-[#6B6B6B] hover:text-black transition-colors"
+              >
+                {item.label}
+              </Link>
+            ))}
+          </nav>
+
+          {settings?.instagramUrl && (
+            <a
+              href={settings.instagramUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-[#6B6B6B] hover:text-black transition-colors inline-flex items-center justify-center"
+              aria-label="Follow us on Instagram"
             >
-              {item.label}
-            </Link>
-          ))}
-        </nav>
+              <span className="sr-only">Instagram</span>
+              <svg
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden
+              >
+                <title>Instagram</title>
+                <rect width="20" height="20" x="2" y="2" rx="5" ry="5" />
+                <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
+                <line x1="17.5" x2="17.51" y1="6.5" y2="6.5" />
+              </svg>
+            </a>
+          )}
+
+          <p className="text-sm text-[#6B6B6B]">
+            © {new Date().getFullYear()} Neptune Papers. All rights reserved.
+          </p>
+        </div>
       </div>
     </footer>
   )

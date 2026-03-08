@@ -39,6 +39,13 @@ export const siteSettings = defineType({
       group: 'newsletter',
     }),
     defineField({
+      name: 'newsletterImage',
+      title: 'Newsletter Background Image',
+      type: 'image',
+      options: { hotspot: true },
+      group: 'newsletter',
+    }),
+    defineField({
       name: 'aboutText',
       title: 'About Text',
       type: 'array',
