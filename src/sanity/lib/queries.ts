@@ -89,6 +89,19 @@ export const ARTICLE_SLUGS_BY_CATEGORY_QUERY = `
   *[_type == "article" && category == $category] { "slug": slug.current }
 `
 
+// Related articles from same category (excluding current article)
+export const RELATED_ARTICLES_BY_CATEGORY_QUERY = `
+  *[_type == "article" && category == $category && _id != $excludeId] | order(publishedAt desc)[0...6] {
+    _id,
+    title,
+    "slug": slug.current,
+    category,
+    subcategory,
+    coverImage,
+    "author": author->{ name, "slug": slug.current }
+  }
+`
+
 // All clients (for Studio page)
 export const CLIENTS_QUERY = `
   *[_type == "client"] | order(publishedAt desc) {

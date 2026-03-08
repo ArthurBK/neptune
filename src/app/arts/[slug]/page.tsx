@@ -8,11 +8,13 @@ import {
   AD_BANNER_BY_PLACEMENT_QUERY,
   ARTICLE_BY_SLUG_QUERY,
   ARTICLE_SLUGS_BY_CATEGORY_QUERY,
+  RELATED_ARTICLES_BY_CATEGORY_QUERY,
 } from '@/sanity/lib/queries'
 
 import { AdBanner } from '@/components/shared/AdBanner'
 import { ArticleBody } from '@/components/editorial/ArticleBody'
 import { ArticleCard } from '@/components/editorial/ArticleCard'
+import { NewsstandCta } from '@/components/shared/NewsstandCta'
 
 export const revalidate = 86400
 
@@ -53,7 +55,10 @@ export default async function ArtsArticlePage({ params }: ArticlePageProps) {
     ? urlFor(article.coverImage).width(1400).height(933).url()
     : null
 
-  const relatedArticles = (article.relatedArticles ?? []) as ArticleCardData[]
+  const relatedArticles = await client.fetch<ArticleCardData[]>(
+    RELATED_ARTICLES_BY_CATEGORY_QUERY,
+    { category: 'arts', excludeId: article._id }
+  )
 
   return (
     <main>
@@ -135,21 +140,16 @@ export default async function ArtsArticlePage({ params }: ArticlePageProps) {
         )}
 
         {/* Newsstand CTA */}
-        <div className="mt-20 max-w-[580px] mx-auto px-6 md:px-12 text-center">
-          <Link
-            href="/newsstand"
-            className="text-xs tracking-[0.25em] uppercase text-[#6B6B6B] hover:text-black transition-colors"
-          >
-            Discover all available issues
-          </Link>
+        <div className="mt-20">
+          <NewsstandCta />
         </div>
 
-        {/* You May Also Like */}
+        {/* Related articles — same category */}
         {relatedArticles.length > 0 && (
           <div className="mt-24 pt-20 border-t border-[#E5E5E5]">
             <div className="max-w-[1400px] mx-auto px-6 md:px-12">
               <h2 className="font-serif text-3xl md:text-4xl text-[#1A1A1A] mb-12">
-                You May Also Like
+                More in Arts
               </h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10 md:gap-16">
                 {relatedArticles.map((a) => (
@@ -183,6 +183,7 @@ export default async function ArtsArticlePage({ params }: ArticlePageProps) {
 }
 
 type ArticleData = {
+  _id: string
   title: string
   slug: { current: string }
   category: string
