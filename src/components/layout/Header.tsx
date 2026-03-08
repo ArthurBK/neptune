@@ -51,7 +51,7 @@ function NavLink({
 }
 
 export function Header() {
-  const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const [isBurgerOpen, setIsBurgerOpen] = useState(false)
   const [isSearchOpen, setIsSearchOpen] = useState(false)
   const [isCartOpen, setIsCartOpen] = useState(false)
   const [cartCount, setCartCount] = useState<number | null>(null)
@@ -75,6 +75,16 @@ export function Header() {
   }, [])
 
   useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setIsBurgerOpen(false)
+    }
+    if (isBurgerOpen) {
+      document.addEventListener('keydown', handleEscape)
+      return () => document.removeEventListener('keydown', handleEscape)
+    }
+  }, [isBurgerOpen])
+
+  useEffect(() => {
     fetchCartCount()
     const cartUpdatedHandler = (e: Event) => {
       const cart = (e as CustomEvent<{ cart?: { totalQuantity?: number } | null }>)?.detail?.cart
@@ -96,9 +106,32 @@ export function Header() {
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-white border-b border-[#E5E5E5]">
       <div className="relative max-w-screen-xl mx-auto px-4 sm:px-6 md:px-12 lg:px-16 py-4 md:py-6 w-full min-w-0">
-        {/* Top row: Newsletter left, Logo center */}
+        {/* Top row: Burger + Newsletter left, Logo center */}
         <div className="flex items-center justify-between">
-          <div className="flex-1 flex justify-start">
+          <div className="flex-1 flex justify-start items-center gap-2">
+            <button
+              type="button"
+              aria-label={isBurgerOpen ? 'Close menu' : 'Open menu'}
+              aria-expanded={isBurgerOpen}
+              onClick={() => setIsBurgerOpen(!isBurgerOpen)}
+              className="w-10 h-10 flex flex-col justify-center items-center gap-1.5 text-[#6B6B6B] hover:text-black transition-colors"
+            >
+              <span
+                className={`block w-5 h-px bg-current transition-transform duration-200 ${
+                  isBurgerOpen ? 'rotate-45 translate-y-2' : ''
+                }`}
+              />
+              <span
+                className={`block w-5 h-px bg-current transition-opacity duration-200 ${
+                  isBurgerOpen ? 'opacity-0' : ''
+                }`}
+              />
+              <span
+                className={`block w-5 h-px bg-current transition-transform duration-200 ${
+                  isBurgerOpen ? '-rotate-45 -translate-y-2' : ''
+                }`}
+              />
+            </button>
             <NavLink href="/newsletters" label="NEWSLETTERS" bold />
           </div>
           <Link href="/" className="shrink-0">
@@ -161,29 +194,6 @@ export function Header() {
                 <circle cx="11" cy="11" r="8" />
                 <path d="m21 21-4.35-4.35" />
               </svg>
-            </button>
-            <button
-              type="button"
-              aria-label={isMenuOpen ? 'Close menu' : 'Open menu'}
-              aria-expanded={isMenuOpen}
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="md:hidden w-10 h-10 flex flex-col justify-center items-center gap-1.5"
-            >
-          <span
-            className={`block w-5 h-px bg-black transition-transform duration-200 ${
-              isMenuOpen ? 'rotate-45 translate-y-2' : ''
-            }`}
-          />
-          <span
-            className={`block w-5 h-px bg-black transition-opacity duration-200 ${
-              isMenuOpen ? 'opacity-0' : ''
-            }`}
-          />
-          <span
-            className={`block w-5 h-px bg-black transition-transform duration-200 ${
-              isMenuOpen ? '-rotate-45 -translate-y-2' : ''
-            }`}
-          />
             </button>
           </div>
         </div>
@@ -248,45 +258,59 @@ export function Header() {
         </nav>
       </div>
 
-      {/* Mobile overlay menu */}
-      {isMenuOpen && (
+      {/* Burger menu — slides from left */}
+      <>
         <div
-          className="fixed inset-0 top-[var(--header-height)] bg-white z-40 md:hidden"
-          role="dialog"
-          aria-modal="true"
+          className={`fixed inset-0 z-40 bg-black/20 transition-opacity duration-300 md:z-40 ${
+            isBurgerOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
+          }`}
+          onClick={() => setIsBurgerOpen(false)}
+          aria-hidden
+        />
+        <aside
+          className={`fixed top-[var(--header-height)] left-0 bottom-0 z-50 w-72 max-w-[85vw] bg-white border-r border-[#E5E5E5] shadow-xl transition-transform duration-300 ease-out ${
+            isBurgerOpen ? 'translate-x-0' : '-translate-x-full'
+          }`}
+          aria-hidden={!isBurgerOpen}
         >
-          <nav className="flex flex-col items-center justify-center h-full gap-8 py-16">
+          <nav className="flex flex-col gap-1 px-6 py-8">
+            <NavLink
+              href="/newsletters"
+              label="NEWSLETTERS"
+              bold
+              onClick={() => setIsBurgerOpen(false)}
+            />
+            {NAV_ITEMS.map((item) => (
+              <NavLink
+                key={item.href}
+                href={item.href}
+                label={item.label}
+                onClick={() => setIsBurgerOpen(false)}
+              />
+            ))}
             <button
               type="button"
               onClick={() => {
-                setIsMenuOpen(false)
+                setIsBurgerOpen(false)
                 setIsSearchOpen(true)
               }}
-              className="text-base tracking-[0.2em] uppercase text-[#6B6B6B] hover:text-black transition-colors"
+              className="text-left text-base tracking-[0.2em] uppercase text-[#6B6B6B] hover:text-black transition-colors py-2"
             >
               Search
             </button>
             <button
               type="button"
               onClick={() => {
-                setIsMenuOpen(false)
+                setIsBurgerOpen(false)
                 setIsCartOpen(true)
               }}
-              className="text-base tracking-[0.2em] uppercase text-[#6B6B6B] hover:text-black transition-colors"
+              className="text-left text-base tracking-[0.2em] uppercase text-[#6B6B6B] hover:text-black transition-colors py-2"
             >
               Cart {cartCount != null && cartCount > 0 && `(${cartCount})`}
             </button>
-            {NAV_ITEMS.map((item) => (
-              <NavLink
-                key={item.href}
-                href={item.href}
-                label={item.label}
-                onClick={() => setIsMenuOpen(false)}
-              />
-            ))}
           </nav>
-        </div>
-      )}
+        </aside>
+      </>
 
       <SearchModal isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
       <CartPreview isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
