@@ -1,8 +1,7 @@
+'use client'
+
 import Image from 'next/image'
 import Link from 'next/link'
-
-import { client } from '@/sanity/lib/client'
-import { SITE_SETTINGS_QUERY } from '@/sanity/lib/queries'
 
 const FOOTER_LINKS = [
   { label: 'ABOUT', href: '/about' },
@@ -11,11 +10,7 @@ const FOOTER_LINKS = [
   { label: 'NEWSLETTERS', href: '/newsletters' },
 ] as const
 
-export async function Footer() {
-  const settings = await client.fetch<{ instagramUrl?: string | null } | null>(
-    SITE_SETTINGS_QUERY
-  )
-
+export function Footer({ instagramUrl }: { instagramUrl?: string | null }) {
   return (
     <footer className="border-t border-[#E5E5E5] bg-white">
       <div className="max-w-screen-xl mx-auto px-6 md:px-12 lg:px-16 py-12 md:py-16">
@@ -42,9 +37,9 @@ export async function Footer() {
             ))}
           </nav>
 
-          {settings?.instagramUrl && (
+          {instagramUrl && (
             <a
-              href={settings.instagramUrl}
+              href={instagramUrl}
               target="_blank"
               rel="noopener noreferrer"
               className="text-[#6B6B6B] hover:text-black transition-colors inline-flex items-center justify-center"

@@ -2,6 +2,7 @@ import { client } from '@/sanity/lib/client'
 import {
   FEATURED_ARTICLES_HOME_QUERY,
   HOME_PAGE_QUERY,
+  SITE_SETTINGS_QUERY,
 } from '@/sanity/lib/queries'
 import { shopifyFetch } from '@/lib/shopify/client'
 import {
@@ -11,6 +12,7 @@ import {
 } from '@/lib/shopify/queries'
 import { HomeScrollContainer } from '@/components/home/HomeScrollContainer'
 import type { HomeSection } from '@/components/home/StickyHeroStack'
+import { Footer } from '@/components/layout/Footer'
 
 export const revalidate = 3600
 
@@ -55,9 +57,10 @@ function toFeaturedProduct(node: {
 }
 
 export default async function Home() {
-  const homePage = await client.fetch<{ sections?: HomePageSection[] } | null>(
-    HOME_PAGE_QUERY
-  )
+  const [homePage, settings] = await Promise.all([
+    client.fetch<{ sections?: HomePageSection[] } | null>(HOME_PAGE_QUERY),
+    client.fetch<{ instagramUrl?: string | null } | null>(SITE_SETTINGS_QUERY),
+  ])
 
   const sections: HomeSection[] = []
 
@@ -177,7 +180,9 @@ export default async function Home() {
 
   return (
     <div className="min-h-[calc(100vh-var(--header-height))]">
-      <HomeScrollContainer sections={sections} />
+      <HomeScrollContainer sections={sections}>
+        <Footer instagramUrl={settings?.instagramUrl ?? null} />
+      </HomeScrollContainer>
     </div>
   )
 }

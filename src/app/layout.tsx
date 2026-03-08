@@ -2,6 +2,8 @@ import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import localFont from 'next/font/local'
 
+import { client } from '@/sanity/lib/client'
+import { SITE_SETTINGS_QUERY } from '@/sanity/lib/queries'
 import { LayoutShell } from '@/components/layout/LayoutShell'
 
 import './globals.css'
@@ -44,15 +46,20 @@ export const metadata: Metadata = {
   description: 'Luxury editorial magazine',
 }
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode
 }>) {
+  const settings = await client.fetch<{ instagramUrl?: string | null } | null>(
+    SITE_SETTINGS_QUERY
+  )
+  const instagramUrl = settings?.instagramUrl ?? null
+
   return (
     <html lang="en" className={`${cormorantGaramond.variable} ${inter.variable}`} suppressHydrationWarning>
       <body className="min-h-screen flex flex-col bg-white text-[#1A1A1A] antialiased font-sans font-light" suppressHydrationWarning>
-        <LayoutShell>{children}</LayoutShell>
+        <LayoutShell instagramUrl={instagramUrl}>{children}</LayoutShell>
       </body>
     </html>
   )

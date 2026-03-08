@@ -21,7 +21,7 @@ const PRODUCT_FIELDS = `
 export const NEWSSTAND_PRODUCTS_QUERY = `
   query NewsstandProducts {
     collection(handle: "newsstand") {
-      products(first: 20) {
+      products(first: 100, sortKey: CREATED, reverse: true) {
         edges {
           node {
             ${PRODUCT_FIELDS}
@@ -74,10 +74,10 @@ export const FIRST_PRODUCT_QUERY = `
   }
 `
 
-/** All products (Shopify allows up to 250) */
+/** All products (Shopify allows up to 250), sorted by created date */
 export const ALL_PRODUCTS_QUERY = `
   query AllProducts {
-    products(first: 100) {
+    products(first: 100, sortKey: CREATED_AT, reverse: true) {
       edges {
         node {
           ${PRODUCT_FIELDS}

@@ -1,6 +1,10 @@
 import { shopifyFetch } from '@/lib/shopify/client'
-import { ALL_PRODUCTS_QUERY } from '@/lib/shopify/queries'
-import type { AllProductsResponse, ShopifyProduct } from '@/lib/shopify/types'
+import { ALL_PRODUCTS_QUERY, NEWSSTAND_PRODUCTS_QUERY } from '@/lib/shopify/queries'
+import type {
+  AllProductsResponse,
+  NewsstandProductsResponse,
+  ShopifyProduct,
+} from '@/lib/shopify/types'
 
 import { ProductGrid } from '@/components/commerce/ProductGrid'
 
@@ -10,17 +14,26 @@ export default async function NewsstandPage() {
   let products: ShopifyProduct[] = []
 
   try {
-    const data = await shopifyFetch<AllProductsResponse>({
-      query: ALL_PRODUCTS_QUERY,
+    const data = await shopifyFetch<NewsstandProductsResponse>({
+      query: NEWSSTAND_PRODUCTS_QUERY,
     })
-    products = data.products?.edges.map((edge) => edge.node) ?? []
+    products =
+      data.collection?.products.edges.map((edge) => edge.node) ?? []
+
+    // Fallback to all products if newsstand collection is empty
+    if (products.length === 0) {
+      const fallback = await shopifyFetch<AllProductsResponse>({
+        query: ALL_PRODUCTS_QUERY,
+      })
+      products = fallback.products?.edges.map((edge) => edge.node) ?? []
+    }
   } catch (err) {
     console.error('Newsstand fetch error:', err)
   }
 
   return (
     <main>
-      <div className="max-w-screen-xl mx-auto px-6 md:px-12 lg:px-16 py-16 md:py-24">
+      <div className="max-w-screen-xl mx-auto px-6 md:px-12 lg:px-16 pt-8 md:pt-12 pb-16 md:pb-24">
         <header className="mb-12 md:mb-16">
           <h1 className="font-serif text-6xl md:text-7xl text-[#1A1A1A]">
             Newsstand
