@@ -181,7 +181,9 @@ export default async function Home() {
   return (
     <div className="min-h-[calc(100vh-var(--header-height))]">
       <HomeScrollContainer sections={sections}>
-        <Footer instagramUrl={settings?.instagramUrl ?? null} />
+        <section className="min-h-[calc(100vh-var(--header-height))] snap-start flex flex-col items-center justify-center bg-white">
+          <Footer instagramUrl={settings?.instagramUrl ?? null} />
+        </section>
       </HomeScrollContainer>
     </div>
   )
