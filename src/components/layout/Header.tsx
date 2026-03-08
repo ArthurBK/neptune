@@ -95,7 +95,7 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-50 bg-white border-b border-[#E5E5E5]">
-      <div className="relative max-w-screen-xl mx-auto px-6 md:px-12 lg:px-16 py-4 md:py-6">
+      <div className="relative max-w-screen-xl mx-auto px-4 sm:px-6 md:px-12 lg:px-16 py-4 md:py-6 w-full min-w-0">
         {/* Top row: Newsletter left, Logo center */}
         <div className="flex items-center justify-between">
           <div className="flex-1 flex justify-start">

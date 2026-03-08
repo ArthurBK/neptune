@@ -57,7 +57,7 @@ export function HomeScrollContainer({ sections }: HomeScrollContainerProps) {
   return (
     <div
       ref={scrollRef}
-      className="fixed inset-x-0 top-[var(--header-height)] bottom-0 overflow-y-auto snap-y snap-proximity overscroll-contain"
+      className="fixed inset-x-0 top-[var(--header-height)] bottom-0 overflow-x-hidden overflow-y-auto snap-y snap-proximity overscroll-contain w-full min-w-0"
     >
       <StickyHeroStack sections={sections} />
     </div>

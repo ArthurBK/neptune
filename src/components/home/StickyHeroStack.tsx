@@ -63,7 +63,7 @@ function HeroSection({
   return (
     <section
       key={keyProp}
-      className={`sticky top-0 min-h-[480px] h-[calc(100vh-var(--header-height))] snap-start overflow-hidden ${bgWhite ? 'bg-white' : 'bg-[#0a0a0a]'}`}
+      className={`sticky top-0 min-h-[480px] h-[calc(100vh-var(--header-height))] w-full min-w-0 snap-start overflow-hidden ${bgWhite ? 'bg-white' : 'bg-[#0a0a0a]'}`}
       style={{ zIndex }}
     >
       {children}
@@ -88,7 +88,7 @@ function ImageOnlyContent({
   priority?: boolean
 }) {
   const inner = (
-    <div className="relative w-full h-full flex items-center justify-center">
+    <div className="relative w-full h-full min-w-0 flex items-center justify-center overflow-hidden">
       {imageUrl ? (
         <>
           <div className="absolute inset-0 overflow-hidden">
@@ -190,23 +190,23 @@ function ProductContent({
       href={href}
       target="_blank"
       rel="noopener noreferrer"
-      className="block relative w-full flex-1 min-h-[200px] cursor-pointer"
+      className="block relative w-full min-w-0 flex-1 min-h-[200px] cursor-pointer overflow-hidden"
     >
       {imageContent}
     </a>
   ) : (
     <Link
       href={href}
-      className="block relative w-full flex-1 min-h-[200px] cursor-pointer"
+      className="block relative w-full min-w-0 flex-1 min-h-[200px] cursor-pointer overflow-hidden"
     >
       {imageContent}
     </Link>
   )
 
   return (
-    <div className="flex flex-col items-center justify-start h-full w-full gap-6 pt-6 md:pt-12">
-      <div className="flex flex-col items-center gap-4 shrink-0 px-6 md:px-12">
-        <h2 className="font-serif text-xl md:text-2xl text-[#1A1A1A] text-center whitespace-nowrap overflow-hidden text-ellipsis max-w-full">
+    <div className="flex flex-col items-center justify-start h-full w-full min-w-0 gap-6 pt-6 md:pt-12">
+      <div className="flex flex-col items-center gap-4 shrink-0 px-4 sm:px-6 md:px-12 w-full max-w-full">
+        <h2 className="font-serif text-xl md:text-2xl text-[#1A1A1A] text-center break-words max-w-full">
           {title}
         </h2>
         {DiscoverButton}
@@ -249,7 +249,7 @@ function HeroContent({
           className="absolute inset-0 z-10"
           aria-label={`Read article: ${title}`}
         />
-        <div className="absolute inset-0 flex flex-col items-center justify-center px-6 text-center z-20 pointer-events-none">
+        <div className="absolute inset-0 flex flex-col items-center justify-center px-4 sm:px-6 text-center z-20 pointer-events-none w-full max-w-full box-border">
           {categoryHref && (
             <Link
               href={categoryHref}
@@ -260,13 +260,13 @@ function HeroContent({
           )}
           <Link
             href={href}
-            className="pointer-events-auto font-serif text-5xl md:text-6xl lg:text-8xl text-white tracking-wide max-w-4xl [text-shadow:0_2px_20px_rgba(0,0,0,0.8),0_0_40px_rgba(0,0,0,0.6)] hover:opacity-90 transition-opacity"
+            className="pointer-events-auto font-serif text-4xl sm:text-5xl md:text-6xl lg:text-8xl text-white tracking-wide max-w-full break-words [text-shadow:0_2px_20px_rgba(0,0,0,0.8),0_0_40px_rgba(0,0,0,0.6)] hover:opacity-90 transition-opacity"
           >
             {title}
           </Link>
           <Link
             href={subtitleHref}
-            className="pointer-events-auto mt-3 text-lg md:text-xl text-white tracking-[0.15em] uppercase font-bold italic [text-shadow:0_2px_12px_rgba(0,0,0,0.8)] hover:underline underline-offset-2 transition-colors"
+            className="pointer-events-auto mt-3 text-base sm:text-lg md:text-xl text-white tracking-[0.15em] uppercase font-bold italic break-words [text-shadow:0_2px_12px_rgba(0,0,0,0.8)] hover:underline underline-offset-2 transition-colors"
           >
             {subtitle}
           </Link>
@@ -279,7 +279,7 @@ function HeroContent({
         </div>
       </>
     ) : (
-      <div className="absolute inset-0 flex flex-col items-center justify-center px-6 text-center">
+      <div className="absolute inset-0 flex flex-col items-center justify-center px-4 sm:px-6 text-center w-full max-w-full box-border">
         {categoryHref && (
           <Link
             href={categoryHref}
@@ -288,7 +288,7 @@ function HeroContent({
             Cover Story
           </Link>
         )}
-        <h2 className="font-serif text-5xl md:text-6xl lg:text-8xl text-white tracking-wide max-w-4xl [text-shadow:0_2px_20px_rgba(0,0,0,0.8),0_0_40px_rgba(0,0,0,0.6)]">
+        <h2 className="font-serif text-4xl sm:text-5xl md:text-6xl lg:text-8xl text-white tracking-wide max-w-full break-words [text-shadow:0_2px_20px_rgba(0,0,0,0.8),0_0_40px_rgba(0,0,0,0.6)]">
           {title}
         </h2>
         {subtitle}
@@ -370,7 +370,7 @@ export function StickyHeroStack({ sections }: StickyHeroStackProps) {
   if (sections.length === 0) return null
 
   return (
-    <div>
+    <div className="w-full min-w-0">
       {sections.map((item, i) => {
         const zIndex = i + 1
         const priority = i === 0
