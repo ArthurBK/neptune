@@ -44,12 +44,12 @@ export function MarketPageContent({ products }: MarketPageContentProps) {
 
   return (
     <main>
-      <div className="max-w-[1400px] mx-auto px-6 md:px-12 lg:px-16 py-16 md:py-24">
-        <header className="mb-12 md:mb-16">
-          <h1 className="font-serif text-6xl md:text-7xl text-[#1A1A1A]">
-            neptune market
+      <div className="max-w-[1400px] mx-auto px-6 md:px-12 lg:px-16 pt-8 md:pt-12 pb-16 md:pb-24">
+        <header className="mb-12 md:mb-16 text-center">
+          <h1 className="font-serif text-6xl md:text-7xl uppercase tracking-wide text-[var(--neptune-red)]">
+            The Neptune Market
           </h1>
-          <p className="mt-4 text-base text-[#6B6B6B] max-w-xl">
+          <p className="mt-4 text-base text-[#6B6B6B] max-w-xl mx-auto">
             Curated products we love. Purchases through these links may support
             Neptune.
           </p>

@@ -4,6 +4,7 @@
   --background: #ffffff;
   --foreground: #1a1a1a;
   --header-height: 3.5rem; /* ~56px mobile */
+  --neptune-red: #8B2942;
 }
 
 @media (min-width: 768px) {

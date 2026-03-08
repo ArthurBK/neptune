@@ -49,7 +49,9 @@ export function AffiliateProductCard({
           {title}
         </h3>
         <p className="mt-1 text-sm text-[#6B6B6B]">{brand}</p>
-        <p className="mt-1 text-[#1A1A1A]">{price}</p>
+        <p className="mt-1 text-[#1A1A1A]">
+          {/^[€$£]/.test(price ?? '') ? price : `€${price ?? ''}`}
+        </p>
       </div>
     </a>
   )
