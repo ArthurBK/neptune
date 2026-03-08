@@ -37,33 +37,31 @@ export function Footer({ instagramUrl }: { instagramUrl?: string | null }) {
             ))}
           </nav>
 
-          {instagramUrl && (
-            <a
-              href={instagramUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-[#6B6B6B] hover:text-black transition-colors inline-flex items-center justify-center"
-              aria-label="Follow us on Instagram"
+          <a
+            href={instagramUrl ?? 'https://www.instagram.com/neptune_papers/'}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-[#6B6B6B] hover:text-black transition-colors inline-flex items-center justify-center"
+            aria-label="Follow us on Instagram"
+          >
+            <span className="sr-only">Instagram</span>
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden
             >
-              <span className="sr-only">Instagram</span>
-              <svg
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                aria-hidden
-              >
-                <title>Instagram</title>
-                <rect width="20" height="20" x="2" y="2" rx="5" ry="5" />
-                <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
-                <line x1="17.5" x2="17.51" y1="6.5" y2="6.5" />
-              </svg>
-            </a>
-          )}
+              <title>Instagram</title>
+              <rect width="20" height="20" x="2" y="2" rx="5" ry="5" />
+              <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
+              <line x1="17.5" x2="17.51" y1="6.5" y2="6.5" />
+            </svg>
+          </a>
 
           <p className="text-sm text-[#6B6B6B]">
             © {new Date().getFullYear()} Neptune Papers. All rights reserved.
