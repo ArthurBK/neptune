@@ -10,7 +10,7 @@ const TextWrapper = ({
   children: React.ReactNode
   className?: string
 }) => (
-  <div className={`w-full px-4 md:px-8 ${className}`}>
+  <div className={`w-full max-w-[900px] mx-auto px-6 md:px-12 ${className}`}>
     {children}
   </div>
 )
@@ -57,7 +57,7 @@ function createComponents(isFirstParagraph: { current: boolean }): PortableTextC
       </TextWrapper>
     ),
     pullQuote: ({ children }) => (
-      <div className="w-full px-4 md:px-8 my-8">
+      <div className="w-full my-8">
         <blockquote className="font-serif text-4xl md:text-5xl text-center leading-snug text-[#1A1A1A]">
           {children}
         </blockquote>
@@ -88,10 +88,10 @@ function createComponents(isFirstParagraph: { current: boolean }): PortableTextC
       if (!value?.image) return null
       const layout = (value.layout as string) ?? 'full'
       const layoutClasses: Record<string, string> = {
-        full: 'w-full px-4 md:px-8 my-6 md:my-8',
-        wide: 'w-full -mx-4 md:-mx-8 my-6 md:my-8',
-        left: 'float-left mr-6 mb-4 w-full md:w-[45%]',
-        right: 'float-right clear-left ml-6 mb-4 w-full md:w-[45%]',
+        full: 'clear-both w-full my-6 md:my-8',
+        wide: 'clear-both w-full my-6 md:my-8',
+        left: 'float-left mr-6 mb-4 w-full md:w-[50vw] shrink-0',
+        right: 'float-right ml-6 mb-4 w-full md:w-[50vw] shrink-0',
       }
       const figureClass = layoutClasses[layout] ?? layoutClasses.full
       const imageUrl = urlFor(value.image).width(1400).height(1050).quality(90).url()
@@ -103,13 +103,17 @@ function createComponents(isFirstParagraph: { current: boolean }): PortableTextC
                 src={imageUrl}
                 alt={value.alt ?? ''}
                 fill
-                sizes="100vw"
+                sizes={
+                  layout === 'full' || layout === 'wide'
+                    ? '100vw'
+                    : '(max-width: 768px) 100vw, 50vw'
+                }
                 className="object-cover"
               />
             </div>
           </div>
           {value.caption && (
-            <figcaption className="mt-2 text-sm text-[#6B6B6B] px-4 md:px-8">
+            <figcaption className="mt-2 text-sm text-[#6B6B6B]">
               {value.caption}
             </figcaption>
           )}
@@ -120,7 +124,7 @@ function createComponents(isFirstParagraph: { current: boolean }): PortableTextC
       const images = (value?.images as Array<{ asset?: { _ref?: string }; alt?: string; caption?: string }>) ?? []
       if (images.length === 0) return null
       return (
-        <div className="px-4 md:px-8 my-6 md:my-8">
+        <div className="max-w-[900px] mx-auto px-6 md:px-12 my-6 md:my-8">
           <div className="grid grid-cols-3 gap-3 md:gap-6">
             {images.map((img, i) => {
               const imageUrl = img?.asset ? urlFor(img).width(600).height(450).quality(90).url() : null
@@ -165,7 +169,7 @@ function createComponents(isFirstParagraph: { current: boolean }): PortableTextC
         </div>
       )
       return (
-        <figure className="px-4 md:px-8 my-8">
+        <figure className="max-w-[900px] mx-auto px-6 md:px-12 my-8">
           {linkUrl ? (
             <a href={linkUrl} target="_blank" rel="noopener noreferrer" className="block">
               {content}
