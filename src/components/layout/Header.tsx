@@ -110,7 +110,89 @@ export function Header() {
               priority
             />
           </Link>
-          <div className="flex flex-1 justify-end items-center gap-2 md:justify-center">
+          <div className="flex flex-1 justify-end items-center gap-2 md:justify-end">
+            <button
+              type="button"
+              aria-label="Cart"
+              onClick={() => setIsCartOpen(true)}
+              className="md:hidden relative w-10 h-10 flex items-center justify-center text-[#6B6B6B] hover:text-black transition-colors"
+            >
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden
+              >
+                <title>Cart</title>
+                <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
+                <line x1="3" y1="6" x2="21" y2="6" />
+                <path d="M16 10a4 4 0 0 1-8 0" />
+              </svg>
+              {cartCount != null && cartCount > 0 && (
+                <span className="absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-black px-1 text-[10px] font-medium text-white">
+                  {cartCount > 99 ? '99+' : cartCount}
+                </span>
+              )}
+            </button>
+            <button
+              type="button"
+              aria-label="Search"
+              onClick={() => setIsSearchOpen(true)}
+              className="md:hidden w-10 h-10 flex items-center justify-center text-[#6B6B6B] hover:text-black transition-colors"
+            >
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden
+              >
+                <title>Search</title>
+                <circle cx="11" cy="11" r="8" />
+                <path d="m21 21-4.35-4.35" />
+              </svg>
+            </button>
+            <button
+              type="button"
+              aria-label={isMenuOpen ? 'Close menu' : 'Open menu'}
+              aria-expanded={isMenuOpen}
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              className="md:hidden w-10 h-10 flex flex-col justify-center items-center gap-1.5"
+            >
+          <span
+            className={`block w-5 h-px bg-black transition-transform duration-200 ${
+              isMenuOpen ? 'rotate-45 translate-y-2' : ''
+            }`}
+          />
+          <span
+            className={`block w-5 h-px bg-black transition-opacity duration-200 ${
+              isMenuOpen ? 'opacity-0' : ''
+            }`}
+          />
+          <span
+            className={`block w-5 h-px bg-black transition-transform duration-200 ${
+              isMenuOpen ? '-rotate-45 -translate-y-2' : ''
+            }`}
+          />
+            </button>
+          </div>
+        </div>
+
+        {/* Desktop nav — nav items centered, search & cart on the right */}
+        <nav className="hidden md:flex items-center justify-center gap-8 mt-4 w-full relative">
+          {NAV_ITEMS.map((item) => (
+            <NavLink key={item.href} href={item.href} label={item.label} />
+          ))}
+          <div className="absolute right-0 top-1/2 -translate-y-1/2 flex items-center gap-2">
             <button
               type="button"
               aria-label="Cart"
@@ -161,37 +243,7 @@ export function Header() {
                 <path d="m21 21-4.35-4.35" />
               </svg>
             </button>
-            <button
-              type="button"
-              aria-label={isMenuOpen ? 'Close menu' : 'Open menu'}
-              aria-expanded={isMenuOpen}
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="md:hidden w-10 h-10 flex flex-col justify-center items-center gap-1.5"
-            >
-          <span
-            className={`block w-5 h-px bg-black transition-transform duration-200 ${
-              isMenuOpen ? 'rotate-45 translate-y-2' : ''
-            }`}
-          />
-          <span
-            className={`block w-5 h-px bg-black transition-opacity duration-200 ${
-              isMenuOpen ? 'opacity-0' : ''
-            }`}
-          />
-          <span
-            className={`block w-5 h-px bg-black transition-transform duration-200 ${
-              isMenuOpen ? '-rotate-45 -translate-y-2' : ''
-            }`}
-          />
-            </button>
           </div>
-        </div>
-
-        {/* Desktop nav — centered below logo */}
-        <nav className="hidden md:flex items-center justify-center gap-8 mt-4">
-          {NAV_ITEMS.map((item) => (
-            <NavLink key={item.href} href={item.href} label={item.label} />
-          ))}
         </nav>
       </div>
 
