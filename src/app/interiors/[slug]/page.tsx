@@ -183,6 +183,7 @@ export default async function InteriorsArticlePage({ params }: ArticlePageProps)
 type ArticleData = {
   title: string
   slug: { current: string }
+  category: string
   subcategory?: string | null
   coverImage?: { asset?: { _ref: string }; alt?: string }
   body: unknown
