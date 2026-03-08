@@ -93,7 +93,7 @@ export function Header() {
   }, [fetchCartCount])
 
   return (
-    <header className="sticky top-0 z-50 bg-white border-b border-[#E5E5E5]">
+    <header className="fixed top-0 left-0 right-0 z-50 bg-white border-b border-[#E5E5E5]">
       <div className="relative max-w-screen-xl mx-auto px-4 sm:px-6 md:px-12 lg:px-16 py-4 md:py-6 w-full min-w-0">
         {/* Top row: Newsletter left, Logo center */}
         <div className="flex items-center justify-between">
@@ -198,7 +198,7 @@ export function Header() {
       {/* Mobile overlay menu */}
       {isMenuOpen && (
         <div
-          className="fixed inset-0 top-16 bg-white z-40 md:hidden"
+          className="fixed inset-0 top-[var(--header-height)] bg-white z-40 md:hidden"
           role="dialog"
           aria-modal="true"
         >
