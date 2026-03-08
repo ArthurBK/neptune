@@ -11,8 +11,8 @@ import { CartPreview } from '@/components/commerce/CartPreview'
 import { SearchModal } from './SearchModal'
 
 const NAV_ITEMS = [
+  { label: 'NEWSLETTERS', href: '/newsletters' },
   { label: 'NEWSSTAND', href: '/newsstand' },
-  { label: 'NEWSLETTERS', href: '/#newsletter' },
   { label: 'INTERIORS', href: '/interiors' },
   { label: 'ARTS', href: '/arts' },
   { label: 'GARDENS', href: '/gardens' },
@@ -35,9 +35,7 @@ function NavLink({
   const isActive =
     href === '/'
       ? pathname === '/'
-      : href === '/#newsletter'
-        ? pathname === '/'
-        : pathname === baseHref || pathname.startsWith(`${baseHref}/`)
+      : pathname === baseHref || pathname.startsWith(`${baseHref}/`)
 
   return (
     <Link
@@ -101,7 +99,7 @@ export function Header() {
         {/* Top row: Newsletter left, Logo center */}
         <div className="flex items-center justify-between">
           <div className="flex-1 flex justify-start">
-            <NavLink href="/#newsletter" label="NEWSLETTERS" bold />
+            <NavLink href="/newsletters" label="NEWSLETTERS" bold />
           </div>
           <Link href="/" className="shrink-0">
             <Image
@@ -192,7 +190,7 @@ export function Header() {
 
         {/* Desktop nav — centered below logo */}
         <nav className="hidden md:flex items-center justify-center gap-8 mt-4">
-          {NAV_ITEMS.filter((item) => item.href !== '/#newsletter').map((item) => (
+          {NAV_ITEMS.map((item) => (
             <NavLink key={item.href} href={item.href} label={item.label} />
           ))}
         </nav>

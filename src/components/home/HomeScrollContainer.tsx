@@ -3,77 +3,24 @@
 import { useCallback, useEffect, useRef } from 'react'
 
 import { StickyHeroStack } from './StickyHeroStack'
-import { NewsletterSection } from './NewsletterSection'
 
-import type { CarouselArticle, FeaturedProduct } from './StickyHeroStack'
+import type { HomeSection } from './StickyHeroStack'
 
 interface HomeScrollContainerProps {
-  articles: CarouselArticle[]
-  featuredProduct?: FeaturedProduct | null
+  sections: HomeSection[]
 }
 
 /**
- * Dedicated scroll container for homepage. Avoids document scroll restoration
- * and snap conflicts. Always starts at top on load.
+ * Dedicated scroll container for homepage. Avoids document scroll restoration.
+ * Uses CSS scroll-snap only — no JS snap to avoid conflicts and stuck scroll.
  */
-export function HomeScrollContainer({
-  articles,
-  featuredProduct,
-}: HomeScrollContainerProps) {
+export function HomeScrollContainer({ sections }: HomeScrollContainerProps) {
   const scrollRef = useRef<HTMLDivElement>(null)
-  const lastScrollTop = useRef(0)
-  const snapTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
 
   useEffect(() => {
     // Force scroll to top on mount - prevents browser scroll restoration
     scrollRef.current?.scrollTo(0, 0)
   }, [])
-
-  // Snap to nearest section when scroll ends (fixes: middle stops + scroll-up freeze)
-  const handleScroll = useCallback(() => {
-    const container = scrollRef.current
-    if (!container) return
-    const { scrollTop } = container
-    const sectionHeight = container.clientHeight
-    const wasScrollingUp = scrollTop < lastScrollTop.current
-    lastScrollTop.current = scrollTop
-
-    // Clear any pending snap
-    if (snapTimeoutRef.current) {
-      clearTimeout(snapTimeoutRef.current)
-      snapTimeoutRef.current = undefined
-    }
-
-    // When scrolling up in upper portion of first section, snap to top immediately
-    if (wasScrollingUp && scrollTop > 0 && scrollTop < sectionHeight * 0.7) {
-      container.scrollTo({ top: 0, behavior: 'auto' })
-      return
-    }
-
-    // When scroll ends, snap to nearest section if we're stuck in the middle
-    snapTimeoutRef.current = setTimeout(() => {
-      snapTimeoutRef.current = undefined
-      const c = scrollRef.current
-      if (!c) return
-      const { scrollTop: st } = c
-      const sh = c.clientHeight
-      const nearestIndex = Math.round(st / sh)
-      const targetTop = Math.min(nearestIndex * sh, c.scrollHeight - sh)
-      if (Math.abs(st - targetTop) > 2) {
-        c.scrollTo({ top: targetTop, behavior: 'smooth' })
-      }
-    }, 100)
-  }, [])
-
-  useEffect(() => {
-    const container = scrollRef.current
-    if (!container) return
-    container.addEventListener('scroll', handleScroll, { passive: true })
-    return () => {
-      container.removeEventListener('scroll', handleScroll)
-      if (snapTimeoutRef.current) clearTimeout(snapTimeoutRef.current)
-    }
-  }, [handleScroll])
 
   const handleKeyDown = useCallback((e: KeyboardEvent) => {
     // Don't capture when user is typing in an input
@@ -110,10 +57,9 @@ export function HomeScrollContainer({
   return (
     <div
       ref={scrollRef}
-      className="fixed inset-x-0 top-[var(--header-height)] bottom-0 overflow-y-auto snap-y snap-mandatory overscroll-contain"
+      className="fixed inset-x-0 top-[var(--header-height)] bottom-0 overflow-y-auto snap-y snap-proximity overscroll-contain"
     >
-      <StickyHeroStack articles={articles} featuredProduct={featuredProduct} />
-      <NewsletterSection />
+      <StickyHeroStack sections={sections} />
     </div>
   )
 }

@@ -2,11 +2,13 @@ import { client } from '@/sanity/lib/client'
 import {
   AD_BANNER_BY_PLACEMENT_QUERY,
   ARTICLES_BY_CATEGORY_QUERY,
+  CATEGORY_PAGE_QUERY,
 } from '@/sanity/lib/queries'
 
 import { AdBanner } from '@/components/shared/AdBanner'
 import { ArticleGrid } from '@/components/editorial/ArticleGrid'
-import Link from 'next/link'
+import { CategoryPageImage } from '@/components/shared/CategoryPageImage'
+import { NewsstandCta } from '@/components/shared/NewsstandCta'
 
 export const revalidate = 3600
 
@@ -22,13 +24,18 @@ const CATEGORY_DESCRIPTION: Record<string, string> = {
 }
 
 export default async function InteriorsPage() {
-  const [articles, adBanner] = await Promise.all([
+  const [articles, adBanner, categoryPage] = await Promise.all([
     client.fetch<unknown[]>(ARTICLES_BY_CATEGORY_QUERY, { category: 'interiors' }),
     client.fetch<{
       image: { asset?: { _ref: string } }
       linkUrl?: string | null
       title?: string | null
     } | null>(AD_BANNER_BY_PLACEMENT_QUERY, { placement: 'category-top' }),
+    client.fetch<{
+      interiorsImage?: { asset?: { _ref: string }; alt?: string } | null
+      artsImage?: { asset?: { _ref: string }; alt?: string } | null
+      gardensImage?: { asset?: { _ref: string }; alt?: string } | null
+    } | null>(CATEGORY_PAGE_QUERY),
   ])
 
   const typedArticles = articles as Array<{
@@ -69,15 +76,11 @@ export default async function InteriorsPage() {
         <ArticleGrid articles={typedArticles} />
 
         {/* Newsstand CTA */}
-        <div className="mt-16 md:mt-24 pt-16 border-t border-[#E5E5E5] text-center">
-          <Link
-            href="/newsstand"
-            className="text-sm tracking-[0.2em] uppercase text-[#6B6B6B] hover:text-black transition-colors"
-          >
-            Discover all available issues →
-          </Link>
-        </div>
+        <NewsstandCta />
       </div>
+
+      {/* Category page image — fullscreen */}
+      <CategoryPageImage image={categoryPage?.interiorsImage} />
     </main>
   )
 }

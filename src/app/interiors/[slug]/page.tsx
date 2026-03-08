@@ -69,6 +69,12 @@ export default async function InteriorsArticlePage({ params }: ArticlePageProps)
             />
             <div className="absolute inset-0 bg-linear-to-t from-black/60 via-black/20 to-transparent" />
             <div className="absolute inset-0 flex flex-col items-center justify-end pb-12 md:pb-16 px-6 md:px-12 text-center">
+              <Link
+                href={`/${article.category}`}
+                className="text-xs tracking-[0.25em] uppercase text-white/80 hover:text-white hover:underline underline-offset-2 transition-colors mb-3"
+              >
+                Cover Story
+              </Link>
               {article.subcategory && (
                 <p className="text-xs tracking-[0.25em] uppercase text-white/80 mb-3">
                   {article.subcategory}
@@ -83,7 +89,7 @@ export default async function InteriorsArticlePage({ params }: ArticlePageProps)
                     Written by{' '}
                     <Link
                       href={`/contributors/${article.author.slug}`}
-                      className="uppercase hover:text-white transition-colors"
+                      className="uppercase hover:text-white hover:underline underline-offset-2 transition-colors"
                     >
                       {article.author.name}
                     </Link>

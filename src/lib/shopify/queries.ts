@@ -87,6 +87,22 @@ export const ALL_PRODUCTS_QUERY = `
   }
 `
 
+/** Product by handle for home hero (image-focused) */
+export const PRODUCT_BY_HANDLE_HERO_QUERY = `
+  query ProductByHandleHero($handle: String!) {
+    product(handle: $handle) {
+      handle
+      title
+      featuredImage { url altText }
+      images(first: 5) {
+        edges {
+          node { url altText }
+        }
+      }
+    }
+  }
+`
+
 export const PRODUCT_BY_HANDLE_QUERY = `
   query ProductByHandle($handle: String!) {
     product(handle: $handle) {

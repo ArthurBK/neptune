@@ -1,3 +1,40 @@
+// Home page sections (configurable in Studio)
+export const HOME_PAGE_QUERY = `
+  *[_type == "homePage" && _id == "homePage"][0] {
+    sections[] {
+      _type,
+      _key,
+      _type == "homeArticleBlock" => {
+        "article": article->{
+          _id,
+          title,
+          "slug": slug.current,
+          category,
+          coverImage,
+          "author": author->{ name, "slug": slug.current }
+        }
+      },
+      _type == "homeImageBlock" => {
+        image,
+        alt,
+        title,
+        linkUrl
+      },
+      _type == "homeProductBlock" => {
+        "product": product->{
+          _id,
+          title,
+          image,
+          affiliateUrl
+        }
+      },
+      _type == "homeNewsstandBlock" => {
+        handle
+      }
+    }
+  }
+`
+
 // Featured articles for home page carousel (latest across all categories)
 export const FEATURED_ARTICLES_HOME_QUERY = `
   *[_type == "article"] | order(publishedAt desc)[0...8] {
@@ -6,7 +43,7 @@ export const FEATURED_ARTICLES_HOME_QUERY = `
     "slug": slug.current,
     category,
     coverImage,
-    "author": author->{ name }
+    "author": author->{ name, "slug": slug.current }
   }
 `
 
@@ -111,6 +148,47 @@ export const ARTICLES_SEARCH_QUERY = `
     category,
     coverImage,
     "author": author->{ name }
+  }
+`
+
+// Single contributor by slug
+export const CONTRIBUTOR_BY_SLUG_QUERY = `
+  *[_type == "contributor" && slug.current == $slug][0] {
+    _id,
+    name,
+    "slug": slug.current,
+    role,
+    bio,
+    portrait,
+    location
+  }
+`
+
+// Contributor slugs for generateStaticParams
+export const CONTRIBUTOR_SLUGS_QUERY = `
+  *[_type == "contributor"] { "slug": slug.current }
+`
+
+// Articles by contributor (author reference)
+export const ARTICLES_BY_CONTRIBUTOR_QUERY = `
+  *[_type == "article" && author->slug.current == $contributorSlug] | order(publishedAt desc) {
+    _id,
+    title,
+    "slug": slug.current,
+    category,
+    subcategory,
+    coverImage,
+    publishedAt,
+    "author": author->{ name, "slug": slug.current }
+  }
+`
+
+// Category page images (Interiors, Arts, Gardens)
+export const CATEGORY_PAGE_QUERY = `
+  *[_type == "categoryPage" && _id == "categoryPage"][0] {
+    interiorsImage,
+    artsImage,
+    gardensImage
   }
 `
 
