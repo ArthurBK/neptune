@@ -25,17 +25,24 @@ export function VerticalImageCarousel({
   const touchStartY = useRef(0)
   const wheelAccumulator = useRef(0)
   const wheelTimeout = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const scrollLocked = useRef(true)
 
   const total = images.length
 
   const goTo = useCallback(
     (index: number) => {
       if (isTransitioning) return
-      const next = Math.max(0, Math.min(index, total - 1))
-      if (next === current) return
+      const clamped = Math.max(0, Math.min(index, total - 1))
+      if (clamped === current) return
+      scrollLocked.current = true
       setIsTransitioning(true)
-      setCurrent(next)
-      setTimeout(() => setIsTransitioning(false), 600)
+      setCurrent(clamped)
+      setTimeout(() => {
+        setIsTransitioning(false)
+        if (clamped === 0 || clamped === total - 1) {
+          scrollLocked.current = false
+        }
+      }, 600)
     },
     [current, total, isTransitioning]
   )
@@ -48,24 +55,26 @@ export function VerticalImageCarousel({
 
   useEffect(() => {
     const el = containerRef.current
-    if (!el) return
+    if (!el || total <= 1) return
 
     const handleWheel = (e: WheelEvent) => {
+      const scrollingDown = e.deltaY > 0
+      const scrollingUp = e.deltaY < 0
+      const atBoundary =
+        (scrollingDown && isAtEnd) || (scrollingUp && isAtStart)
+
+      if (atBoundary && !scrollLocked.current) return
+
+      e.preventDefault()
+
       wheelAccumulator.current += e.deltaY
       if (wheelTimeout.current) clearTimeout(wheelTimeout.current)
       wheelTimeout.current = setTimeout(() => {
         wheelAccumulator.current = 0
       }, 150)
 
-      const scrollingDown = wheelAccumulator.current > 0
-      const scrollingUp = wheelAccumulator.current < 0
-
-      if ((scrollingDown && isAtEnd) || (scrollingUp && isAtStart)) return
-
-      e.preventDefault()
-
-      if (Math.abs(wheelAccumulator.current) > 50) {
-        if (scrollingDown) next()
+      if (!atBoundary && Math.abs(wheelAccumulator.current) > 50) {
+        if (wheelAccumulator.current > 0) next()
         else prev()
         wheelAccumulator.current = 0
       }
@@ -73,7 +82,7 @@ export function VerticalImageCarousel({
 
     el.addEventListener('wheel', handleWheel, { passive: false })
     return () => el.removeEventListener('wheel', handleWheel)
-  }, [next, prev, isAtEnd, isAtStart])
+  }, [next, prev, isAtEnd, isAtStart, total])
 
   const handleTouchStart = (e: React.TouchEvent) => {
     touchStartY.current = e.touches[0].clientY
@@ -81,10 +90,12 @@ export function VerticalImageCarousel({
 
   const handleTouchEnd = (e: React.TouchEvent) => {
     const delta = touchStartY.current - e.changedTouches[0].clientY
-    if (Math.abs(delta) > 50) {
-      if (delta > 0 && !isAtEnd) next()
-      else if (delta < 0 && !isAtStart) prev()
-    }
+    if (Math.abs(delta) < 50) return
+    const atBoundary =
+      (delta > 0 && isAtEnd) || (delta < 0 && isAtStart)
+    if (atBoundary && !scrollLocked.current) return
+    if (delta > 0) next()
+    else prev()
   }
 
   useEffect(() => {
