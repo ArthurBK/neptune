@@ -171,15 +171,40 @@ export const AFFILIATE_PRODUCTS_BY_CATEGORY_QUERY = `
   }
 `
 
-// Search articles by title
+// Search articles by title or author name (match is case-insensitive natively).
+// score() can't dereference (author->name), so we only score on title.
 export const ARTICLES_SEARCH_QUERY = `
-  *[_type == "article" && title match $query] | order(publishedAt desc)[0...10] {
+  *[_type == "article" && (
+    title match $query ||
+    author->name match $query
+  )]
+  | score(boost(title match $query, 2))
+  | order(_score desc, publishedAt desc)[0...15] {
     _id,
     title,
     "slug": slug.current,
     category,
     coverImage,
     "author": author->{ name }
+  }
+`
+
+// Search contributors by name or role (match is case-insensitive natively)
+export const CONTRIBUTORS_SEARCH_QUERY = `
+  *[_type == "contributor" && (
+    name match $query ||
+    role match $query
+  )]
+  | score(
+    boost(name match $query, 2),
+    role match $query
+  )
+  | order(_score desc)[0...10] {
+    _id,
+    name,
+    "slug": slug.current,
+    role,
+    portrait
   }
 `
 
