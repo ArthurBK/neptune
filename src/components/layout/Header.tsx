@@ -111,8 +111,14 @@ export function Header({ transparent: _transparent }: { transparent?: boolean } 
     }
   }, [fetchCartCount])
 
+  const pathname = usePathname()
+  const solidBgRoutes = ['/interiors', '/gardens', '/arts', '/fashion', '/the-market']
+  const hasSolidBg = solidBgRoutes.some(
+    (route) => pathname === route || pathname.startsWith(`${route}/`)
+  )
+
   const headerClass =
-    'fixed left-0 right-0 top-0 z-50 w-full flex flex-col overflow-x-hidden overflow-y-visible border-b border-transparent transition-colors shrink-0'
+    'fixed left-0 right-0 top-0 z-50 w-full flex flex-col overflow-x-hidden overflow-y-visible border-b transition-colors shrink-0'
   const headerStyle: CSSProperties = {
     height: 'var(--header-height)',
     minHeight: 'var(--header-height)',
@@ -120,7 +126,7 @@ export function Header({ transparent: _transparent }: { transparent?: boolean } 
     top: 0,
     left: 0,
     right: 0,
-    background: 'transparent',
+    background: hasSolidBg ? '#ffffff' : 'transparent',
     borderColor: 'transparent',
   }
   const iconClass = lightText
