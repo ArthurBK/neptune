@@ -12,9 +12,10 @@ interface Article {
 
 interface ArticleGridProps {
   articles: Article[]
+  size?: 'default' | 'compact'
 }
 
-export function ArticleGrid({ articles }: ArticleGridProps) {
+export function ArticleGrid({ articles, size = 'default' }: ArticleGridProps) {
   if (articles.length === 0) {
     return (
       <p className="text-center text-base text-[#6B6B6B] py-16">
@@ -24,7 +25,13 @@ export function ArticleGrid({ articles }: ArticleGridProps) {
   }
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-12">
+    <div
+      className={
+        size === 'compact'
+          ? 'mx-auto max-w-2xl grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8'
+          : 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-12'
+      }
+    >
       {articles.map((article) => (
         <ArticleCard
           key={article._id}
@@ -34,6 +41,7 @@ export function ArticleGrid({ articles }: ArticleGridProps) {
           subcategory={article.subcategory}
           coverImage={article.coverImage}
           author={article.author}
+          size={size}
         />
       ))}
     </div>

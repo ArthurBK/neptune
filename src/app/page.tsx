@@ -216,7 +216,7 @@ export default async function Home() {
 
   return (
     <div className="min-h-screen">
-      <HomeScrollContainer sections={sections} navbar={<Header />}>
+      <HomeScrollContainer sections={sections} navbar={<Header transparent={sections[0]?.type === 'video'} />}>
         <section className="h-screen min-h-screen flex flex-col items-center justify-center bg-white">
           <Footer instagramUrl={settings?.instagramUrl ?? null} />
         </section>

@@ -8,12 +8,18 @@ import { formatPrice } from '@/lib/shopify/types'
 interface ProductCardProps {
   product: ShopifyProduct
   compact?: boolean
+  size?: 'default' | 'small'
 }
 
-export function ProductCard({ product, compact = false }: ProductCardProps) {
+export function ProductCard({
+  product,
+  compact = false,
+  size = 'default',
+}: ProductCardProps) {
   const { title, handle, priceRange, featuredImage, variants } = product
   const price = priceRange.minVariantPrice
   const firstVariant = variants.edges[0]?.node
+  const isSmall = size === 'small' || compact
 
   return (
     <article className={`group ${compact ? 'max-w-[200px]' : ''}`}>
@@ -23,33 +29,39 @@ export function ProductCard({ product, compact = false }: ProductCardProps) {
             <Image
               src={featuredImage.url}
               alt={featuredImage.altText ?? title}
-              width={compact ? 200 : 400}
-              height={compact ? 267 : 533}
+              width={compact ? 200 : size === 'small' ? 280 : 400}
+              height={compact ? 267 : size === 'small' ? 373 : 533}
               sizes={
                 compact
                   ? '(max-width: 640px) 50vw, 200px'
-                  : '(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw'
+                  : size === 'small'
+                    ? '(max-width: 640px) 50vw, (max-width: 1024px) 50vw, 25vw'
+                    : '(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw'
               }
               className="w-full h-full object-cover transition-transform duration-300 ease-out group-hover:scale-[1.02]"
             />
           ) : (
-            <div className="w-full h-full flex items-center justify-center text-[#6B6B6B] text-base">
+            <div className="w-full h-full flex items-center justify-center text-[#6B6B6B] text-sm">
               No image
             </div>
           )}
         </div>
       </Link>
-      <div className={compact ? 'mt-2' : 'mt-4'}>
+      <div className={compact ? 'mt-2' : size === 'small' ? 'mt-3' : 'mt-4'}>
         <Link href={`/newsstand/${handle}`}>
           <h3
             className={`font-serif text-[#1A1A1A] group-hover:underline line-clamp-2 ${
-              compact ? 'text-base' : 'text-2xl'
+              compact ? 'text-base' : size === 'small' ? 'text-lg' : 'text-2xl'
             }`}
           >
             {title}
           </h3>
         </Link>
-        <p className={`mt-1 text-[#1A1A1A] ${compact ? 'text-sm' : 'text-base'}`}>
+        <p
+          className={`mt-1 text-[#1A1A1A] ${
+            compact ? 'text-sm' : size === 'small' ? 'text-sm' : 'text-base'
+          }`}
+        >
           {formatPrice(price.amount, price.currencyCode)}
         </p>
         {!compact && firstVariant?.availableForSale && (

@@ -669,26 +669,41 @@ export function StickyHeroStack({ sections, headerSlot }: StickyHeroStackProps) 
     <div className="w-full min-w-0">
       {withNavbar ? (
         <>
-          {/* First block: navbar + first section (100vh total) */}
+          {/* First block: 100vh. When first section is video: video full screen with menu on top; else header + content below */}
           <div
-            className="sticky top-0 flex flex-col w-full min-w-0 shrink-0 h-screen overflow-hidden"
+            className="sticky top-0 flex flex-col w-full min-w-0 shrink-0 h-screen overflow-hidden relative"
             style={{ zIndex: 1 }}
           >
-            {headerSlot}
-            {(() => {
-              const cfg = renderSectionContent(sections[0], 0)
-              if (!cfg) return null
-              const bgClass = cfg.bgTransparent
-                ? 'bg-transparent'
-                : cfg.bgWhite
-                  ? 'bg-white'
-                  : 'bg-[#0a0a0a]'
-              return (
-                <div className={`relative flex-1 min-h-0 overflow-hidden ${bgClass}`}>
-                  {cfg.content}
+            {sections[0]?.type === 'video' ? (
+              <>
+                {/* Video full screen, then menu on top */}
+                <div className="absolute inset-0 w-full h-full">
+                  {(() => {
+                    const cfg = renderSectionContent(sections[0], 0)
+                    return cfg ? cfg.content : null
+                  })()}
                 </div>
-              )
-            })()}
+                <div className="relative z-10 shrink-0">{headerSlot}</div>
+              </>
+            ) : (
+              <>
+                {headerSlot}
+                {(() => {
+                  const cfg = renderSectionContent(sections[0], 0)
+                  if (!cfg) return null
+                  const bgClass = cfg.bgTransparent
+                    ? 'bg-transparent'
+                    : cfg.bgWhite
+                      ? 'bg-white'
+                      : 'bg-[#0a0a0a]'
+                  return (
+                    <div className={`relative flex-1 min-h-0 overflow-hidden ${bgClass}`}>
+                      {cfg.content}
+                    </div>
+                  )
+                })()}
+              </>
+            )}
           </div>
           {/* Remaining sections: full 100vh each */}
           {sections.slice(1).map((item, i) => {

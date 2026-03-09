@@ -13,6 +13,7 @@ interface ArticleCardProps {
     alt?: string
   }
   author?: { name: string; slug: string } | null
+  size?: 'default' | 'compact'
 }
 
 export function ArticleCard({
@@ -22,9 +23,14 @@ export function ArticleCard({
   subcategory,
   coverImage,
   author,
+  size = 'default',
 }: ArticleCardProps) {
+  const isCompact = size === 'compact'
   const imageUrl = coverImage?.asset
-    ? urlFor(coverImage).width(600).height(800).url()
+    ? urlFor(coverImage)
+        .width(isCompact ? 200 : 600)
+        .height(isCompact ? 267 : 800)
+        .url()
     : null
 
   return (
@@ -36,26 +42,36 @@ export function ArticleCard({
               <Image
                 src={imageUrl}
                 alt={coverImage?.alt ?? title}
-                width={600}
-                height={800}
-                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                width={isCompact ? 200 : 600}
+                height={isCompact ? 267 : 800}
+                sizes={
+                  isCompact
+                    ? '(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw'
+                    : '(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw'
+                }
                 className="w-full h-full object-cover transition-transform duration-300 ease-out group-hover:scale-[1.02]"
               />
             ) : (
-              <div className="w-full h-full flex items-center justify-center text-[#6B6B6B] text-base">
+              <div
+                className={`w-full h-full flex items-center justify-center text-[#6B6B6B] ${isCompact ? 'text-sm' : 'text-base'}`}
+              >
                 No image
               </div>
             )}
           </div>
         </Link>
-        <div className="mt-4">
+        <div className={isCompact ? 'mt-3' : 'mt-4'}>
           {subcategory && (
-            <p className="text-sm tracking-[0.2em] uppercase text-[#6B6B6B] mb-1">
+            <p
+              className={`tracking-[0.2em] uppercase text-[#6B6B6B] mb-1 ${isCompact ? 'text-xs' : 'text-sm'}`}
+            >
               {subcategory}
             </p>
           )}
           <Link href={`/${category}/${slug}`}>
-            <h3 className="font-serif text-2xl text-[#1A1A1A] group-hover:underline line-clamp-2">
+            <h3
+              className={`font-serif text-[#1A1A1A] group-hover:underline line-clamp-2 ${isCompact ? 'text-lg' : 'text-2xl'}`}
+            >
               {title}
             </h3>
           </Link>
@@ -64,7 +80,7 @@ export function ArticleCard({
       {author && (
         <Link
           href={`/contributors/${author.slug}`}
-          className="mt-1 block text-base text-[#6B6B6B] hover:text-black hover:underline underline-offset-2 transition-colors"
+          className={`mt-1 block text-[#6B6B6B] hover:text-black hover:underline underline-offset-2 transition-colors ${isCompact ? 'text-sm' : 'text-base'}`}
         >
           By {author.name}
         </Link>

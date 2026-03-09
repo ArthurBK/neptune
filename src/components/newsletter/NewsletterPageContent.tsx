@@ -57,36 +57,37 @@ export function NewsletterPageContent({
   }, [isModalOpen])
 
   return (
-    <main className="relative min-h-[calc(100vh-var(--header-height))] flex flex-col">
-      {/* Background image */}
-      <div className="absolute inset-0">
-        <Image
-          src={imageUrl ?? DEFAULT_IMAGE}
-          alt=""
-          fill
-          className="object-cover"
-          sizes="100vw"
-          priority
-        />
-        <div className="absolute inset-0 bg-black/30" />
-      </div>
-
-      {/* Content overlay */}
-      <div className="relative flex-1 flex flex-col items-center justify-center px-6 md:px-12 py-16 md:py-24 text-center">
-        <h1 className="font-serif text-4xl md:text-6xl text-white max-w-2xl [text-shadow:0_2px_12px_rgba(0,0,0,0.5)]">
+    <main className="flex flex-col">
+      {/* Title and text above the image */}
+      <div className="flex flex-col items-center px-6 md:px-12 pt-8 md:pt-12 pb-10 md:pb-14 text-center">
+        <h1 className="font-serif text-4xl md:text-5xl text-[#1A1A1A] uppercase tracking-wide">
           {headline ?? 'Newsletters'}
         </h1>
-        <p className="mt-6 text-base md:text-lg text-white/95 max-w-xl [text-shadow:0_1px_8px_rgba(0,0,0,0.5)]">
+        <p className="mt-4 text-base text-[#6B6B6B] max-w-xl mx-auto">
           {introText}
         </p>
         <button
           type="button"
           onClick={() => setIsModalOpen(true)}
-          className="mt-8 px-8 py-3 text-sm tracking-[0.2em] uppercase border-2 border-[var(--neptune-red)] text-[var(--neptune-red)] hover:bg-[var(--neptune-red)] hover:text-white transition-colors"
+          className="mt-8 cursor-pointer bg-transparent text-sm tracking-[0.2em] uppercase text-black transition-colors hover:underline"
         >
           Subscribe
         </button>
       </div>
+
+      {/* Image from Sanity (below the text) */}
+      {(imageUrl ?? DEFAULT_IMAGE) && (
+        <div className="relative w-full aspect-[16/10] md:aspect-[21/9] max-h-[60vh]">
+          <Image
+            src={imageUrl ?? DEFAULT_IMAGE}
+            alt=""
+            fill
+            className="object-cover"
+            sizes="100vw"
+            priority
+          />
+        </div>
+      )}
 
       {/* Modal */}
       {isModalOpen && (
@@ -140,7 +141,7 @@ export function NewsletterPageContent({
                 <button
                   type="submit"
                   disabled={status === 'loading'}
-                  className="mt-8 w-full py-3 text-sm tracking-[0.2em] uppercase border border-[#1A1A1A] text-[#1A1A1A] hover:bg-[#1A1A1A] hover:text-white transition-colors disabled:opacity-60"
+                  className="mt-8 block mx-auto cursor-pointer bg-transparent text-sm tracking-[0.2em] uppercase text-black transition-colors hover:underline disabled:opacity-60 disabled:cursor-not-allowed"
                 >
                   {status === 'loading' ? 'Subscribing…' : 'Subscribe'}
                 </button>

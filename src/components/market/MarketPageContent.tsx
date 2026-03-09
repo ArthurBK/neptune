@@ -47,27 +47,26 @@ export function MarketPageContent({ products }: MarketPageContentProps) {
     <main>
       <div className="max-w-[1400px] mx-auto px-6 md:px-12 lg:px-16 pt-8 md:pt-12 pb-16 md:pb-24">
         <header className="mb-12 md:mb-16 text-center">
-          <h1 className="font-serif text-6xl md:text-7xl uppercase tracking-wide text-[var(--neptune-red)]">
+          <h1 className="font-serif text-4xl md:text-5xl uppercase tracking-wide text-[var(--neptune-red)]">
             The Neptune Market
           </h1>
           <p className="mt-4 text-base text-[#6B6B6B] max-w-xl mx-auto">
-            Curated products we love. Purchases through these links may support
-            Neptune.
+            Our editors independently curate all products featured on Neptune.
+            We may receive compensation from retailers and/or from purchases of
+            products through these links.
           </p>
         </header>
 
         {categories.length > 0 && (
           <nav
-            className="mb-10 md:mb-12 flex flex-wrap gap-2"
+            className="mb-10 md:mb-12 flex flex-wrap justify-center gap-6"
             aria-label="Filter by category"
           >
             <button
               type="button"
               onClick={() => setSelectedCategory(null)}
-              className={`px-4 py-2 text-sm tracking-[0.15em] uppercase transition-colors border ${
-                selectedCategory === null
-                  ? 'border-[#1A1A1A] bg-[#1A1A1A] text-white'
-                  : 'border-[#E5E5E5] text-[#6B6B6B] hover:border-[#1A1A1A] hover:text-[#1A1A1A]'
+              className={`cursor-pointer bg-transparent text-sm tracking-[0.15em] uppercase text-black transition-colors hover:underline ${
+                selectedCategory === null ? 'underline' : ''
               }`}
             >
               All
@@ -77,10 +76,8 @@ export function MarketPageContent({ products }: MarketPageContentProps) {
                 key={cat}
                 type="button"
                 onClick={() => setSelectedCategory(cat)}
-                className={`px-4 py-2 text-sm tracking-[0.15em] uppercase transition-colors border ${
-                  selectedCategory === cat
-                    ? 'border-[#1A1A1A] bg-[#1A1A1A] text-white'
-                    : 'border-[#E5E5E5] text-[#6B6B6B] hover:border-[#1A1A1A] hover:text-[#1A1A1A]'
+                className={`cursor-pointer bg-transparent text-sm tracking-[0.15em] uppercase text-black transition-colors hover:underline ${
+                  selectedCategory === cat ? 'underline' : ''
                 }`}
               >
                 {CATEGORY_LABELS[cat] ?? cat}

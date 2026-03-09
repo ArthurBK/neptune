@@ -21,7 +21,7 @@ export function FashionPageContent({ products }: FashionPageContentProps) {
     <main>
       <div className="max-w-[1400px] mx-auto px-6 md:px-12 lg:px-16 pt-8 md:pt-12 pb-16 md:pb-24">
         <header className="mb-12 md:mb-16 text-center">
-          <h1 className="font-serif text-6xl md:text-7xl uppercase tracking-wide text-[#1A1A1A]">
+          <h1 className="font-serif text-4xl md:text-5xl uppercase tracking-wide text-[#1A1A1A]">
             Fashion
           </h1>
           <p className="mt-4 text-base text-[#6B6B6B] max-w-xl mx-auto">
