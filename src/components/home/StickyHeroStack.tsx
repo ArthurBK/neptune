@@ -227,8 +227,8 @@ function NewsstandHeroContent({
 
   return (
     <div className="flex flex-col md:flex-row w-full min-w-0 h-full gap-0 items-stretch overflow-hidden bg-white">
-      {/* Left: 6 product covers in 3x2 grid, no padding on left/right/top */}
-      <div className="flex-1 min-w-0 min-h-0 flex overflow-hidden">
+      {/* Left: 6 product covers in 3x2 grid, padding on top */}
+      <div className="flex-1 min-w-0 min-h-0 flex overflow-hidden pt-8 md:pt-12 lg:pt-16">
         <div className="grid grid-cols-3 grid-rows-2 gap-3 sm:gap-4 w-full h-full overflow-hidden">
           {products.slice(0, 6).map((p, i) => (
             <Link
