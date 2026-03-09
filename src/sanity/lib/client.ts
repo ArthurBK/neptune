@@ -10,14 +10,13 @@ export const client = createClient({
 })
 
 /**
- * Server-side fetch with Next.js Data Cache tags.
- * All results are cached and invalidated together via revalidateTag('sanity').
+ * Thin wrapper around client.fetch for server components.
+ * Pages use revalidate = 3600 (ISR) and the webhook calls
+ * revalidatePath('/', 'layout') to bust the Full Route Cache.
  */
 export async function sanityFetch<T>(
   query: string,
   params?: Record<string, unknown>,
 ): Promise<T> {
-  return client.fetch<T>(query, params ?? {}, {
-    next: { tags: ['sanity'] },
-  })
+  return client.fetch<T>(query, params ?? {})
 }
