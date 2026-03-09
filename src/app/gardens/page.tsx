@@ -71,7 +71,7 @@ export default async function GardensPage() {
         </header>
 
         {/* Article grid */}
-        <ArticleGrid articles={typedArticles} size="compact" />
+        <ArticleGrid articles={typedArticles} size="compact" featuredLayout />
 
         {/* Newsstand CTA */}
         <NewsstandCta />

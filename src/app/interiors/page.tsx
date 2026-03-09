@@ -73,7 +73,7 @@ export default async function InteriorsPage() {
         </header>
 
         {/* Article grid */}
-        <ArticleGrid articles={typedArticles} size="compact" />
+        <ArticleGrid articles={typedArticles} size="compact" featuredLayout />
 
         {/* Newsstand CTA */}
         <NewsstandCta />
