@@ -2,7 +2,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 
-import { client } from '@/sanity/lib/client'
+import { client, sanityFetch } from '@/sanity/lib/client'
 import { urlFor } from '@/sanity/lib/image'
 import {
   AD_BANNER_BY_PLACEMENT_QUERY,
@@ -29,14 +29,14 @@ export default async function ClientPage({ params }: ClientPageProps) {
   const { slug } = await params
 
   const [clientData, adTop, adMid, adBottom] = await Promise.all([
-    client.fetch<ClientData | null>(CLIENT_BY_SLUG_QUERY, { slug }),
-    client.fetch<AdData | null>(AD_BANNER_BY_PLACEMENT_QUERY, {
+    sanityFetch<ClientData | null>(CLIENT_BY_SLUG_QUERY, { slug }),
+    sanityFetch<AdData | null>(AD_BANNER_BY_PLACEMENT_QUERY, {
       placement: 'article-top',
     }),
-    client.fetch<AdData | null>(AD_BANNER_BY_PLACEMENT_QUERY, {
+    sanityFetch<AdData | null>(AD_BANNER_BY_PLACEMENT_QUERY, {
       placement: 'article-mid',
     }),
-    client.fetch<AdData | null>(AD_BANNER_BY_PLACEMENT_QUERY, {
+    sanityFetch<AdData | null>(AD_BANNER_BY_PLACEMENT_QUERY, {
       placement: 'article-bottom',
     }),
   ])

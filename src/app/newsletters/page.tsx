@@ -1,4 +1,4 @@
-import { client } from '@/sanity/lib/client'
+import { sanityFetch } from '@/sanity/lib/client'
 import { urlFor } from '@/sanity/lib/image'
 import { SITE_SETTINGS_QUERY } from '@/sanity/lib/queries'
 
@@ -7,7 +7,7 @@ import { NewsletterPageContent } from '@/components/newsletter/NewsletterPageCon
 export const revalidate = 3600
 
 export default async function NewslettersPage() {
-  const settings = await client.fetch<{
+  const settings = await sanityFetch<{
     newsletterHeadline?: string | null
     newsletterSubtitle?: string | null
     newsletterImage?: { asset?: { _ref: string } } | null

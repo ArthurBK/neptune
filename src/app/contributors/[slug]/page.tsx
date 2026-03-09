@@ -2,7 +2,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 
-import { client } from '@/sanity/lib/client'
+import { client, sanityFetch } from '@/sanity/lib/client'
 import { urlFor } from '@/sanity/lib/image'
 import {
   AD_BANNER_BY_PLACEMENT_QUERY,
@@ -50,11 +50,11 @@ export default async function ContributorPage({ params }: ContributorPageProps) 
   const { slug } = await params
 
   const [contributor, articles, adBanner] = await Promise.all([
-    client.fetch<ContributorData | null>(CONTRIBUTOR_BY_SLUG_QUERY, { slug }),
-    client.fetch<ArticleCardData[]>(ARTICLES_BY_CONTRIBUTOR_QUERY, {
+    sanityFetch<ContributorData | null>(CONTRIBUTOR_BY_SLUG_QUERY, { slug }),
+    sanityFetch<ArticleCardData[]>(ARTICLES_BY_CONTRIBUTOR_QUERY, {
       contributorSlug: slug,
     }),
-    client.fetch<{ image: { asset?: { _ref: string } }; linkUrl?: string | null; title?: string | null } | null>(
+    sanityFetch<{ image: { asset?: { _ref: string } }; linkUrl?: string | null; title?: string | null } | null>(
       AD_BANNER_BY_PLACEMENT_QUERY,
       { placement: 'category-top' }
     ),

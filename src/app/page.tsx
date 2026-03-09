@@ -1,4 +1,4 @@
-import { client } from '@/sanity/lib/client'
+import { sanityFetch } from '@/sanity/lib/client'
 import {
   FEATURED_ARTICLES_HOME_QUERY,
   HOME_PAGE_QUERY,
@@ -74,8 +74,8 @@ function toFeaturedProduct(node: {
 
 export default async function Home() {
   const [homePage, settings] = await Promise.all([
-    client.fetch<{ sections?: HomePageSection[] } | null>(HOME_PAGE_QUERY),
-    client.fetch<{ instagramUrl?: string | null } | null>(SITE_SETTINGS_QUERY),
+    sanityFetch<{ sections?: HomePageSection[] } | null>(HOME_PAGE_QUERY),
+    sanityFetch<{ instagramUrl?: string | null } | null>(SITE_SETTINGS_QUERY),
   ])
 
   const sections: HomeSection[] = []
@@ -157,7 +157,7 @@ export default async function Home() {
 
   // Fallback: no config or empty — use legacy articles + first newsstand product
   if (sections.length === 0) {
-    const articles = await client.fetch<
+    const articles = await sanityFetch<
       Array<{
         _id: string
         title: string

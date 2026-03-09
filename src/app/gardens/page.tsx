@@ -1,4 +1,4 @@
-import { client } from '@/sanity/lib/client'
+import { sanityFetch } from '@/sanity/lib/client'
 import {
   AD_BANNER_BY_PLACEMENT_QUERY,
   ARTICLES_BY_CATEGORY_QUERY,
@@ -23,13 +23,13 @@ const CATEGORY_DESCRIPTION: Record<string, string> = {
 
 export default async function GardensPage() {
   const [articles, adBanner, categoryPage] = await Promise.all([
-    client.fetch<unknown[]>(ARTICLES_BY_CATEGORY_QUERY, { category: 'gardens' }),
-    client.fetch<{
+    sanityFetch<unknown[]>(ARTICLES_BY_CATEGORY_QUERY, { category: 'gardens' }),
+    sanityFetch<{
       image: { asset?: { _ref: string } }
       linkUrl?: string | null
       title?: string | null
     } | null>(AD_BANNER_BY_PLACEMENT_QUERY, { placement: 'category-top' }),
-    client.fetch<{
+    sanityFetch<{
       interiorsImage?: { asset?: { _ref: string }; alt?: string } | null
       artsImage?: { asset?: { _ref: string }; alt?: string } | null
       gardensImage?: { asset?: { _ref: string }; alt?: string } | null

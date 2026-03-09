@@ -1,4 +1,4 @@
-import { client } from '@/sanity/lib/client'
+import { sanityFetch } from '@/sanity/lib/client'
 import { AFFILIATE_PRODUCTS_QUERY } from '@/sanity/lib/queries'
 
 import { MarketPageContent } from '@/components/market/MarketPageContent'
@@ -16,7 +16,7 @@ type AffiliateProduct = {
 }
 
 export default async function TheMarketPage() {
-  const products = await client.fetch<AffiliateProduct[]>(AFFILIATE_PRODUCTS_QUERY)
+  const products = await sanityFetch<AffiliateProduct[]>(AFFILIATE_PRODUCTS_QUERY)
 
   return <MarketPageContent products={products} />
 }

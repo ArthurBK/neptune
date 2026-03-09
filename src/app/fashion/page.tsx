@@ -1,4 +1,4 @@
-import { client } from '@/sanity/lib/client'
+import { sanityFetch } from '@/sanity/lib/client'
 import {
   AFFILIATE_PRODUCTS_BY_CATEGORY_QUERY,
   CATEGORY_PAGE_QUERY,
@@ -21,10 +21,10 @@ type AffiliateProduct = {
 
 export default async function FashionPage() {
   const [products, categoryPage] = await Promise.all([
-    client.fetch<AffiliateProduct[]>(AFFILIATE_PRODUCTS_BY_CATEGORY_QUERY, {
+    sanityFetch<AffiliateProduct[]>(AFFILIATE_PRODUCTS_BY_CATEGORY_QUERY, {
       category: 'fashion',
     }),
-    client.fetch<{
+    sanityFetch<{
       fashionImage?: { asset?: { _ref: string }; alt?: string } | null
     } | null>(CATEGORY_PAGE_QUERY),
   ])

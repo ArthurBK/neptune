@@ -35,6 +35,8 @@ export async function POST(req: NextRequest) {
       )
     }
 
+    revalidatePath('/', 'layout')
+
     const revalidated: string[] = []
 
     switch (body._type) {

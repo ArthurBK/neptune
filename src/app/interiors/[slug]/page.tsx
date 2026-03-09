@@ -2,7 +2,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 
-import { client } from '@/sanity/lib/client'
+import { client, sanityFetch } from '@/sanity/lib/client'
 import { urlFor } from '@/sanity/lib/image'
 import {
   AD_BANNER_BY_PLACEMENT_QUERY,
@@ -32,17 +32,17 @@ export default async function InteriorsArticlePage({ params }: ArticlePageProps)
   const { slug } = await params
 
   const [article, adTop, adMid, adBottom] = await Promise.all([
-    client.fetch<ArticleData | null>(ARTICLE_BY_SLUG_QUERY, {
+    sanityFetch<ArticleData | null>(ARTICLE_BY_SLUG_QUERY, {
       slug,
       category: 'interiors',
     }),
-    client.fetch<AdData | null>(AD_BANNER_BY_PLACEMENT_QUERY, {
+    sanityFetch<AdData | null>(AD_BANNER_BY_PLACEMENT_QUERY, {
       placement: 'article-top',
     }),
-    client.fetch<AdData | null>(AD_BANNER_BY_PLACEMENT_QUERY, {
+    sanityFetch<AdData | null>(AD_BANNER_BY_PLACEMENT_QUERY, {
       placement: 'article-mid',
     }),
-    client.fetch<AdData | null>(AD_BANNER_BY_PLACEMENT_QUERY, {
+    sanityFetch<AdData | null>(AD_BANNER_BY_PLACEMENT_QUERY, {
       placement: 'article-bottom',
     }),
   ])
@@ -53,7 +53,7 @@ export default async function InteriorsArticlePage({ params }: ArticlePageProps)
     ? urlFor(article.coverImage).width(1400).height(933).url()
     : null
 
-  const relatedArticles = await client.fetch<ArticleCardData[]>(
+  const relatedArticles = await sanityFetch<ArticleCardData[]>(
     RELATED_ARTICLES_BY_CATEGORY_QUERY,
     { category: 'interiors', excludeId: article._id }
   )

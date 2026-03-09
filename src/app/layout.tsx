@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import localFont from 'next/font/local'
 
-import { client } from '@/sanity/lib/client'
+import { sanityFetch } from '@/sanity/lib/client'
 import { SITE_SETTINGS_QUERY } from '@/sanity/lib/queries'
 import { LayoutShell } from '@/components/layout/LayoutShell'
 
@@ -51,7 +51,7 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode
 }>) {
-  const settings = await client.fetch<{ instagramUrl?: string | null } | null>(
+  const settings = await sanityFetch<{ instagramUrl?: string | null } | null>(
     SITE_SETTINGS_QUERY
   )
   const instagramUrl = settings?.instagramUrl ?? null
