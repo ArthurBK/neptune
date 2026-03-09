@@ -7,7 +7,6 @@ import {
   pteImageGridBlock,
 } from './article'
 import { adBanner } from './adBanner'
-import { client } from './client'
 import {
   homeArticleBlock,
   homeImageBlock,
@@ -25,7 +24,6 @@ import { siteSettings } from './siteSettings'
 export const schema: { types: SchemaTypeDefinition[] } = {
   types: [
     article,
-    client,
     categoryPage,
     homePage,
     homeArticleBlock,

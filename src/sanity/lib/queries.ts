@@ -108,43 +108,6 @@ export const RELATED_ARTICLES_BY_CATEGORY_QUERY = `
   }
 `
 
-// All clients (for Studio page)
-export const CLIENTS_QUERY = `
-  *[_type == "client"] | order(publishedAt desc) {
-    _id,
-    title,
-    "slug": slug.current,
-    category,
-    services,
-    coverImage
-  }
-`
-
-// Single client by slug
-export const CLIENT_BY_SLUG_QUERY = `
-  *[_type == "client" && slug.current == $slug][0] {
-    ...,
-    "relatedClients": relatedClients[]->{ _id, title, "slug": slug.current, category, subcategory, coverImage },
-    "body": body[] {
-      ...,
-      _type == "adBannerEmbedBlock" => {
-        "adBanner": adBanner->{ image, linkUrl, title }
-      },
-      markDefs[] {
-        ...,
-        _type == "affiliateProductEmbed" => {
-          "product": product->{ title, affiliateUrl }
-        }
-      }
-    }
-  }
-`
-
-// Client slugs for generateStaticParams
-export const CLIENT_SLUGS_QUERY = `
-  *[_type == "client"] { "slug": slug.current }
-`
-
 // All affiliate products (for neptune market)
 export const AFFILIATE_PRODUCTS_QUERY = `
   *[_type == "affiliateProduct"] | order(publishedAt desc) {
