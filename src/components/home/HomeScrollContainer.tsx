@@ -111,8 +111,8 @@ export function HomeScrollContainer({ sections, navbar, children }: HomeScrollCo
       ref={scrollRef}
       className={
         hasNavbar
-          ? 'fixed left-0 right-0 top-0 z-10 h-screen overflow-x-hidden overflow-y-auto overscroll-contain w-full min-w-0'
-          : 'fixed left-0 right-0 top-[var(--header-height)] z-10 h-[calc(100vh-var(--header-height))] overflow-x-hidden overflow-y-auto overscroll-contain w-full min-w-0'
+          ? 'fixed left-0 right-0 top-0 z-10 h-screen overflow-x-hidden overflow-y-auto overscroll-contain w-full min-w-0 snap-y snap-mandatory'
+          : 'fixed left-0 right-0 top-[var(--header-height)] z-10 h-[calc(100vh-var(--header-height))] overflow-x-hidden overflow-y-auto overscroll-contain w-full min-w-0 snap-y snap-mandatory'
       }
     >
       <StickyHeroStack sections={sections} headerSlot={navbar} />

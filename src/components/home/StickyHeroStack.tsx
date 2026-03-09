@@ -89,7 +89,7 @@ function HeroSection({
   return (
     <section
       key={keyProp}
-      className={`sticky top-0 box-border w-full min-w-0 shrink-0 overflow-hidden ${heightClass} ${bgClass}`}
+      className={`sticky top-0 box-border w-full min-w-0 shrink-0 overflow-hidden snap-start ${heightClass} ${bgClass}`}
       style={{ zIndex }}
     >
       {children}
@@ -671,7 +671,7 @@ export function StickyHeroStack({ sections, headerSlot }: StickyHeroStackProps) 
         <>
           {/* First block: 100vh. When first section is video: video full screen with menu on top; else header + content below */}
           <div
-            className="sticky top-0 flex flex-col w-full min-w-0 shrink-0 h-screen overflow-hidden relative"
+            className="sticky top-0 flex flex-col w-full min-w-0 shrink-0 h-screen overflow-hidden relative snap-start"
             style={{ zIndex: 1 }}
           >
             {sections[0]?.type === 'video' ? (

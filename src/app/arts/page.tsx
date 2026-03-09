@@ -71,7 +71,7 @@ export default async function ArtsPage() {
         </header>
 
         {/* Article grid */}
-        <ArticleGrid articles={typedArticles} />
+        <ArticleGrid articles={typedArticles} size="compact" />
 
         {/* Newsstand CTA */}
         <NewsstandCta />
