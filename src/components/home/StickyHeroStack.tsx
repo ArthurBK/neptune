@@ -671,19 +671,21 @@ export function StickyHeroStack({ sections, headerSlot }: StickyHeroStackProps) 
         <>
           {/* First block: 100vh. When first section is video: video full screen with menu on top; else header + content below */}
           <div
-            className="sticky top-0 flex flex-col w-full min-w-0 shrink-0 h-screen overflow-hidden relative snap-start"
+            className="sticky top-0 flex flex-col w-full min-w-0 shrink-0 h-screen min-h-screen overflow-hidden relative snap-start"
             style={{ zIndex: 1 }}
           >
             {sections[0]?.type === 'video' ? (
               <>
                 {/* Video full screen, then menu on top */}
-                <div className="absolute inset-0 w-full h-full">
+                <div className="absolute inset-0 w-full h-full min-h-full">
                   {(() => {
                     const cfg = renderSectionContent(sections[0], 0)
                     return cfg ? cfg.content : null
                   })()}
                 </div>
+                {/* Spacer so flex layout takes full height (header + rest = 100vh) */}
                 <div className="relative z-10 shrink-0">{headerSlot}</div>
+                <div className="flex-1 min-h-0" aria-hidden />
               </>
             ) : (
               <>

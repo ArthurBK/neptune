@@ -8,6 +8,7 @@ import { StickyHeroStack } from './StickyHeroStack'
 import type { HomeSection } from './StickyHeroStack'
 
 const WHEEL_THRESHOLD = 20
+const TOUCH_SWIPE_THRESHOLD_PX = 50
 const SCROLL_COOLDOWN_MS = 500
 
 interface HomeScrollContainerProps {
@@ -24,6 +25,7 @@ export function HomeScrollContainer({ sections, navbar, children }: HomeScrollCo
   const scrollRef = useRef<HTMLDivElement>(null)
   const cooldownUntilRef = useRef(0)
   const goToSectionRef = useRef<(index: number) => void>(() => {})
+  const touchStartYRef = useRef<number | null>(null)
 
   const hasNavbar = !!navbar
   const goToSection = useCallback((index: number) => {
@@ -69,6 +71,52 @@ export function HomeScrollContainer({ sections, navbar, children }: HomeScrollCo
 
     el.addEventListener('wheel', onWheel, { passive: false })
     return () => el.removeEventListener('wheel', onWheel)
+  }, [])
+
+  // Touch: one section per swipe on mobile (prevent native scroll, use same section logic as wheel)
+  useEffect(() => {
+    const el = scrollRef.current
+    if (!el) return
+
+    const onTouchStart = (e: TouchEvent) => {
+      touchStartYRef.current = e.touches[0].clientY
+    }
+
+    const onTouchMove = (e: TouchEvent) => {
+      // Prevent native scroll so we control section changes in touchend
+      e.preventDefault()
+    }
+
+    const onTouchEnd = (e: TouchEvent) => {
+      const startY = touchStartYRef.current
+      touchStartYRef.current = null
+      if (startY == null || e.changedTouches.length === 0) return
+
+      const endY = e.changedTouches[0].clientY
+      const deltaY = endY - startY
+
+      const sectionHeight = el.clientHeight
+      if (sectionHeight <= 0) return
+      if (Date.now() < cooldownUntilRef.current) return
+
+      const currentIndex = Math.round(el.scrollTop / sectionHeight)
+      const sectionCount = Math.ceil(el.scrollHeight / sectionHeight)
+
+      if (deltaY < -TOUCH_SWIPE_THRESHOLD_PX && currentIndex < sectionCount - 1) {
+        goToSectionRef.current(currentIndex + 1)
+      } else if (deltaY > TOUCH_SWIPE_THRESHOLD_PX && currentIndex > 0) {
+        goToSectionRef.current(currentIndex - 1)
+      }
+    }
+
+    el.addEventListener('touchstart', onTouchStart, { passive: true })
+    el.addEventListener('touchmove', onTouchMove, { passive: false })
+    el.addEventListener('touchend', onTouchEnd, { passive: true })
+    return () => {
+      el.removeEventListener('touchstart', onTouchStart)
+      el.removeEventListener('touchmove', onTouchMove)
+      el.removeEventListener('touchend', onTouchEnd)
+    }
   }, [])
 
   const handleKeyDown = useCallback(
