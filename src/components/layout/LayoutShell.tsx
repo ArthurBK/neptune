@@ -18,8 +18,10 @@ export function LayoutShell({
 
   return (
     <>
-      {!isStudio && <Header />}
-      <main className={`flex-1 ${!isStudio ? 'pt-[var(--header-height)]' : ''}`}>{children}</main>
+      {!isStudio && !isHome && <Header />}
+      <main className="flex-1 min-w-0">
+        {children}
+      </main>
       {!isStudio && !isHome && <Footer instagramUrl={instagramUrl} />}
     </>
   )

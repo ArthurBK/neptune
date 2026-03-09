@@ -29,7 +29,13 @@ export const HOME_PAGE_QUERY = `
         }
       },
       _type == "homeNewsstandBlock" => {
-        handle
+        "productHandles": productHandles[] { handle },
+        title,
+        description,
+        ctaLabel
+      },
+      _type == "homeVideoBlock" => {
+        "videoUrl": video.asset->url
       }
     }
   }

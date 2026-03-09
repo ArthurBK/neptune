@@ -41,9 +41,7 @@ function NavLink({
     <Link
       href={href}
       onClick={onClick}
-      className={`text-base tracking-[0.2em] uppercase transition-colors hover:text-black ${
-        bold ? 'font-bold' : ''
-      } ${isActive ? 'text-black font-medium' : 'text-[#6B6B6B]'}`}
+      className={`font-header font-medium text-base tracking-[0.2em] uppercase transition-colors hover:text-black ${bold ? 'font-bold' : ''} ${isActive ? 'text-black' : 'text-[#6B6B6B]'}`}
     >
       {label}
     </Link>
@@ -104,11 +102,18 @@ export function Header() {
   }, [fetchCartCount])
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-white border-b border-[#E5E5E5]">
-      <div className="relative max-w-screen-xl mx-auto px-4 sm:px-6 md:px-12 lg:px-16 py-4 md:py-6 w-full min-w-0">
-        {/* Top row: Burger + Newsletter left, Logo center */}
-        <div className="flex items-center justify-between">
-          <div className="flex-1 flex justify-start items-center gap-2">
+    <header
+      className="static w-full flex flex-col overflow-hidden bg-white border-b border-[#E5E5E5] transition-colors shrink-0"
+      style={{
+        height: 'var(--header-height)',
+        minHeight: 'var(--header-height)',
+        position: 'static',
+      }}
+    >
+      <div className="relative flex flex-col flex-1 min-h-0 max-w-screen-xl mx-auto px-4 sm:px-6 md:px-12 lg:px-16 py-2 md:py-3 w-full min-w-0">
+        {/* Top row: Burger + Newsletter left, Logo center, Cart/Search right */}
+        <div className="relative flex items-center justify-between">
+          <div className="flex-1 flex justify-start items-center gap-2 -ml-4 md:-ml-8">
             <button
               type="button"
               aria-label={isBurgerOpen ? 'Close menu' : 'Open menu'}
@@ -132,15 +137,15 @@ export function Header() {
                 }`}
               />
             </button>
-            <NavLink href="/newsletters" label="NEWSLETTERS" bold />
+            <NavLink href="/newsletters" label="NEWSLETTERS" />
           </div>
-          <Link href="/" className="shrink-0">
+          <Link href="/" className="absolute left-1/2 -translate-x-1/2 shrink-0">
             <Image
               src="/neptune_logo.png"
               alt="Neptune"
-              width={120}
-              height={32}
-              className="h-6 w-auto md:h-8"
+              width={90}
+              height={24}
+              className="h-5 w-auto md:h-6"
               priority
             />
           </Link>
@@ -199,7 +204,7 @@ export function Header() {
         </div>
 
         {/* Desktop nav — nav items centered, search & cart on the right */}
-        <nav className="hidden md:flex items-center justify-center gap-8 mt-4 w-full relative">
+        <nav className="hidden md:flex items-center justify-center gap-8 mt-2 pb-3 w-full relative">
           {NAV_ITEMS.map((item) => (
             <NavLink key={item.href} href={item.href} label={item.label} />
           ))}
@@ -268,7 +273,7 @@ export function Header() {
           aria-hidden
         />
         <aside
-          className={`fixed top-[var(--header-height)] left-0 bottom-0 z-50 w-72 max-w-[85vw] bg-white border-r border-[#E5E5E5] shadow-xl transition-transform duration-300 ease-out ${
+          className={`fixed top-0 left-0 bottom-0 z-50 w-72 max-w-[85vw] bg-white border-r border-[#E5E5E5] shadow-xl transition-transform duration-300 ease-out ${
             isBurgerOpen ? 'translate-x-0' : '-translate-x-full'
           }`}
           aria-hidden={!isBurgerOpen}
@@ -277,7 +282,6 @@ export function Header() {
             <NavLink
               href="/newsletters"
               label="NEWSLETTERS"
-              bold
               onClick={() => setIsBurgerOpen(false)}
             />
             {NAV_ITEMS.map((item) => (

@@ -7,12 +7,13 @@ import {
 import { shopifyFetch } from '@/lib/shopify/client'
 import {
   FIRST_PRODUCT_QUERY,
-  LATEST_NEWSSTAND_PRODUCT_QUERY,
+  NEWSSTAND_6_PRODUCTS_QUERY,
   PRODUCT_BY_HANDLE_HERO_QUERY,
 } from '@/lib/shopify/queries'
 import { HomeScrollContainer } from '@/components/home/HomeScrollContainer'
 import type { HomeSection } from '@/components/home/StickyHeroStack'
 import { Footer } from '@/components/layout/Footer'
+import { Header } from '@/components/layout/Header'
 
 export const revalidate = 3600
 
@@ -37,7 +38,23 @@ type HomePageSection = {
     image: { asset?: { _ref: string }; alt?: string }
     affiliateUrl: string
   }
-  handle?: string
+  productHandles?: Array<{ handle: string }>
+  description?: string | null
+  ctaLabel?: string | null
+  videoUrl?: string | null
+}
+
+type NewsstandProductNode = {
+  handle: string
+  title: string
+  featuredImage?: { url: string; altText: string | null } | null
+  images?: { edges: Array<{ node: { url: string; altText: string | null } }> }
+}
+
+type NewsstandResponse = {
+  collection: {
+    products: { edges: Array<{ node: NewsstandProductNode }> }
+  } | null
 }
 
 function toFeaturedProduct(node: {
@@ -66,7 +83,12 @@ export default async function Home() {
 
   if (homePage?.sections?.length) {
     for (const block of homePage.sections) {
-      if (block._type === 'homeArticleBlock' && block.article) {
+      if (block._type === 'homeVideoBlock' && block.videoUrl) {
+        sections.push({
+          type: 'video',
+          data: { videoUrl: block.videoUrl },
+        })
+      } else if (block._type === 'homeArticleBlock' && block.article) {
         sections.push({
           type: 'article',
           data: {
@@ -100,28 +122,35 @@ export default async function Home() {
             affiliateUrl: block.product.affiliateUrl,
           },
         })
-      } else if (block._type === 'homeNewsstandBlock' && block.handle) {
+      } else if (block._type === 'homeNewsstandBlock' && block.productHandles?.length) {
         try {
-          const data = await shopifyFetch<{
-            product: {
-              handle: string
-              title: string
-              featuredImage?: { url: string; altText: string | null } | null
-              images?: { edges: Array<{ node: { url: string; altText: string | null } }> }
-            } | null
-          }>({
-            query: PRODUCT_BY_HANDLE_HERO_QUERY,
-            variables: { handle: block.handle },
-          })
-          if (data?.product) {
-            const fp = toFeaturedProduct(data.product)
+          const handles = block.productHandles.map((p) => p.handle).filter(Boolean)
+          const productResults = await Promise.all(
+            handles.map((handle) =>
+              shopifyFetch<{ product: NewsstandProductNode | null }>({
+                query: PRODUCT_BY_HANDLE_HERO_QUERY,
+                variables: { handle },
+              })
+            )
+          )
+          const products = productResults
+            .map((r) => (r?.product ? toFeaturedProduct(r.product) : null))
+            .filter((p): p is NonNullable<typeof p> => p != null)
+          const featuredHandle = handles[0]
+          if (products.length > 0 && featuredHandle) {
             sections.push({
               type: 'newsstandProduct',
-              data: fp,
+              data: {
+                products,
+                featuredHandle,
+                title: block.title,
+                description: block.description,
+                ctaLabel: block.ctaLabel,
+              },
             })
           }
         } catch (err) {
-          console.error(`[Home] Shopify fetch for handle "${block.handle}":`, err)
+          console.error('[Home] Shopify fetch for newsstand block:', err)
         }
       }
     }
@@ -146,31 +175,38 @@ export default async function Home() {
 
     try {
       const [collectionData, allProductsData] = await Promise.all([
-        shopifyFetch<{
-          collection: { products: { edges: Array<{ node: unknown }> } } | null
-        }>({ query: LATEST_NEWSSTAND_PRODUCT_QUERY }),
+        shopifyFetch<NewsstandResponse>({ query: NEWSSTAND_6_PRODUCTS_QUERY }),
         shopifyFetch<{ products: { edges: Array<{ node: unknown }> } }>({
           query: FIRST_PRODUCT_QUERY,
         }),
       ])
-      const collectionProduct = (collectionData?.collection?.products?.edges?.[0]
-        ?.node) as {
-        handle: string
-        title: string
-        featuredImage?: { url: string; altText: string | null }
-        images?: { edges: Array<{ node: { url: string; altText: string | null } }> }
-      } | undefined
-      const allProductsNode = (allProductsData?.products?.edges?.[0]?.node) as {
-        handle: string
-        title: string
-        featuredImage?: { url: string; altText: string | null }
-        images?: { edges: Array<{ node: { url: string; altText: string | null } }> }
-      } | undefined
-      const node = collectionProduct ?? allProductsNode
-      if (node) {
+      const collectionProducts =
+        collectionData?.collection?.products?.edges?.map((e) => toFeaturedProduct(e.node)) ?? []
+      const allProductsNode = allProductsData?.products?.edges?.[0]?.node as
+        | {
+            handle: string
+            title: string
+            featuredImage?: { url: string; altText: string | null }
+            images?: { edges: Array<{ node: { url: string; altText: string | null } }> }
+          }
+        | undefined
+      const products =
+        collectionProducts.length > 0
+          ? collectionProducts
+          : allProductsNode
+            ? [toFeaturedProduct(allProductsNode)]
+            : []
+      const featuredHandle = products[0]?.handle
+      if (products.length > 0 && featuredHandle) {
         sections.push({
           type: 'newsstandProduct',
-          data: toFeaturedProduct(node),
+          data: {
+            products,
+            featuredHandle,
+            title: null,
+            description: null,
+            ctaLabel: null,
+          },
         })
       }
     } catch (err) {
@@ -179,9 +215,9 @@ export default async function Home() {
   }
 
   return (
-    <div className="min-h-[calc(100vh-var(--header-height))]">
-      <HomeScrollContainer sections={sections}>
-        <section className="min-h-[calc(100vh-var(--header-height))] snap-start flex flex-col items-center justify-center bg-white">
+    <div className="min-h-screen">
+      <HomeScrollContainer sections={sections} navbar={<Header />}>
+        <section className="h-screen min-h-screen flex flex-col items-center justify-center bg-white">
           <Footer instagramUrl={settings?.instagramUrl ?? null} />
         </section>
       </HomeScrollContainer>

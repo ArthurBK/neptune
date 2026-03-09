@@ -9,7 +9,7 @@
 
 @media (min-width: 768px) {
   :root {
-    --header-height: 6rem; /* ~96px desktop */
+    --header-height: 5.75rem; /* ~92px desktop, room for nav + bottom padding */
   }
 }
 
@@ -19,6 +19,7 @@
   --font-sans: var(--font-cormorant), ui-serif, Georgia, serif;
   --font-serif: var(--font-cormorant), ui-serif, Georgia, serif;
   --font-accent: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-header: "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 
 html {

@@ -32,6 +32,28 @@ export const NEWSSTAND_PRODUCTS_QUERY = `
   }
 `
 
+/** First 6 products from newsstand collection (for homepage hero grid) */
+export const NEWSSTAND_6_PRODUCTS_QUERY = `
+  query Newsstand6Products {
+    collection(handle: "newsstand") {
+      products(first: 6, sortKey: CREATED, reverse: true) {
+        edges {
+          node {
+            handle
+            title
+            featuredImage { url altText }
+            images(first: 5) {
+              edges {
+                node { url altText }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+`
+
 /** Newest product from newsstand collection (for homepage hero) */
 export const LATEST_NEWSSTAND_PRODUCT_QUERY = `
   query LatestNewsstandProduct {

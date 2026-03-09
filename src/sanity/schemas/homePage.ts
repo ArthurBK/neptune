@@ -82,24 +82,86 @@ const homeProductBlock = defineType({
   },
 })
 
-// Home section: newsstand product (Shopify handle)
-const homeNewsstandBlock = defineType({
-  name: 'homeNewsstandBlock',
-  title: 'Newsstand Product',
+// Home section: fullscreen video (auto-play, muted)
+const homeVideoBlock = defineType({
+  name: 'homeVideoBlock',
+  title: 'Video',
   type: 'object',
   icon: ImageIcon,
   fields: [
     defineField({
-      name: 'handle',
-      title: 'Product handle',
-      type: 'string',
-      description: 'Shopify product handle from Newsstand (e.g. neptune-issue-01)',
+      name: 'video',
+      title: 'Video',
+      type: 'file',
+      options: {
+        accept: 'video/mp4,video/webm,video/quicktime',
+      },
       validation: (rule) => rule.required(),
     }),
   ],
   preview: {
-    select: { handle: 'handle' },
-    prepare: ({ handle }) => ({ title: handle ? `Newsstand: ${handle}` : 'Newsstand Product' }),
+    select: { title: 'video.asset.originalFilename' },
+    prepare: ({ title }) => ({ title: title ? `Video: ${title}` : 'Video' }),
+  },
+})
+
+// Home section: newsstand products (Shopify handles)
+const homeNewsstandBlock = defineType({
+  name: 'homeNewsstandBlock',
+  title: 'Newsstand Hero',
+  type: 'object',
+  icon: ImageIcon,
+  fields: [
+    defineField({
+      name: 'productHandles',
+      title: 'Products',
+      type: 'array',
+      description: 'Exactly 6 Shopify product handles from Newsstand. Drag to reorder. First product is used for the CTA link.',
+      of: [
+        {
+          type: 'object',
+          fields: [
+            {
+              name: 'handle',
+              title: 'Product handle',
+              type: 'string',
+              description: 'e.g. neptune-issue-01',
+              validation: (rule) => rule.required(),
+            },
+          ],
+          preview: {
+            select: { handle: 'handle' },
+            prepare: ({ handle }) => ({ title: handle || 'Product' }),
+          },
+        },
+      ],
+      validation: (rule) => rule.required().length(6),
+    }),
+    defineField({
+      name: 'title',
+      title: 'Headline',
+      type: 'string',
+      description: 'Optional — overrides product title (e.g. "NEPTUNE 10")',
+    }),
+    defineField({
+      name: 'description',
+      title: 'Description',
+      type: 'text',
+      description: 'Optional body text for the right column',
+    }),
+    defineField({
+      name: 'ctaLabel',
+      title: 'CTA label',
+      type: 'string',
+      description: 'Optional — e.g. "DISCOVER OUR ANNIVERSARY ISSUE"',
+    }),
+  ],
+  preview: {
+    select: { productHandles: 'productHandles' },
+    prepare: ({ productHandles }) => {
+      const count = Array.isArray(productHandles) ? productHandles.length : 0
+      return { title: `Newsstand Hero (${count} products)` }
+    },
   },
 })
 
@@ -121,6 +183,7 @@ export const homePage = defineType({
       type: 'array',
       description: 'Drag to reorder. Each section appears as a full-screen slide on the home page.',
       of: [
+        defineArrayMember({ type: 'homeVideoBlock' }),
         defineArrayMember({ type: 'homeArticleBlock' }),
         defineArrayMember({ type: 'homeImageBlock' }),
         defineArrayMember({ type: 'homeProductBlock' }),
@@ -134,4 +197,4 @@ export const homePage = defineType({
   },
 })
 
-export { homeArticleBlock, homeImageBlock, homeProductBlock, homeNewsstandBlock }
+export { homeArticleBlock, homeImageBlock, homeProductBlock, homeNewsstandBlock, homeVideoBlock }
