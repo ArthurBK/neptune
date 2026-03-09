@@ -24,7 +24,7 @@ export function Footer({ instagramUrl }: { instagramUrl?: string | null }) {
             />
           </Link>
 
-          <nav className="flex flex-col sm:flex-row flex-wrap items-center justify-center gap-4 sm:gap-6 md:gap-8 font-header font-medium text-base tracking-[0.2em] uppercase text-[#6B6B6B]">
+          <nav className="flex flex-col sm:flex-row flex-wrap items-center justify-center gap-4 sm:gap-6 md:gap-8 font-header font-medium text-sm tracking-[0.2em] uppercase text-[#6B6B6B]">
             {FOOTER_LINKS.map((item) => (
               <Link
                 key={item.href}
@@ -64,7 +64,7 @@ export function Footer({ instagramUrl }: { instagramUrl?: string | null }) {
             </a>
           </nav>
 
-          <p className="font-header font-medium text-sm text-[#6B6B6B]">
+          <p className="font-header font-medium text-xs text-[#6B6B6B]">
             © {new Date().getFullYear()} Neptune Papers. All rights reserved.
           </p>
         </div>

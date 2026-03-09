@@ -63,6 +63,44 @@ interface StickyHeroStackProps {
   headerSlot?: ReactNode | null
   /** When true, reserve space for fixed header at top of first block (e.g. when header is rendered by layout) */
   reserveHeaderSpace?: boolean
+  /** Optional: called when user clicks the scroll-down chevron on the first section */
+  onScrollDown?: () => void
+}
+
+function ScrollDownChevron({
+  onClick,
+  lightBg = false,
+}: {
+  onClick?: () => void
+  lightBg?: boolean
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`absolute bottom-6 left-1/2 z-20 -translate-x-1/2 flex flex-col items-center gap-1 transition-transform hover:scale-110 focus:outline-none focus-visible:ring-2 rounded-full p-2 animate-bounce-subtle ${
+        lightBg
+          ? 'text-neutral-700 drop-shadow-[0_1px_2px_rgba(255,255,255,0.8)] focus-visible:ring-neutral-400'
+          : 'text-white/90 drop-shadow-[0_1px_3px_rgba(0,0,0,0.5)] focus-visible:ring-white/50'
+      }`}
+      aria-label="Scroll down"
+    >
+      <svg
+        width="28"
+        height="28"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        aria-hidden
+      >
+        <title>Scroll down</title>
+        <path d="M6 9l6 6 6-6" />
+      </svg>
+    </button>
+  )
 }
 
 function HeroSection({
@@ -86,12 +124,12 @@ function HeroSection({
       ? 'bg-white'
       : 'bg-[#0a0a0a]'
   const heightClass = fullHeight
-    ? 'h-screen max-h-screen'
-    : 'h-[calc(100vh-var(--header-height))] max-h-[calc(100vh-var(--header-height))]'
+    ? 'h-[var(--section-height,100vh)] max-h-[var(--section-height,100vh)]'
+    : 'h-[calc(var(--section-height,100vh)-var(--header-height))] max-h-[calc(var(--section-height,100vh)-var(--header-height))]'
   return (
     <section
       key={keyProp}
-      className={`sticky top-0 box-border w-full min-w-0 shrink-0 overflow-hidden snap-start ${heightClass} ${bgClass}`}
+      className={`sticky top-0 box-border w-full min-w-0 shrink-0 overflow-hidden ${heightClass} ${bgClass}`}
       style={{ zIndex }}
     >
       {children}
@@ -572,18 +610,22 @@ function renderSectionContent(
       : null
     return {
       content: (
-        <ArticleSplitContent
-          imageUrl={imageUrl}
-          alt={article.coverImage?.alt ?? article.title}
-          title={article.title}
-          subtitle={article.author?.name}
-          subtitleHref={
-            article.author?.slug ? `/contributors/${article.author.slug}` : undefined
-          }
-          categoryHref={`/${article.category}`}
-          href={`/${article.category}/${article.slug}`}
-          priority={priority}
-        />
+        <div
+          className={`w-full h-full min-w-0 flex flex-col ${imageUrl ? 'pt-[var(--header-height)]' : ''}`}
+        >
+          <ArticleSplitContent
+            imageUrl={imageUrl}
+            alt={article.coverImage?.alt ?? article.title}
+            title={article.title}
+            subtitle={article.author?.name}
+            subtitleHref={
+              article.author?.slug ? `/contributors/${article.author.slug}` : undefined
+            }
+            categoryHref={`/${article.category}`}
+            href={`/${article.category}/${article.slug}`}
+            priority={priority}
+          />
+        </div>
       ),
       key: article._id,
       keyProp: article._id,
@@ -666,6 +708,7 @@ export function StickyHeroStack({
   sections,
   headerSlot = null,
   reserveHeaderSpace = false,
+  onScrollDown,
 }: StickyHeroStackProps) {
   if (sections.length === 0) return null
 
@@ -675,9 +718,9 @@ export function StickyHeroStack({
     <div className="w-full min-w-0">
       {withNavbar ? (
         <>
-          {/* First block: 100vh. When first section is video: video full screen with menu on top; else header + content below */}
+          {/* First block: one section height. When first section is video: video full screen with menu on top; else header + content below */}
           <div
-            className="sticky top-0 flex flex-col w-full min-w-0 shrink-0 h-screen min-h-screen overflow-hidden relative snap-start"
+            className="sticky top-0 flex flex-col w-full min-w-0 shrink-0 h-[var(--section-height,100vh)] min-h-[var(--section-height,100vh)] overflow-hidden relative"
             style={{ zIndex: 1 }}
           >
             {sections[0]?.type === 'video' ? (
@@ -717,6 +760,10 @@ export function StickyHeroStack({
                 })()}
               </>
             )}
+            <ScrollDownChevron
+              onClick={onScrollDown}
+              lightBg={renderSectionContent(sections[0], 0)?.bgWhite ?? false}
+            />
           </div>
           {/* Remaining sections: full 100vh each */}
           {sections.slice(1).map((item, i) => {

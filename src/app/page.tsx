@@ -216,7 +216,7 @@ export default async function Home() {
   return (
     <div className="min-h-screen">
       <HomeScrollContainer sections={sections}>
-        <section className="h-screen min-h-screen w-full shrink-0 snap-start flex flex-col items-center justify-center bg-white">
+        <section className="h-[var(--section-height,100vh)] min-h-[var(--section-height,100vh)] w-full shrink-0 flex flex-col items-center justify-center bg-white">
           <Footer instagramUrl={settings?.instagramUrl ?? null} />
         </section>
       </HomeScrollContainer>

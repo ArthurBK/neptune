@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useRef } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 
 import { useSetHeaderVariant } from '@/contexts/HeaderVariantContext'
 
@@ -10,26 +10,48 @@ import type { HomeSection } from './StickyHeroStack'
 
 const WHEEL_THRESHOLD = 20
 const TOUCH_SWIPE_THRESHOLD_PX = 50
-const SCROLL_COOLDOWN_MS = 500
+
+function useSectionHeight(scrollRef: React.RefObject<HTMLDivElement | null>) {
+  const [sectionHeight, setSectionHeight] = useState(0)
+
+  useEffect(() => {
+    const el = scrollRef.current
+    if (!el) return
+
+    const update = () => {
+      const h = el.clientHeight
+      if (h > 0) setSectionHeight(h)
+    }
+
+    update()
+    const ro = new ResizeObserver(update)
+    ro.observe(el)
+    return () => ro.disconnect()
+  }, [scrollRef])
+
+  return sectionHeight
+}
 
 interface HomeScrollContainerProps {
   sections: HomeSection[]
   children?: React.ReactNode
 }
 
-/**
- * Homepage scroll: JS only. One section per wheel or arrow key. No free scroll.
- */
+/** Sections with dark backgrounds (video, full-bleed image) use white header text. */
 function isSectionDark(section: HomeSection | undefined): boolean {
-  return section?.type === 'video'
+  if (!section) return false
+  return section.type === 'video' || section.type === 'image'
 }
 
 export function HomeScrollContainer({ sections, children }: HomeScrollContainerProps) {
   const scrollRef = useRef<HTMLDivElement>(null)
-  const cooldownUntilRef = useRef(0)
-  const goToSectionRef = useRef<(index: number) => void>(() => {})
+  const currentIndexRef = useRef(0)
+  const isScrollingRef = useRef(false)
   const touchStartYRef = useRef<number | null>(null)
   const setHeaderVariant = useSetHeaderVariant()
+  const totalSections = sections.length + 1
+  const sectionHeightPx = useSectionHeight(scrollRef)
+
   const goToSection = useCallback((index: number) => {
     const el = scrollRef.current
     if (!el) return
@@ -37,28 +59,63 @@ export function HomeScrollContainer({ sections, children }: HomeScrollContainerP
     if (sectionHeight <= 0) return
     const maxIndex = Math.max(0, Math.ceil(el.scrollHeight / sectionHeight) - 1)
     const targetIndex = Math.max(0, Math.min(index, maxIndex))
+
+    if (targetIndex === currentIndexRef.current && !isScrollingRef.current) return
+
+    currentIndexRef.current = targetIndex
+    isScrollingRef.current = true
     el.scrollTo({ top: targetIndex * sectionHeight, behavior: 'smooth' })
-    cooldownUntilRef.current = Date.now() + SCROLL_COOLDOWN_MS
   }, [])
 
+  const goToSectionRef = useRef(goToSection)
   useEffect(() => {
     goToSectionRef.current = goToSection
   }, [goToSection])
 
   useEffect(() => {
     scrollRef.current?.scrollTo(0, 0)
+    currentIndexRef.current = 0
   }, [])
 
-  // Update header variant (light/dark text) based on which section is in view
+  // Detect scroll completion — clears the isScrolling lock
+  useEffect(() => {
+    const el = scrollRef.current
+    if (!el) return
+
+    let scrollEndTimer = 0
+
+    const onScrollEnd = () => {
+      isScrollingRef.current = false
+    }
+
+    // scrollend event (supported in Chrome 114+, Firefox 109+, Safari 18+)
+    if ('onscrollend' in el) {
+      el.addEventListener('scrollend', onScrollEnd, { passive: true })
+    }
+
+    // Fallback: also use a debounced scroll listener for older browsers
+    const onScroll = () => {
+      clearTimeout(scrollEndTimer)
+      scrollEndTimer = window.setTimeout(onScrollEnd, 120)
+    }
+    el.addEventListener('scroll', onScroll, { passive: true })
+
+    return () => {
+      clearTimeout(scrollEndTimer)
+      if ('onscrollend' in el) {
+        el.removeEventListener('scrollend', onScrollEnd)
+      }
+      el.removeEventListener('scroll', onScroll)
+    }
+  }, [])
+
+  // Update header variant based on current section
   useEffect(() => {
     const el = scrollRef.current
     if (!el || sections.length === 0) return
 
     const updateVariant = () => {
-      const sectionHeight = el.clientHeight
-      if (sectionHeight <= 0) return
-      const currentIndex = Math.round(el.scrollTop / sectionHeight)
-      const section = sections[currentIndex]
+      const section = sections[currentIndexRef.current]
       setHeaderVariant(isSectionDark(section) ? 'dark' : 'light')
     }
 
@@ -67,25 +124,25 @@ export function HomeScrollContainer({ sections, children }: HomeScrollContainerP
     return () => el.removeEventListener('scroll', updateVariant)
   }, [sections, setHeaderVariant])
 
-  // Native wheel listener with { passive: false } so we can preventDefault and block all native scroll
+  // Wheel: advance/retreat one section. Block native scroll. Ignore while animating.
   useEffect(() => {
     const el = scrollRef.current
     if (!el) return
 
     const onWheel = (e: WheelEvent) => {
-      e.preventDefault()
-
       const sectionHeight = el.clientHeight
       if (sectionHeight <= 0) return
-      if (Date.now() < cooldownUntilRef.current) return
+      e.preventDefault()
 
-      const currentIndex = Math.round(el.scrollTop / sectionHeight)
-      const sectionCount = Math.ceil(el.scrollHeight / sectionHeight)
+      if (isScrollingRef.current) return
 
-      if (e.deltaY > WHEEL_THRESHOLD && currentIndex < sectionCount - 1) {
-        goToSectionRef.current(currentIndex + 1)
-      } else if (e.deltaY < -WHEEL_THRESHOLD && currentIndex > 0) {
-        goToSectionRef.current(currentIndex - 1)
+      const idx = currentIndexRef.current
+      const maxIndex = Math.max(0, Math.ceil(el.scrollHeight / sectionHeight) - 1)
+
+      if (e.deltaY > WHEEL_THRESHOLD && idx < maxIndex) {
+        goToSectionRef.current(idx + 1)
+      } else if (e.deltaY < -WHEEL_THRESHOLD && idx > 0) {
+        goToSectionRef.current(idx - 1)
       }
     }
 
@@ -93,7 +150,7 @@ export function HomeScrollContainer({ sections, children }: HomeScrollContainerP
     return () => el.removeEventListener('wheel', onWheel)
   }, [])
 
-  // Touch: one section per swipe on mobile (prevent native scroll, use same section logic as wheel)
+  // Touch: one section per swipe
   useEffect(() => {
     const el = scrollRef.current
     if (!el) return
@@ -103,39 +160,43 @@ export function HomeScrollContainer({ sections, children }: HomeScrollContainerP
     }
 
     const onTouchMove = (e: TouchEvent) => {
-      // Prevent native scroll so we control section changes in touchend
-      e.preventDefault()
+      if (el.clientHeight > 0) e.preventDefault()
     }
 
     const onTouchEnd = (e: TouchEvent) => {
       const startY = touchStartYRef.current
       touchStartYRef.current = null
       if (startY == null || e.changedTouches.length === 0) return
-
-      const endY = e.changedTouches[0].clientY
-      const deltaY = endY - startY
+      if (isScrollingRef.current) return
 
       const sectionHeight = el.clientHeight
       if (sectionHeight <= 0) return
-      if (Date.now() < cooldownUntilRef.current) return
 
-      const currentIndex = Math.round(el.scrollTop / sectionHeight)
-      const sectionCount = Math.ceil(el.scrollHeight / sectionHeight)
+      const endY = e.changedTouches[0].clientY
+      const deltaY = endY - startY
+      const idx = currentIndexRef.current
+      const maxIndex = Math.max(0, Math.ceil(el.scrollHeight / sectionHeight) - 1)
 
-      if (deltaY < -TOUCH_SWIPE_THRESHOLD_PX && currentIndex < sectionCount - 1) {
-        goToSectionRef.current(currentIndex + 1)
-      } else if (deltaY > TOUCH_SWIPE_THRESHOLD_PX && currentIndex > 0) {
-        goToSectionRef.current(currentIndex - 1)
+      if (deltaY < -TOUCH_SWIPE_THRESHOLD_PX && idx < maxIndex) {
+        goToSectionRef.current(idx + 1)
+      } else if (deltaY > TOUCH_SWIPE_THRESHOLD_PX && idx > 0) {
+        goToSectionRef.current(idx - 1)
       }
+    }
+
+    const onTouchCancel = () => {
+      touchStartYRef.current = null
     }
 
     el.addEventListener('touchstart', onTouchStart, { passive: true })
     el.addEventListener('touchmove', onTouchMove, { passive: false })
     el.addEventListener('touchend', onTouchEnd, { passive: true })
+    el.addEventListener('touchcancel', onTouchCancel, { passive: true })
     return () => {
       el.removeEventListener('touchstart', onTouchStart)
       el.removeEventListener('touchmove', onTouchMove)
       el.removeEventListener('touchend', onTouchEnd)
+      el.removeEventListener('touchcancel', onTouchCancel)
     }
   }, [])
 
@@ -151,19 +212,20 @@ export function HomeScrollContainer({ sections, children }: HomeScrollContainerP
       }
       const el = scrollRef.current
       if (!el || (e.key !== 'ArrowDown' && e.key !== 'ArrowUp')) return
+      if (isScrollingRef.current) return
 
       const sectionHeight = el.clientHeight
       if (sectionHeight <= 0) return
 
-      const currentIndex = Math.round(el.scrollTop / sectionHeight)
-      const sectionCount = Math.ceil(el.scrollHeight / sectionHeight)
+      const idx = currentIndexRef.current
+      const maxIndex = Math.max(0, Math.ceil(el.scrollHeight / sectionHeight) - 1)
 
-      if (e.key === 'ArrowDown' && currentIndex < sectionCount - 1) {
+      if (e.key === 'ArrowDown' && idx < maxIndex) {
         e.preventDefault()
-        goToSection(currentIndex + 1)
-      } else if (e.key === 'ArrowUp' && currentIndex > 0) {
+        goToSection(idx + 1)
+      } else if (e.key === 'ArrowUp' && idx > 0) {
         e.preventDefault()
-        goToSection(currentIndex - 1)
+        goToSection(idx - 1)
       }
     },
     [goToSection]
@@ -174,21 +236,40 @@ export function HomeScrollContainer({ sections, children }: HomeScrollContainerP
     return () => document.removeEventListener('keydown', handleKeyDown)
   }, [handleKeyDown])
 
-  const totalSections = sections.length + 1
+  // On resize, re-align to current section
+  useEffect(() => {
+    const el = scrollRef.current
+    if (!el || sectionHeightPx <= 0) return
+    const targetTop = currentIndexRef.current * sectionHeightPx
+    if (Math.abs(el.scrollTop - targetTop) > 1) {
+      el.scrollTo({ top: targetTop, behavior: 'auto' })
+    }
+  }, [sectionHeightPx])
 
   return (
     <div
       ref={scrollRef}
-      className="fixed left-0 right-0 top-0 z-10 h-screen overflow-x-hidden overflow-y-auto overscroll-contain w-full min-w-0 snap-y snap-mandatory"
+      className="fixed left-0 right-0 top-0 z-10 h-screen overflow-x-hidden overflow-y-auto overscroll-contain w-full min-w-0"
+      style={
+        sectionHeightPx > 0
+          ? { ['--section-height' as string]: `${sectionHeightPx}px` }
+          : undefined
+      }
     >
       <div
         className="min-w-0 w-full"
-        style={{ minHeight: `calc(${totalSections} * 100vh)` }}
+        style={{
+          minHeight:
+            sectionHeightPx > 0
+              ? `${totalSections * sectionHeightPx}px`
+              : `calc(${totalSections} * 100vh)`,
+        }}
       >
         <StickyHeroStack
           sections={sections}
           headerSlot={null}
           reserveHeaderSpace
+          onScrollDown={() => goToSection(1)}
         />
         {children}
       </div>

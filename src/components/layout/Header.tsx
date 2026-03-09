@@ -225,9 +225,9 @@ export function Header({ transparent: _transparent }: { transparent?: boolean } 
         </div>
 
         {/* Desktop nav — nav items centered, search & cart on the right (in flow for alignment) */}
-        <nav className="hidden md:flex items-center justify-between gap-12 mt-6 pb-3 w-full">
+        <nav className="hidden md:flex items-center justify-between gap-12 mt-4 pb-3 w-full">
           <div className="flex-1 min-w-0" aria-hidden />
-          <div className="flex items-center gap-12 shrink-0">
+          <div className="flex items-center gap-14 shrink-0">
             {NAV_ITEMS.map((item) => (
               <NavLink key={item.href} href={item.href} label={item.label} transparent={lightText} />
             ))}
