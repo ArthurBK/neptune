@@ -3,13 +3,13 @@
 :root {
   --background: #ffffff;
   --foreground: #1a1a1a;
-  --header-height: 3.5rem; /* ~56px mobile */
+  --header-height: 4rem; /* 64px mobile — room for icons */
   --neptune-red: #8B2942;
 }
 
 @media (min-width: 768px) {
   :root {
-    --header-height: 5.75rem; /* ~92px desktop, room for nav + bottom padding */
+    --header-height: 8.5rem; /* ~136px desktop: logo + nav + padding, no clip */
   }
 }
 

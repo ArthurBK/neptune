@@ -60,7 +60,9 @@ export type HomeSection =
 interface StickyHeroStackProps {
   sections: HomeSection[]
   /** When set, the first 100vh block shows this + first section; remaining sections use full 100vh */
-  headerSlot?: ReactNode
+  headerSlot?: ReactNode | null
+  /** When true, reserve space for fixed header at top of first block (e.g. when header is rendered by layout) */
+  reserveHeaderSpace?: boolean
 }
 
 function HeroSection({
@@ -660,10 +662,14 @@ function renderSectionContent(
 }
 
 /** Sticky stack: each section is position: sticky; top: 0; 100vh. As you scroll, each slides over the previous. */
-export function StickyHeroStack({ sections, headerSlot }: StickyHeroStackProps) {
+export function StickyHeroStack({
+  sections,
+  headerSlot = null,
+  reserveHeaderSpace = false,
+}: StickyHeroStackProps) {
   if (sections.length === 0) return null
 
-  const withNavbar = !!headerSlot
+  const withNavbar = !!headerSlot || reserveHeaderSpace
 
   return (
     <div className="w-full min-w-0">
@@ -683,13 +689,18 @@ export function StickyHeroStack({ sections, headerSlot }: StickyHeroStackProps) 
                     return cfg ? cfg.content : null
                   })()}
                 </div>
-                {/* Spacer so flex layout takes full height (header + rest = 100vh) */}
-                <div className="relative z-10 shrink-0">{headerSlot}</div>
+                {/* Spacer for fixed header in flow; fixed header overlays */}
+                <div className="relative z-10 shrink-0 h-[var(--header-height)]" aria-hidden />
+                {headerSlot && (
+                  <div className="relative z-10 shrink-0">{headerSlot}</div>
+                )}
                 <div className="flex-1 min-h-0" aria-hidden />
               </>
             ) : (
               <>
-                {headerSlot}
+                {/* Spacer for fixed header in flow; fixed header overlays */}
+                <div className="shrink-0 h-[var(--header-height)]" aria-hidden />
+                {headerSlot != null && headerSlot}
                 {(() => {
                   const cfg = renderSectionContent(sections[0], 0)
                   if (!cfg) return null

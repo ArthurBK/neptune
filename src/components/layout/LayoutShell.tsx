@@ -2,6 +2,8 @@
 
 import { usePathname } from 'next/navigation'
 
+import { HeaderVariantProvider } from '@/contexts/HeaderVariantContext'
+
 import { Footer } from './Footer'
 import { Header } from './Header'
 
@@ -16,13 +18,25 @@ export function LayoutShell({
   const isStudio = pathname?.startsWith('/studio')
   const isHome = pathname === '/'
 
-  return (
+  if (isStudio) {
+    return <main className="flex-1 min-w-0">{children}</main>
+  }
+
+  const content = (
     <>
-      {!isStudio && !isHome && <Header />}
-      <main className="flex-1 min-w-0">
+      <Header />
+      <main
+        className={`flex-1 min-w-0 ${isHome ? '' : 'pt-[var(--header-height)]'}`}
+      >
         {children}
       </main>
-      {!isStudio && !isHome && <Footer instagramUrl={instagramUrl} />}
+      {!isHome && <Footer instagramUrl={instagramUrl} />}
     </>
+  )
+
+  return isHome ? (
+    <HeaderVariantProvider>{content}</HeaderVariantProvider>
+  ) : (
+    content
   )
 }

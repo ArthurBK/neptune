@@ -13,7 +13,6 @@ import {
 import { HomeScrollContainer } from '@/components/home/HomeScrollContainer'
 import type { HomeSection } from '@/components/home/StickyHeroStack'
 import { Footer } from '@/components/layout/Footer'
-import { Header } from '@/components/layout/Header'
 
 export const revalidate = 3600
 
@@ -216,8 +215,8 @@ export default async function Home() {
 
   return (
     <div className="min-h-screen">
-      <HomeScrollContainer sections={sections} navbar={<Header transparent={sections[0]?.type === 'video'} />}>
-        <section className="h-screen min-h-screen flex flex-col items-center justify-center bg-white">
+      <HomeScrollContainer sections={sections}>
+        <section className="h-screen min-h-screen w-full shrink-0 snap-start flex flex-col items-center justify-center bg-white">
           <Footer instagramUrl={settings?.instagramUrl ?? null} />
         </section>
       </HomeScrollContainer>

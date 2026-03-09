@@ -1,7 +1,8 @@
 'use client'
 
-import type { ReactNode } from 'react'
 import { useCallback, useEffect, useRef } from 'react'
+
+import { useSetHeaderVariant } from '@/contexts/HeaderVariantContext'
 
 import { StickyHeroStack } from './StickyHeroStack'
 
@@ -13,21 +14,22 @@ const SCROLL_COOLDOWN_MS = 500
 
 interface HomeScrollContainerProps {
   sections: HomeSection[]
-  /** Navbar rendered inside the first 100vh block (homepage only) */
-  navbar?: ReactNode
   children?: React.ReactNode
 }
 
 /**
  * Homepage scroll: JS only. One section per wheel or arrow key. No free scroll.
  */
-export function HomeScrollContainer({ sections, navbar, children }: HomeScrollContainerProps) {
+function isSectionDark(section: HomeSection | undefined): boolean {
+  return section?.type === 'video'
+}
+
+export function HomeScrollContainer({ sections, children }: HomeScrollContainerProps) {
   const scrollRef = useRef<HTMLDivElement>(null)
   const cooldownUntilRef = useRef(0)
   const goToSectionRef = useRef<(index: number) => void>(() => {})
   const touchStartYRef = useRef<number | null>(null)
-
-  const hasNavbar = !!navbar
+  const setHeaderVariant = useSetHeaderVariant()
   const goToSection = useCallback((index: number) => {
     const el = scrollRef.current
     if (!el) return
@@ -46,6 +48,24 @@ export function HomeScrollContainer({ sections, navbar, children }: HomeScrollCo
   useEffect(() => {
     scrollRef.current?.scrollTo(0, 0)
   }, [])
+
+  // Update header variant (light/dark text) based on which section is in view
+  useEffect(() => {
+    const el = scrollRef.current
+    if (!el || sections.length === 0) return
+
+    const updateVariant = () => {
+      const sectionHeight = el.clientHeight
+      if (sectionHeight <= 0) return
+      const currentIndex = Math.round(el.scrollTop / sectionHeight)
+      const section = sections[currentIndex]
+      setHeaderVariant(isSectionDark(section) ? 'dark' : 'light')
+    }
+
+    updateVariant()
+    el.addEventListener('scroll', updateVariant, { passive: true })
+    return () => el.removeEventListener('scroll', updateVariant)
+  }, [sections, setHeaderVariant])
 
   // Native wheel listener with { passive: false } so we can preventDefault and block all native scroll
   useEffect(() => {
@@ -154,17 +174,24 @@ export function HomeScrollContainer({ sections, navbar, children }: HomeScrollCo
     return () => document.removeEventListener('keydown', handleKeyDown)
   }, [handleKeyDown])
 
+  const totalSections = sections.length + 1
+
   return (
     <div
       ref={scrollRef}
-      className={
-        hasNavbar
-          ? 'fixed left-0 right-0 top-0 z-10 h-screen overflow-x-hidden overflow-y-auto overscroll-contain w-full min-w-0 snap-y snap-mandatory'
-          : 'fixed left-0 right-0 top-[var(--header-height)] z-10 h-[calc(100vh-var(--header-height))] overflow-x-hidden overflow-y-auto overscroll-contain w-full min-w-0 snap-y snap-mandatory'
-      }
+      className="fixed left-0 right-0 top-0 z-10 h-screen overflow-x-hidden overflow-y-auto overscroll-contain w-full min-w-0 snap-y snap-mandatory"
     >
-      <StickyHeroStack sections={sections} headerSlot={navbar} />
-      {children}
+      <div
+        className="min-w-0 w-full"
+        style={{ minHeight: `calc(${totalSections} * 100vh)` }}
+      >
+        <StickyHeroStack
+          sections={sections}
+          headerSlot={null}
+          reserveHeaderSpace
+        />
+        {children}
+      </div>
     </div>
   )
 }

@@ -7,6 +7,7 @@ import { usePathname } from 'next/navigation'
 import { useCallback, useEffect, useState } from 'react'
 
 import { CART_OPEN_EVENT, getCartId } from '@/lib/cart'
+import { useHeaderVariant } from '@/contexts/HeaderVariantContext'
 
 import { CartPreview } from '@/components/commerce/CartPreview'
 import { SearchModal } from './SearchModal'
@@ -48,14 +49,16 @@ function NavLink({
     <Link
       href={href}
       onClick={onClick}
-      className={`font-header font-medium text-base tracking-[0.2em] uppercase transition-colors ${bold ? 'font-bold' : ''} ${textClass}`}
+      className={`font-header font-medium text-sm tracking-[0.2em] [word-spacing:0.3em] uppercase transition-colors ${bold ? 'font-bold' : ''} ${textClass}`}
     >
       {label}
     </Link>
   )
 }
 
-export function Header({ transparent = false }: { transparent?: boolean }) {
+export function Header({ transparent: _transparent }: { transparent?: boolean } = {}) {
+  const variant = useHeaderVariant()
+  const lightText = variant === 'dark'
   const [isBurgerOpen, setIsBurgerOpen] = useState(false)
   const [isSearchOpen, setIsSearchOpen] = useState(false)
   const [isCartOpen, setIsCartOpen] = useState(false)
@@ -108,25 +111,25 @@ export function Header({ transparent = false }: { transparent?: boolean }) {
     }
   }, [fetchCartCount])
 
-  const headerClass = transparent
-    ? 'static w-full flex flex-col overflow-hidden border-b transition-colors shrink-0'
-    : 'static w-full flex flex-col overflow-hidden bg-white border-b border-[#E5E5E5] transition-colors shrink-0'
+  const headerClass =
+    'fixed left-0 right-0 top-0 z-50 w-full flex flex-col overflow-x-hidden overflow-y-visible border-b border-transparent transition-colors shrink-0'
   const headerStyle: CSSProperties = {
     height: 'var(--header-height)',
     minHeight: 'var(--header-height)',
-    position: 'static',
+    position: 'fixed',
+    top: 0,
+    left: 0,
+    right: 0,
+    background: 'transparent',
+    borderColor: 'transparent',
   }
-  if (transparent) {
-    headerStyle.background = 'transparent'
-    headerStyle.borderColor = 'transparent'
-  }
-  const iconClass = transparent
+  const iconClass = lightText
     ? 'text-white hover:text-white/90 transition-colors'
     : 'text-[#6B6B6B] hover:text-black transition-colors'
 
   return (
     <header className={headerClass} style={headerStyle}>
-      <div className="relative flex flex-col flex-1 min-h-0 max-w-screen-xl mx-auto px-4 sm:px-6 md:px-12 lg:px-16 py-2 md:py-3 w-full min-w-0">
+      <div className="relative flex flex-col flex-1 max-w-screen-xl mx-auto px-4 sm:px-6 md:px-12 lg:px-16 py-2 md:py-3 w-full min-w-0 overflow-visible shrink-0">
         {/* Top row: Burger + Newsletter left, Logo center, Cart/Search right */}
         <div className="relative flex items-center justify-between">
           <div className="flex-1 flex justify-start items-center gap-2 -ml-4 md:-ml-8">
@@ -153,7 +156,7 @@ export function Header({ transparent = false }: { transparent?: boolean }) {
                 }`}
               />
             </button>
-            <NavLink href="/newsletters" label="NEWSLETTERS" transparent={transparent} />
+            <NavLink href="/newsletters" label="NEWSLETTERS" transparent={lightText} />
           </div>
           <Link href="/" className="absolute left-1/2 -translate-x-1/2 shrink-0">
             <Image
@@ -161,18 +164,19 @@ export function Header({ transparent = false }: { transparent?: boolean }) {
               alt="Neptune"
               width={90}
               height={24}
-              className={`h-5 w-auto md:h-6 ${transparent ? 'invert' : ''}`}
+              className={`h-5 w-auto md:h-6 ${lightText ? 'invert' : ''}`}
               priority
             />
           </Link>
-          <div className="flex flex-1 justify-end items-center gap-2 md:justify-end">
+          <div className="flex flex-1 justify-end items-center gap-2 md:justify-end shrink-0 min-w-0 overflow-visible">
             <button
               type="button"
               aria-label="Cart"
               onClick={() => setIsCartOpen(true)}
-              className={`md:hidden relative w-10 h-10 flex items-center justify-center ${iconClass}`}
+              className={`md:hidden relative w-10 h-10 flex items-center justify-center overflow-visible shrink-0 ${iconClass}`}
             >
               <svg
+                className="shrink-0 overflow-visible"
                 width="20"
                 height="20"
                 viewBox="0 0 24 24"
@@ -198,9 +202,10 @@ export function Header({ transparent = false }: { transparent?: boolean }) {
               type="button"
               aria-label="Search"
               onClick={() => setIsSearchOpen(true)}
-              className={`md:hidden w-10 h-10 flex items-center justify-center ${iconClass}`}
+              className={`md:hidden w-10 h-10 flex items-center justify-center overflow-visible shrink-0 ${iconClass}`}
             >
               <svg
+                className="shrink-0 overflow-visible"
                 width="20"
                 height="20"
                 viewBox="0 0 24 24"
@@ -219,19 +224,23 @@ export function Header({ transparent = false }: { transparent?: boolean }) {
           </div>
         </div>
 
-        {/* Desktop nav — nav items centered, search & cart on the right */}
-        <nav className="hidden md:flex items-center justify-center gap-8 mt-2 pb-3 w-full relative">
-          {NAV_ITEMS.map((item) => (
-            <NavLink key={item.href} href={item.href} label={item.label} transparent={transparent} />
-          ))}
-          <div className="absolute right-0 top-1/2 -translate-y-1/2 flex items-center gap-2">
+        {/* Desktop nav — nav items centered, search & cart on the right (in flow for alignment) */}
+        <nav className="hidden md:flex items-center justify-between gap-12 mt-6 pb-3 w-full">
+          <div className="flex-1 min-w-0" aria-hidden />
+          <div className="flex items-center gap-12 shrink-0">
+            {NAV_ITEMS.map((item) => (
+              <NavLink key={item.href} href={item.href} label={item.label} transparent={lightText} />
+            ))}
+          </div>
+          <div className="flex-1 flex items-center justify-end gap-2 min-w-0 overflow-visible shrink-0">
             <button
               type="button"
               aria-label="Cart"
               onClick={() => setIsCartOpen(true)}
-              className={`relative w-10 h-10 flex items-center justify-center ${iconClass}`}
+              className={`relative w-10 h-10 flex items-center justify-center overflow-visible shrink-0 ${iconClass}`}
             >
               <svg
+                className="shrink-0 overflow-visible"
                 width="20"
                 height="20"
                 viewBox="0 0 24 24"
@@ -257,9 +266,10 @@ export function Header({ transparent = false }: { transparent?: boolean }) {
               type="button"
               aria-label="Search"
               onClick={() => setIsSearchOpen(true)}
-              className={`w-10 h-10 flex items-center justify-center ${iconClass}`}
+              className={`w-10 h-10 flex items-center justify-center overflow-visible shrink-0 ${iconClass}`}
             >
               <svg
+                className="shrink-0 overflow-visible"
                 width="20"
                 height="20"
                 viewBox="0 0 24 24"
@@ -294,7 +304,7 @@ export function Header({ transparent = false }: { transparent?: boolean }) {
           }`}
           aria-hidden={!isBurgerOpen}
         >
-          <nav className="flex flex-col gap-1 px-6 py-8">
+          <nav className="flex flex-col gap-3 px-6 py-8">
             <NavLink
               href="/newsletters"
               label="NEWSLETTERS"
@@ -314,7 +324,7 @@ export function Header({ transparent = false }: { transparent?: boolean }) {
                 setIsBurgerOpen(false)
                 setIsSearchOpen(true)
               }}
-              className="text-left text-base tracking-[0.2em] uppercase text-[#6B6B6B] hover:text-black transition-colors py-2"
+              className="text-left text-sm tracking-[0.2em] [word-spacing:0.3em] uppercase text-[#6B6B6B] hover:text-black transition-colors py-2 font-header font-medium"
             >
               Search
             </button>
@@ -324,7 +334,7 @@ export function Header({ transparent = false }: { transparent?: boolean }) {
                 setIsBurgerOpen(false)
                 setIsCartOpen(true)
               }}
-              className="text-left text-base tracking-[0.2em] uppercase text-[#6B6B6B] hover:text-black transition-colors py-2"
+              className="text-left text-sm tracking-[0.2em] [word-spacing:0.3em] uppercase text-[#6B6B6B] hover:text-black transition-colors py-2 font-header font-medium"
             >
               Cart {cartCount != null && cartCount > 0 && `(${cartCount})`}
             </button>
