@@ -1,4 +1,3 @@
-import Image from 'next/image'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 
@@ -16,6 +15,7 @@ import type {
 
 import { ProductCard } from '@/components/commerce/ProductCard'
 import { ProductForm } from '@/components/commerce/ProductForm'
+import { VerticalImageCarousel } from '@/components/commerce/VerticalImageCarousel'
 
 export const revalidate = 3600
 
@@ -72,30 +72,12 @@ export default async function NewsstandProductPage({ params }: ProductPageProps)
         {/* Box 1 — empty */}
         <div className="hidden lg:block" />
 
-        {/* Box 2 — image */}
-        <div className="flex flex-col items-center gap-6 px-6 pt-4">
-          {images.map((img) => (
-            <div
-              key={img.url}
-              className="flex min-h-[300px] w-full items-center"
-              style={{ maxHeight: 'calc(100vh - var(--header-height))' }}
-            >
-              <Image
-                src={img.url}
-                alt={img.altText ?? product.title}
-                width={img.width ?? 800}
-                height={img.height ?? 1067}
-                sizes="(max-width: 1024px) 100vw, 33vw"
-                className="max-h-[calc(100vh-var(--header-height))] max-w-full object-contain"
-              />
-            </div>
-          ))}
-          {images.length > 1 && (
-            <p className="text-base tracking-[0.2em] uppercase text-[#6B6B6B] flex items-center gap-2">
-              <span className="inline-block">↓</span>
-              Scroll to see other images from the issue
-            </p>
-          )}
+        {/* Box 2 — image carousel */}
+        <div
+          className="px-6 pt-4"
+          style={{ height: 'calc(100vh - var(--header-height))' }}
+        >
+          <VerticalImageCarousel images={images} productTitle={product.title} />
         </div>
 
         {/* Box 3 — product info */}
