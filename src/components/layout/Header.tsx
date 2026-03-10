@@ -112,7 +112,7 @@ export function Header({ transparent: _transparent }: { transparent?: boolean } 
   }, [fetchCartCount])
 
   const pathname = usePathname()
-  const solidBgRoutes = ['/interiors', '/gardens', '/arts', '/fashion', '/the-market']
+  const solidBgRoutes = ['/newsstand', '/interiors', '/gardens', '/arts', '/fashion', '/the-market']
   const hasSolidBg = solidBgRoutes.some(
     (route) => pathname === route || pathname.startsWith(`${route}/`)
   )
