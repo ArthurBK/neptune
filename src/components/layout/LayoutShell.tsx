@@ -22,21 +22,13 @@ export function LayoutShell({
     return <main className="flex-1 min-w-0">{children}</main>
   }
 
-  const content = (
-    <>
+  return (
+    <HeaderVariantProvider>
       <Header />
-      <main
-        className={`flex-1 min-w-0 ${isHome ? '' : 'pt-[var(--header-height)]'}`}
-      >
+      <main className="flex-1 min-w-0 pt-(--header-height)">
         {children}
       </main>
       {!isHome && <Footer instagramUrl={instagramUrl} />}
-    </>
-  )
-
-  return isHome ? (
-    <HeaderVariantProvider>{content}</HeaderVariantProvider>
-  ) : (
-    content
+    </HeaderVariantProvider>
   )
 }
