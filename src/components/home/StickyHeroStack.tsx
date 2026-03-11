@@ -333,17 +333,20 @@ function ArticleSplitContent({
               {title}
             </h2>
           </Link>
-          {subtitleHref && subtitle ? (
-            <Link
-              href={subtitleHref}
-              className="mt-3 text-base md:text-lg text-[#6B6B6B] hover:text-black hover:underline underline-offset-2 transition-colors"
-            >
-              {subtitle}
-            </Link>
-          ) : (
-            subtitle && (
-              <p className="mt-3 text-base md:text-lg text-[#6B6B6B]">{subtitle}</p>
-            )
+          {subtitle && (
+            <p className="mt-3 text-base md:text-lg text-[#6B6B6B]">
+              by{' '}
+              {subtitleHref ? (
+                <Link
+                  href={subtitleHref}
+                  className="hover:text-black hover:underline underline-offset-2 transition-colors"
+                >
+                  {subtitle}
+                </Link>
+              ) : (
+                subtitle
+              )}
+            </p>
           )}
           <Link
             href={href}
