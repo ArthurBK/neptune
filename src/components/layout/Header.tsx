@@ -135,7 +135,7 @@ export function Header({ transparent: _transparent }: { transparent?: boolean } 
 
   return (
     <header className={headerClass} style={headerStyle}>
-      <div className="relative flex flex-col flex-1 max-w-screen-xl mx-auto px-4 sm:px-6 md:px-12 lg:px-16 py-2 md:py-3 w-full min-w-0 overflow-visible shrink-0">
+      <div className="relative flex flex-col flex-1 max-w-screen-xl mx-auto px-4 sm:px-6 md:px-8 lg:px-10 py-2 md:py-3 w-full min-w-0 overflow-visible shrink-0">
         {/* Top row: Burger + Newsletter left, Logo center, Cart/Search right */}
         <div className="relative flex items-center justify-between">
           <div className="flex-1 flex justify-start items-center gap-2 -ml-4 md:-ml-8">
@@ -230,15 +230,12 @@ export function Header({ transparent: _transparent }: { transparent?: boolean } 
           </div>
         </div>
 
-        {/* Desktop nav — nav items centered, search & cart on the right (in flow for alignment) */}
-        <nav className="hidden md:flex items-center justify-between gap-12 mt-4 pb-3 w-full">
-          <div className="flex-1 min-w-0" aria-hidden />
-          <div className="flex items-center gap-14 shrink-0">
-            {NAV_ITEMS.map((item) => (
-              <NavLink key={item.href} href={item.href} label={item.label} transparent={lightText} />
-            ))}
-          </div>
-          <div className="flex-1 flex items-center justify-end gap-2 min-w-0 overflow-visible shrink-0">
+        {/* Desktop nav — nav items centered, search & cart pinned right */}
+        <nav className="hidden md:flex items-center justify-center gap-14 mt-4 pb-3 w-full relative">
+          {NAV_ITEMS.map((item) => (
+            <NavLink key={item.href} href={item.href} label={item.label} transparent={lightText} />
+          ))}
+          <div className="absolute right-0 flex items-center gap-2 overflow-visible">
             <button
               type="button"
               aria-label="Cart"
