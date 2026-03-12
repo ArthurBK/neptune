@@ -72,7 +72,7 @@ function NewsletterModalInner({ children }: { children: ReactNode }) {
         >
           <dialog
             open
-            className="relative w-full max-w-md bg-[#CCC5BC] p-8 md:p-12 shadow-xl border-0 m-0"
+            className="relative w-full max-w-md bg-[#EBEBEB] p-8 md:p-12 shadow-xl border-0 m-0"
             onClick={(e) => e.stopPropagation()}
             onKeyDown={(e) => e.key !== 'Escape' && e.stopPropagation()}
             aria-labelledby="newsletter-modal-title"
@@ -83,7 +83,7 @@ function NewsletterModalInner({ children }: { children: ReactNode }) {
               onKeyDown={(e) => {
                 if (e.key === 'Enter' || e.key === ' ') closeModal()
               }}
-              className="absolute top-4 right-4 text-2xl font-bold text-white hover:opacity-70 transition-opacity"
+              className="absolute top-4 right-4 text-2xl font-bold text-black hover:opacity-70 transition-opacity"
               aria-label="Close"
             >
               ×
@@ -91,13 +91,13 @@ function NewsletterModalInner({ children }: { children: ReactNode }) {
 
             <h2
               id="newsletter-modal-title"
-              className="text-base md:text-lg font-header font-bold text-white tracking-wide text-center"
+              className="text-base md:text-lg font-header font-bold text-black tracking-wide text-center"
             >
               Enter your email:
             </h2>
 
             {status === 'success' ? (
-              <p className="mt-6 text-center text-white">
+              <p className="mt-6 text-center text-black">
                 Thank you for subscribing.
               </p>
             ) : (
@@ -109,19 +109,19 @@ function NewsletterModalInner({ children }: { children: ReactNode }) {
                   placeholder="your@email.com"
                   required
                   disabled={status === 'loading'}
-                  className="w-full py-3 border-b-2 border-white bg-transparent text-white placeholder:text-white/70 focus:outline-none focus:border-white disabled:opacity-60"
+                  className="w-full py-3 border-b-2 border-black bg-transparent text-black placeholder:text-black/70 focus:outline-none focus:border-black disabled:opacity-60"
                 />
                 <button
                   type="submit"
                   disabled={status === 'loading'}
-                  className="mt-8 block mx-auto cursor-pointer bg-transparent font-header font-bold text-base tracking-[0.2em] uppercase text-white transition-colors hover:underline disabled:opacity-60 disabled:cursor-not-allowed"
+                  className="mt-8 block mx-auto cursor-pointer bg-transparent font-header font-bold text-base tracking-[0.2em] uppercase text-black transition-colors hover:underline disabled:opacity-60 disabled:cursor-not-allowed"
                 >
                   {status === 'loading' ? 'Subscribing…' : 'Subscribe'}
                 </button>
               </form>
             )}
 
-            <p className="mt-8 text-xs text-white/80 italic text-center">
+            <p className="mt-8 text-xs text-black/80 italic text-center">
               By submitting your email, you agree to our Terms and Privacy Policy.
             </p>
           </dialog>

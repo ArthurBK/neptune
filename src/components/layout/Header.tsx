@@ -42,8 +42,8 @@ function NavLink({
       : pathname === baseHref || pathname.startsWith(`${baseHref}/`)
 
   const textClass = transparent
-    ? 'text-white hover:text-[var(--neptune-logo-red)]'
-    : 'text-black hover:text-[var(--neptune-logo-red)]'
+    ? 'text-white hover:text-[#63382E]'
+    : 'text-black hover:text-[#63382E]'
 
   return (
     <Link

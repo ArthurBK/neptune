@@ -28,7 +28,7 @@ type HomePageSection = {
     coverImage: { asset?: { _ref: string }; alt?: string }
     author?: { name: string; slug: string } | null
   }
-  image?: { asset?: { _ref: string }; alt?: string }
+  image?: { asset?: { _ref: string }; alt?: string } | null
   alt?: string
   title?: string | null
   linkUrl?: string | null
@@ -44,7 +44,6 @@ type HomePageSection = {
   videoUrl?: string | null
   headline?: string | null
   subtitle?: string | null
-  image?: { asset?: { _ref: string }; alt?: string } | null
 }
 
 type NewsstandProductNode = {

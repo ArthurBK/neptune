@@ -47,8 +47,8 @@ export function MarketPageContent({ products }: MarketPageContentProps) {
     <main>
       <div className="max-w-[1400px] mx-auto px-6 md:px-12 lg:px-16 pt-8 md:pt-12 pb-16 md:pb-24">
         <header className="mb-12 md:mb-16 text-center">
-          <h1 className="font-serif text-4xl md:text-5xl uppercase tracking-wide text-[var(--neptune-red)]">
-            The Neptune Market
+          <h1 className="font-serif text-2xl md:text-3xl uppercase tracking-wide text-[var(--neptune-red)]">
+            Neptune Market
           </h1>
           <p className="mt-4 text-base text-[#6B6B6B] max-w-xl mx-auto">
             Our editors independently curate all products featured on Neptune.
@@ -65,9 +65,8 @@ export function MarketPageContent({ products }: MarketPageContentProps) {
             <button
               type="button"
               onClick={() => setSelectedCategory(null)}
-              className={`cursor-pointer bg-transparent text-sm tracking-[0.15em] uppercase text-black transition-colors hover:underline ${
-                selectedCategory === null ? 'underline' : ''
-              }`}
+              className={`cursor-pointer bg-transparent text-sm tracking-[0.15em] uppercase text-black transition-colors hover:underline ${selectedCategory === null ? 'underline' : ''
+                }`}
             >
               All
             </button>
@@ -76,9 +75,8 @@ export function MarketPageContent({ products }: MarketPageContentProps) {
                 key={cat}
                 type="button"
                 onClick={() => setSelectedCategory(cat)}
-                className={`cursor-pointer bg-transparent text-sm tracking-[0.15em] uppercase text-black transition-colors hover:underline ${
-                  selectedCategory === cat ? 'underline' : ''
-                }`}
+                className={`cursor-pointer bg-transparent text-sm tracking-[0.15em] uppercase text-black transition-colors hover:underline ${selectedCategory === cat ? 'underline' : ''
+                  }`}
               >
                 {CATEGORY_LABELS[cat] ?? cat}
               </button>

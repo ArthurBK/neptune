@@ -64,7 +64,7 @@ export default async function InteriorsPage() {
 
         {/* Category header */}
         <header className="mb-12 md:mb-16 text-center">
-          <h1 className="font-serif text-4xl md:text-5xl text-[#1A1A1A] uppercase tracking-wide">
+          <h1 className="font-serif text-2xl md:text-3xl text-[#1A1A1A] uppercase tracking-wide">
             Interiors
           </h1>
           <p className="mt-4 text-base text-[#6B6B6B] max-w-2xl mx-auto">
