@@ -46,6 +46,13 @@ export const siteSettings = defineType({
       group: 'newsletter',
     }),
     defineField({
+      name: 'newsletterImageLegend',
+      title: 'Newsletter Image Legend',
+      type: 'string',
+      description: 'Small italic caption shown below the image',
+      group: 'newsletter',
+    }),
+    defineField({
       name: 'aboutText',
       title: 'About Text',
       type: 'array',

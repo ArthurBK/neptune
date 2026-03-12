@@ -4,6 +4,7 @@ import type { ReactNode } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 
+import { useOpenNewsletterModal } from '@/contexts/NewsletterModalContext'
 import { urlFor } from '@/sanity/lib/image'
 import { NewsstandCta } from '@/components/shared/NewsstandCta'
 
@@ -26,35 +27,43 @@ export interface FeaturedProduct {
 export type HomeSection =
   | { type: 'article'; data: CarouselArticle }
   | {
-      type: 'image'
-      data: {
-        _key?: string
-        image: { asset?: { _ref: string }; alt?: string }
-        alt: string
-        title?: string | null
-        linkUrl?: string | null
-      }
+    type: 'image'
+    data: {
+      _key?: string
+      image: { asset?: { _ref: string }; alt?: string }
+      alt: string
+      title?: string | null
+      linkUrl?: string | null
     }
+  }
   | {
-      type: 'affiliateProduct'
-      data: {
-        _key?: string
-        _id: string
-        title: string
-        image: { asset?: { _ref: string }; alt?: string }
-        affiliateUrl: string
-      }
+    type: 'affiliateProduct'
+    data: {
+      _key?: string
+      _id: string
+      title: string
+      image: { asset?: { _ref: string }; alt?: string }
+      affiliateUrl: string
     }
+  }
   | {
-      type: 'newsstandProduct'
-      data: {
-        products: FeaturedProduct[]
-        featuredHandle: string
-        title?: string | null
-        description?: string | null
-        ctaLabel?: string | null
-      }
+    type: 'newsstandProduct'
+    data: {
+      products: FeaturedProduct[]
+      featuredHandle: string
+      title?: string | null
+      description?: string | null
+      ctaLabel?: string | null
     }
+  }
+  | {
+    type: 'newsletter'
+    data: {
+      imageUrl: string | null
+      headline?: string | null
+      subtitle?: string | null
+    }
+  }
   | { type: 'video'; data: { videoUrl: string } }
 
 interface StickyHeroStackProps {
@@ -78,11 +87,10 @@ function ScrollDownChevron({
     <button
       type="button"
       onClick={onClick}
-      className={`absolute bottom-6 left-1/2 z-20 -translate-x-1/2 flex flex-col items-center gap-1 transition-transform hover:scale-110 focus:outline-none focus-visible:ring-2 rounded-full p-2 animate-bounce-subtle ${
-        lightBg
-          ? 'text-neutral-700 drop-shadow-[0_1px_2px_rgba(255,255,255,0.8)] focus-visible:ring-neutral-400'
-          : 'text-white/90 drop-shadow-[0_1px_3px_rgba(0,0,0,0.5)] focus-visible:ring-white/50'
-      }`}
+      className={`absolute bottom-6 left-1/2 z-20 -translate-x-1/2 flex flex-col items-center gap-1 transition-transform hover:scale-110 focus:outline-none focus-visible:ring-2 rounded-full p-2 animate-bounce-subtle ${lightBg
+        ? 'text-neutral-700 drop-shadow-[0_1px_2px_rgba(255,255,255,0.8)] focus-visible:ring-neutral-400'
+        : 'text-white/90 drop-shadow-[0_1px_3px_rgba(0,0,0,0.5)] focus-visible:ring-white/50'
+        }`}
       aria-label="Scroll down"
     >
       <svg
@@ -110,6 +118,7 @@ function HeroSection({
   bgWhite = false,
   bgTransparent = false,
   fullHeight = false,
+  noPadding = false,
 }: {
   children: React.ReactNode
   zIndex: number
@@ -117,6 +126,7 @@ function HeroSection({
   bgWhite?: boolean
   bgTransparent?: boolean
   fullHeight?: boolean
+  noPadding?: boolean
 }) {
   const bgClass = bgTransparent
     ? 'bg-transparent'
@@ -126,10 +136,11 @@ function HeroSection({
   const heightClass = fullHeight
     ? 'h-[var(--section-height,100vh)] max-h-[var(--section-height,100vh)]'
     : 'h-[calc(var(--section-height,100vh)-var(--header-height))] max-h-[calc(var(--section-height,100vh)-var(--header-height))]'
+  const padClass = bgTransparent || noPadding ? '' : 'px-[40px]'
   return (
     <section
       key={keyProp}
-      className={`sticky top-0 box-border w-full min-w-0 shrink-0 overflow-hidden ${heightClass} ${bgClass}`}
+      className={`sticky top-0 box-border w-full min-w-0 shrink-0 overflow-hidden ${heightClass} ${bgClass} ${padClass}`}
       style={{ zIndex }}
     >
       {children}
@@ -259,7 +270,7 @@ function NewsstandHeroContent({
 
       {/* Right: text content */}
       <div className="flex-1 min-w-0 flex flex-col justify-center px-6 md:px-10 lg:px-16 py-6 md:py-8">
-        <h2 className="font-header font-medium text-2xl md:text-3xl lg:text-4xl text-[#1A1A1A] mb-4 md:mb-6">
+        <h2 className="font-serif font-bold text-xl md:text-2xl lg:text-3xl text-[#1A1A1A] tracking-wide mb-4 md:mb-6">
           {headline}
         </h2>
         {description ? (
@@ -273,6 +284,68 @@ function NewsstandHeroContent({
         >
           {cta}
         </Link>
+      </div>
+    </div>
+  )
+}
+
+/** Newsletter section: left = headline + subscribe button, right = image */
+function NewsletterSectionContent({
+  imageUrl,
+  headline,
+  subtitle,
+  priority = false,
+}: {
+  imageUrl: string | null
+  headline?: string | null
+  subtitle?: string | null
+  priority?: boolean
+}) {
+  const openModal = useOpenNewsletterModal()
+  const title = headline ?? 'Newsletters'
+  const introText =
+    subtitle ??
+    'Sign up to the Neptune newsletters for an exclusive access to great interiors and great conversations.'
+
+  return (
+    <div className="flex flex-col h-full w-full min-w-0 bg-white">
+      <div className="flex flex-col md:flex-row flex-1 min-h-0 w-full">
+        {/* Left: text (same column as article) */}
+        <div className="flex-1 min-w-0 flex flex-col justify-center px-6 md:px-10 lg:px-16 py-8 md:py-12">
+          <h2 className="font-serif text-2xl md:text-3xl text-[#1A1A1A] uppercase tracking-wide">
+            {title}
+          </h2>
+          <p className="mt-4 text-base text-[#6B6B6B] max-w-xl leading-relaxed">
+            {introText}
+          </p>
+          <button
+            type="button"
+            onClick={openModal}
+            className="mt-8 font-header font-bold text-base tracking-[0.2em] uppercase text-black transition-colors hover:underline w-fit text-left"
+          >
+            Subscribe
+          </button>
+        </div>
+        {/* Right: image (same as article column but with top padding so it sits below header) */}
+        <div className="flex-1 min-w-0 min-h-[40vh] md:min-h-0 flex flex-col pt-[var(--header-height)] bg-transparent overflow-visible">
+          <div className="flex-1 min-h-0 relative overflow-visible flex items-center justify-center">
+            {imageUrl ? (
+              <Image
+                src={imageUrl}
+                alt=""
+                fill
+                className="object-contain object-center"
+                sizes="50vw"
+                priority={priority}
+              />
+            ) : (
+              <div className="absolute inset-0 bg-transparent" />
+            )}
+          </div>
+        </div>
+      </div>
+      <div className="shrink-0 mt-auto">
+        <NewsstandCta />
       </div>
     </div>
   )
@@ -592,7 +665,7 @@ function HeroContent({
 function renderSectionContent(
   item: HomeSection,
   index: number
-): { content: ReactNode; key: string; keyProp: string; zIndex: number; bgWhite: boolean; bgTransparent: boolean } | null {
+): { content: ReactNode; key: string; keyProp: string; zIndex: number; bgWhite: boolean; bgTransparent: boolean; noPadding?: boolean } | null {
   const zIndex = index + 1
   const priority = index === 0
 
@@ -609,7 +682,7 @@ function renderSectionContent(
   if (item.type === 'article') {
     const article = item.data
     const imageUrl = article.coverImage?.asset
-      ? urlFor(article.coverImage).width(3840).height(2160).quality(95).format('webp').url()
+      ? urlFor(article.coverImage).width(2400).quality(95).format('webp').url()
       : null
     return {
       content: (
@@ -640,7 +713,7 @@ function renderSectionContent(
   if (item.type === 'image') {
     const { image, alt, linkUrl } = item.data
     const imageUrl = image?.asset
-      ? urlFor(image).width(3840).height(2160).quality(95).format('webp').url()
+      ? urlFor(image).width(2400).quality(95).format('webp').url()
       : null
     return {
       content: (
@@ -657,12 +730,13 @@ function renderSectionContent(
       zIndex,
       bgWhite: true,
       bgTransparent: false,
+      noPadding: true,
     }
   }
   if (item.type === 'affiliateProduct') {
     const product = item.data
     const imageUrl = product.image?.asset
-      ? urlFor(product.image).width(3840).height(2160).quality(95).format('webp').url()
+      ? urlFor(product.image).width(2400).quality(95).format('webp').url()
       : null
     return {
       content: (
@@ -698,6 +772,26 @@ function renderSectionContent(
       ),
       key: `newsstand-${featuredHandle}`,
       keyProp: `newsstand-${featuredHandle}`,
+      zIndex,
+      bgWhite: true,
+      bgTransparent: false,
+    }
+  }
+  if (item.type === 'newsletter') {
+    const { imageUrl, headline, subtitle } = item.data
+    return {
+      content: (
+        <div className="h-full w-full flex items-center">
+          <NewsletterSectionContent
+            imageUrl={imageUrl}
+            headline={headline}
+            subtitle={subtitle}
+            priority={priority}
+          />
+        </div>
+      ),
+      key: 'newsletter',
+      keyProp: 'newsletter',
       zIndex,
       bgWhite: true,
       bgTransparent: false,
@@ -755,8 +849,9 @@ export function StickyHeroStack({
                     : cfg.bgWhite
                       ? 'bg-white'
                       : 'bg-[#0a0a0a]'
+                  const padClass = cfg.noPadding ? '' : 'px-[40px]'
                   return (
-                    <div className={`relative flex-1 min-h-0 overflow-hidden ${bgClass}`}>
+                    <div className={`relative flex-1 min-h-0 overflow-hidden ${padClass} ${bgClass}`}>
                       {cfg.content}
                     </div>
                   )
@@ -779,6 +874,7 @@ export function StickyHeroStack({
                 zIndex={cfg.zIndex}
                 bgWhite={cfg.bgWhite}
                 bgTransparent={cfg.bgTransparent}
+                noPadding={cfg.noPadding}
                 fullHeight
               >
                 {cfg.content}
@@ -797,6 +893,7 @@ export function StickyHeroStack({
               zIndex={cfg.zIndex}
               bgWhite={cfg.bgWhite}
               bgTransparent={cfg.bgTransparent}
+              noPadding={cfg.noPadding}
             >
               {cfg.content}
             </HeroSection>

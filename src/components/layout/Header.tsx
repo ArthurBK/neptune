@@ -42,14 +42,14 @@ function NavLink({
       : pathname === baseHref || pathname.startsWith(`${baseHref}/`)
 
   const textClass = transparent
-    ? 'text-white hover:text-white/90'
-    : `hover:text-black ${isActive ? 'text-black' : 'text-[#6B6B6B]'}`
+    ? 'text-white hover:text-[var(--neptune-logo-red)]'
+    : 'text-black hover:text-[var(--neptune-logo-red)]'
 
   return (
     <Link
       href={href}
       onClick={onClick}
-      className={`font-header font-medium text-sm tracking-[0.2em] [word-spacing:0.3em] uppercase transition-colors ${bold ? 'font-bold' : ''} ${textClass}`}
+      className={`font-header font-medium text-xs tracking-[0.1em] [word-spacing:0.15em] uppercase transition-colors ${bold ? 'font-bold' : ''} ${textClass}`}
     >
       {label}
     </Link>
@@ -58,7 +58,6 @@ function NavLink({
 
 export function Header({ transparent: _transparent }: { transparent?: boolean } = {}) {
   const variant = useHeaderVariant()
-  const lightText = variant === 'dark'
   const [isBurgerOpen, setIsBurgerOpen] = useState(false)
   const [isSearchOpen, setIsSearchOpen] = useState(false)
   const [isCartOpen, setIsCartOpen] = useState(false)
@@ -112,10 +111,9 @@ export function Header({ transparent: _transparent }: { transparent?: boolean } 
   }, [fetchCartCount])
 
   const pathname = usePathname()
-  const solidBgRoutes = ['/newsstand', '/interiors', '/gardens', '/arts', '/fashion', '/the-market']
-  const hasSolidBg = solidBgRoutes.some(
-    (route) => pathname === route || pathname.startsWith(`${route}/`)
-  )
+  const isHomePage = pathname === '/'
+  const hasSolidBg = !isHomePage
+  const lightText = isHomePage && variant === 'dark'
 
   const headerClass =
     'fixed left-0 right-0 top-0 z-50 w-full flex flex-col overflow-x-hidden overflow-y-visible border-b transition-colors shrink-0'
@@ -135,7 +133,7 @@ export function Header({ transparent: _transparent }: { transparent?: boolean } 
 
   return (
     <header className={headerClass} style={headerStyle}>
-      <div className="relative flex flex-col flex-1 max-w-screen-xl mx-auto px-4 sm:px-6 md:px-8 lg:px-10 py-2 md:py-3 w-full min-w-0 overflow-visible shrink-0">
+      <div className="relative flex flex-col flex-1 max-w-screen-xl mx-auto px-4 sm:px-6 md:px-8 lg:px-10 py-1.5 md:py-2 w-full min-w-0 overflow-visible shrink-0">
         {/* Top row: Burger + Newsletter left, Logo center, Cart/Search right */}
         <div className="relative flex items-center justify-between">
           <div className="flex-1 flex justify-start items-center gap-2 -ml-4 md:-ml-8">
@@ -147,26 +145,23 @@ export function Header({ transparent: _transparent }: { transparent?: boolean } 
               className={`w-10 h-10 flex flex-col justify-center items-center gap-1.5 ${iconClass}`}
             >
               <span
-                className={`block w-5 h-px bg-current transition-transform duration-200 ${
-                  isBurgerOpen ? 'rotate-45 translate-y-2' : ''
-                }`}
+                className={`block w-5 h-px bg-current transition-transform duration-200 ${isBurgerOpen ? 'rotate-45 translate-y-2' : ''
+                  }`}
               />
               <span
-                className={`block w-5 h-px bg-current transition-opacity duration-200 ${
-                  isBurgerOpen ? 'opacity-0' : ''
-                }`}
+                className={`block w-5 h-px bg-current transition-opacity duration-200 ${isBurgerOpen ? 'opacity-0' : ''
+                  }`}
               />
               <span
-                className={`block w-5 h-px bg-current transition-transform duration-200 ${
-                  isBurgerOpen ? '-rotate-45 -translate-y-2' : ''
-                }`}
+                className={`block w-5 h-px bg-current transition-transform duration-200 ${isBurgerOpen ? '-rotate-45 -translate-y-2' : ''
+                  }`}
               />
             </button>
             <NavLink href="/newsletters" label="NEWSLETTERS" transparent={lightText} />
           </div>
           <Link href="/" className="absolute left-1/2 -translate-x-1/2 shrink-0">
             <Image
-              src="/neptune_logo.png"
+              src="/neptune_logo_dark.svg"
               alt="Neptune"
               width={90}
               height={24}
@@ -295,16 +290,14 @@ export function Header({ transparent: _transparent }: { transparent?: boolean } 
       {/* Burger menu — slides from left */}
       <>
         <div
-          className={`fixed inset-0 z-40 bg-black/20 transition-opacity duration-300 md:z-40 ${
-            isBurgerOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
-          }`}
+          className={`fixed inset-0 z-40 bg-black/20 transition-opacity duration-300 md:z-40 ${isBurgerOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
+            }`}
           onClick={() => setIsBurgerOpen(false)}
           aria-hidden
         />
         <aside
-          className={`fixed top-0 left-0 bottom-0 z-50 w-72 max-w-[85vw] bg-white border-r border-[#E5E5E5] shadow-xl transition-transform duration-300 ease-out ${
-            isBurgerOpen ? 'translate-x-0' : '-translate-x-full'
-          }`}
+          className={`fixed top-0 left-0 bottom-0 z-50 w-72 max-w-[85vw] bg-white border-r border-[#E5E5E5] shadow-xl transition-transform duration-300 ease-out ${isBurgerOpen ? 'translate-x-0' : '-translate-x-full'
+            }`}
           aria-hidden={!isBurgerOpen}
         >
           <nav className="flex flex-col gap-3 px-6 py-8">
@@ -327,7 +320,7 @@ export function Header({ transparent: _transparent }: { transparent?: boolean } 
                 setIsBurgerOpen(false)
                 setIsSearchOpen(true)
               }}
-              className="text-left text-sm tracking-[0.2em] [word-spacing:0.3em] uppercase text-[#6B6B6B] hover:text-black transition-colors py-2 font-header font-medium"
+              className="text-left text-xs tracking-[0.2em] [word-spacing:0.3em] uppercase text-[#6B6B6B] hover:text-black transition-colors py-2 font-header font-medium"
             >
               Search
             </button>
@@ -337,7 +330,7 @@ export function Header({ transparent: _transparent }: { transparent?: boolean } 
                 setIsBurgerOpen(false)
                 setIsCartOpen(true)
               }}
-              className="text-left text-sm tracking-[0.2em] [word-spacing:0.3em] uppercase text-[#6B6B6B] hover:text-black transition-colors py-2 font-header font-medium"
+              className="text-left text-xs tracking-[0.2em] [word-spacing:0.3em] uppercase text-[#6B6B6B] hover:text-black transition-colors py-2 font-header font-medium"
             >
               Cart {cartCount != null && cartCount > 0 && `(${cartCount})`}
             </button>

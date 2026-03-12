@@ -1,4 +1,5 @@
 import { sanityFetch } from '@/sanity/lib/client'
+import { urlFor } from '@/sanity/lib/image'
 import {
   FEATURED_ARTICLES_HOME_QUERY,
   HOME_PAGE_QUERY,
@@ -41,6 +42,9 @@ type HomePageSection = {
   description?: string | null
   ctaLabel?: string | null
   videoUrl?: string | null
+  headline?: string | null
+  subtitle?: string | null
+  image?: { asset?: { _ref: string }; alt?: string } | null
 }
 
 type NewsstandProductNode = {
@@ -75,7 +79,12 @@ function toFeaturedProduct(node: {
 export default async function Home() {
   const [homePage, settings] = await Promise.all([
     sanityFetch<{ sections?: HomePageSection[] } | null>(HOME_PAGE_QUERY),
-    sanityFetch<{ instagramUrl?: string | null } | null>(SITE_SETTINGS_QUERY),
+    sanityFetch<{
+      instagramUrl?: string | null
+      newsletterHeadline?: string | null
+      newsletterSubtitle?: string | null
+      newsletterImage?: { asset?: { _ref: string } } | null
+    } | null>(SITE_SETTINGS_QUERY),
   ])
 
   const sections: HomeSection[] = []
@@ -151,6 +160,20 @@ export default async function Home() {
         } catch (err) {
           console.error('[Home] Shopify fetch for newsstand block:', err)
         }
+      } else if (block._type === 'homeNewsletterBlock') {
+        const newsletterImage = block.image ?? settings?.newsletterImage ?? null
+        const newsletterImageUrl =
+          newsletterImage?.asset != null
+            ? urlFor(newsletterImage).width(2400).quality(95).format('webp').url()
+            : null
+        sections.push({
+          type: 'newsletter',
+          data: {
+            imageUrl: newsletterImageUrl,
+            headline: block.headline ?? settings?.newsletterHeadline ?? null,
+            subtitle: block.subtitle ?? settings?.newsletterSubtitle ?? null,
+          },
+        })
       }
     }
   }

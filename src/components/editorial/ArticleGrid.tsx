@@ -21,10 +21,12 @@ function CardFromArticle({
   article,
   size,
   fillHeight,
+  horizontal,
 }: {
   article: Article
   size: 'default' | 'compact' | 'featured'
   fillHeight?: boolean
+  horizontal?: boolean
 }) {
   return (
     <ArticleCard
@@ -37,6 +39,7 @@ function CardFromArticle({
       author={article.author}
       size={size}
       fillHeight={fillHeight}
+      horizontal={horizontal}
     />
   )
 }
@@ -63,22 +66,24 @@ export function ArticleGrid({
   const wrapperClass = size === 'compact' ? 'max-w-2xl mx-auto' : ''
 
   return (
-    <div className={wrapperClass}>
+    <div>
       {useFeatured && (
-        <div className={`grid grid-cols-1 lg:grid-cols-3 ${gapClass} mb-8 md:mb-12`}>
-          <div className="lg:col-span-2 lg:row-span-2 min-w-0">
+        <div className={`grid grid-cols-1 lg:grid-cols-[3fr_2fr] ${gapClass} mb-8 md:mb-12 lg:max-h-[80vh]`}>
+          <div className="min-w-0 lg:max-h-[80vh]">
             <CardFromArticle article={featuredArticles[0]} size="featured" fillHeight />
           </div>
-          <div className="min-w-0">
-            <CardFromArticle article={featuredArticles[1]} size="compact" />
-          </div>
-          <div className="min-w-0">
-            <CardFromArticle article={featuredArticles[2]} size="compact" />
+          <div className="min-w-0 flex flex-col gap-6 md:gap-8 lg:max-h-[80vh]">
+            <div className="flex-1 min-h-0">
+              <CardFromArticle article={featuredArticles[1]} size="compact" horizontal />
+            </div>
+            <div className="flex-1 min-h-0">
+              <CardFromArticle article={featuredArticles[2]} size="compact" horizontal />
+            </div>
           </div>
         </div>
       )}
       {restArticles.length > 0 && (
-        <div className={gridClass}>
+        <div className={`${gridClass} ${wrapperClass}`}>
           {restArticles.map((article) => (
             <ArticleCard
               key={article._id}

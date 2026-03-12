@@ -1,6 +1,5 @@
 'use client'
 
-import Image from 'next/image'
 import Link from 'next/link'
 
 const FOOTER_LINKS = [
@@ -11,20 +10,10 @@ const FOOTER_LINKS = [
 
 export function Footer({ instagramUrl }: { instagramUrl?: string | null }) {
   return (
-    <footer className="border-t border-[#E5E5E5] bg-white">
+    <footer className="bg-white">
       <div className="max-w-screen-xl mx-auto px-6 md:px-12 lg:px-16 py-12 md:py-16">
         <div className="flex flex-col items-center text-center gap-6">
-          <Link href="/" className="shrink-0">
-            <Image
-              src="/neptune_logo.png"
-              alt="Neptune"
-              width={72}
-              height={20}
-              className="h-4 w-auto md:h-5"
-            />
-          </Link>
-
-          <nav className="flex flex-col items-center justify-center gap-4 font-header font-medium text-sm tracking-[0.2em] uppercase text-[#6B6B6B]">
+          <nav className="flex flex-col items-center justify-center gap-4 font-header font-medium text-xs tracking-[0.1em] uppercase text-[#6B6B6B]">
             {FOOTER_LINKS.map((item) => (
               <Link
                 key={item.href}

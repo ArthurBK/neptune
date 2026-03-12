@@ -3,6 +3,7 @@
 import { usePathname } from 'next/navigation'
 
 import { HeaderVariantProvider } from '@/contexts/HeaderVariantContext'
+import { NewsletterModalProvider } from '@/contexts/NewsletterModalContext'
 
 import { Footer } from './Footer'
 import { Header } from './Header'
@@ -24,11 +25,13 @@ export function LayoutShell({
 
   return (
     <HeaderVariantProvider>
-      <Header />
-      <main className="flex-1 min-w-0 pt-(--header-height)">
-        {children}
-      </main>
-      {!isHome && <Footer instagramUrl={instagramUrl} />}
+      <NewsletterModalProvider>
+        <Header />
+        <main className="flex-1 min-w-0 pt-(--header-height)">
+          {children}
+        </main>
+        {!isHome && <Footer instagramUrl={instagramUrl} />}
+      </NewsletterModalProvider>
     </HeaderVariantProvider>
   )
 }

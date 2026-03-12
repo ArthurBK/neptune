@@ -36,6 +36,11 @@ export const HOME_PAGE_QUERY = `
       },
       _type == "homeVideoBlock" => {
         "videoUrl": video.asset->url
+      },
+      _type == "homeNewsletterBlock" => {
+        headline,
+        subtitle,
+        image
       }
     }
   }
@@ -219,6 +224,7 @@ export const SITE_SETTINGS_QUERY = `
     newsletterHeadline,
     newsletterSubtitle,
     newsletterImage,
+    newsletterImageLegend,
     instagramUrl
   }
 `

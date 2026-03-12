@@ -165,6 +165,50 @@ const homeNewsstandBlock = defineType({
   },
 })
 
+// Home section: newsletter (image right, headline + text + subscribe left)
+const homeNewsletterBlock = defineType({
+  name: 'homeNewsletterBlock',
+  title: 'Newsletter',
+  type: 'object',
+  icon: ImageIcon,
+  fields: [
+    defineField({
+      name: 'headline',
+      title: 'Headline',
+      type: 'string',
+      description: 'Title on the left (e.g. "Newsletters"). Falls back to Site Settings → Newsletter if empty.',
+    }),
+    defineField({
+      name: 'subtitle',
+      title: 'Subtitle / description',
+      type: 'text',
+      description: 'Text below the headline on the left. Falls back to Site Settings → Newsletter if empty.',
+    }),
+    defineField({
+      name: 'image',
+      title: 'Image',
+      type: 'image',
+      options: { hotspot: true },
+      description: 'Image on the right. Falls back to Site Settings → Newsletter if empty.',
+      fields: [
+        defineField({
+          name: 'alt',
+          title: 'Alt text',
+          type: 'string',
+          validation: (rule) => rule.required(),
+        }),
+      ],
+    }),
+  ],
+  preview: {
+    select: { headline: 'headline', media: 'image' },
+    prepare: ({ headline, media }) => ({
+      title: headline ? `Newsletter: ${headline}` : 'Newsletter',
+      media,
+    }),
+  },
+})
+
 export const homePage = defineType({
   name: 'homePage',
   title: 'Home Page',
@@ -188,6 +232,7 @@ export const homePage = defineType({
         defineArrayMember({ type: 'homeImageBlock' }),
         defineArrayMember({ type: 'homeProductBlock' }),
         defineArrayMember({ type: 'homeNewsstandBlock' }),
+        defineArrayMember({ type: 'homeNewsletterBlock' }),
       ],
       validation: (rule) => rule.required().min(1),
     }),
@@ -197,4 +242,4 @@ export const homePage = defineType({
   },
 })
 
-export { homeArticleBlock, homeImageBlock, homeProductBlock, homeNewsstandBlock, homeVideoBlock }
+export { homeArticleBlock, homeImageBlock, homeProductBlock, homeNewsstandBlock, homeNewsletterBlock, homeVideoBlock }
