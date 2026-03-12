@@ -60,15 +60,14 @@ export function ArticleCard({
             href={`/${category}/${slug}`}
             className="block w-4/5 shrink-0 overflow-hidden"
           >
-            <div className="aspect-[3/4] h-full bg-[#E5E5E5] overflow-hidden">
+            <div className="relative h-full bg-[#E5E5E5] overflow-hidden">
               {imageUrl ? (
                 <Image
                   src={imageUrl}
                   alt={coverImage?.alt ?? title}
-                  width={imageWidth}
-                  height={imageHeight}
+                  fill
                   sizes="(max-width: 1024px) 50vw, 20vw"
-                  className="w-full h-full object-cover transition-transform duration-300 ease-out group-hover:scale-[1.02]"
+                  className="object-cover transition-transform duration-300 ease-out group-hover:scale-[1.02]"
                 />
               ) : (
                 <div className="w-full h-full flex items-center justify-center text-[#6B6B6B] text-sm">
