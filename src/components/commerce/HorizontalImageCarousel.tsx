@@ -54,7 +54,7 @@ export function HorizontalImageCarousel({
         ref={scrollRef}
         onScroll={handleScroll}
         className="flex overflow-x-auto snap-x snap-mandatory scroll-smooth overscroll-x-contain [-webkit-overflow-scrolling:touch]"
-        style={{ touchAction: 'pan-y pinch-zoom' }}
+        style={{ touchAction: 'pan-x pan-y' }}
       >
         {images.map((img, i) => (
           <div
