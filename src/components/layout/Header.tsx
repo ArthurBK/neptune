@@ -27,12 +27,14 @@ function NavLink({
   onClick,
   bold,
   transparent,
+  className,
 }: {
   href: string
   label: string
   onClick?: () => void
   bold?: boolean
   transparent?: boolean
+  className?: string
 }) {
   const pathname = usePathname()
   const baseHref = href.replace(/#.*/, '')
@@ -49,7 +51,7 @@ function NavLink({
     <Link
       href={href}
       onClick={onClick}
-      className={`font-header font-medium text-xs tracking-[0.1em] [word-spacing:0.15em] uppercase transition-colors ${bold ? 'font-bold' : ''} ${textClass}`}
+      className={`font-header font-medium text-xs tracking-[0.1em] [word-spacing:0.15em] uppercase transition-colors ${bold ? 'font-bold' : ''} ${textClass} ${className ?? ''}`}
     >
       {label}
     </Link>
@@ -157,7 +159,12 @@ export function Header({ transparent: _transparent }: { transparent?: boolean } 
                   }`}
               />
             </button>
-            <NavLink href="/newsletters" label="NEWSLETTERS" transparent={lightText} />
+            <NavLink
+              href="/newsletters"
+              label="NEWSLETTERS"
+              transparent={lightText}
+              className="hidden md:inline-block"
+            />
           </div>
           <Link href="/" className="absolute left-1/2 -translate-x-1/2 shrink-0">
             <Image
@@ -169,7 +176,7 @@ export function Header({ transparent: _transparent }: { transparent?: boolean } 
               priority
             />
           </Link>
-          <div className="flex flex-1 justify-end items-center gap-2 md:justify-end shrink-0 min-w-0 overflow-visible">
+          <div className="flex flex-1 justify-end items-center gap-0 md:justify-end shrink-0 min-w-0 overflow-visible -mr-2 sm:-mr-4 md:-mr-6">
             <button
               type="button"
               aria-label="Cart"
@@ -203,7 +210,7 @@ export function Header({ transparent: _transparent }: { transparent?: boolean } 
               type="button"
               aria-label="Search"
               onClick={() => setIsSearchOpen(true)}
-              className={`md:hidden w-10 h-10 flex items-center justify-center overflow-visible shrink-0 ${iconClass}`}
+              className={`md:hidden w-10 h-10 flex items-center justify-center overflow-visible shrink-0 -ml-2 ${iconClass}`}
             >
               <svg
                 className="shrink-0 overflow-visible"
@@ -230,7 +237,7 @@ export function Header({ transparent: _transparent }: { transparent?: boolean } 
           {NAV_ITEMS.map((item) => (
             <NavLink key={item.href} href={item.href} label={item.label} transparent={lightText} />
           ))}
-          <div className="absolute right-0 flex items-center gap-2 overflow-visible">
+          <div className="absolute right-0 flex items-center gap-0 overflow-visible -mr-2 sm:-mr-4 md:-mr-6">
             <button
               type="button"
               aria-label="Cart"
@@ -264,7 +271,7 @@ export function Header({ transparent: _transparent }: { transparent?: boolean } 
               type="button"
               aria-label="Search"
               onClick={() => setIsSearchOpen(true)}
-              className={`w-10 h-10 flex items-center justify-center overflow-visible shrink-0 ${iconClass}`}
+              className={`w-10 h-10 flex items-center justify-center overflow-visible shrink-0 -ml-2 ${iconClass}`}
             >
               <svg
                 className="shrink-0 overflow-visible"
@@ -301,11 +308,6 @@ export function Header({ transparent: _transparent }: { transparent?: boolean } 
           aria-hidden={!isBurgerOpen}
         >
           <nav className="flex flex-col gap-3 px-6 py-8">
-            <NavLink
-              href="/newsletters"
-              label="NEWSLETTERS"
-              onClick={() => setIsBurgerOpen(false)}
-            />
             {NAV_ITEMS.map((item) => (
               <NavLink
                 key={item.href}

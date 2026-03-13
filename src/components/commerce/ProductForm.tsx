@@ -19,7 +19,7 @@ export function ProductForm({ variants, productTitle }: ProductFormProps) {
   if (!selectedVariant) return null
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {variants.length > 1 && (
         <div>
           <p className="text-sm tracking-[0.2em] uppercase text-[#6B6B6B] mb-3">

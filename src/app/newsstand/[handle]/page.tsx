@@ -15,6 +15,7 @@ import type {
 
 import { ProductCard } from '@/components/commerce/ProductCard'
 import { ProductForm } from '@/components/commerce/ProductForm'
+import { HorizontalImageCarousel } from '@/components/commerce/HorizontalImageCarousel'
 import { VerticalImageCarousel } from '@/components/commerce/VerticalImageCarousel'
 
 export const revalidate = 3600
@@ -69,12 +70,18 @@ export default async function NewsstandProductPage({ params }: ProductPageProps)
   return (
     <main className="min-h-[calc(100vh-var(--header-height))]">
       <div className="grid grid-cols-1 lg:grid-cols-3 lg:min-h-[calc(100vh-var(--header-height))]">
-        {/* Box 1 — empty */}
+        {/* Box 1 — empty on large screens */}
         <div className="hidden lg:block" />
 
-        {/* Box 2 — image carousel */}
+        {/* Box 2 — images */}
+        {/* Mobile / tablet: horizontal carousel (swipe left/right); vertical scroll = page scroll */}
+        <div className="px-4 pt-3 lg:hidden">
+          <HorizontalImageCarousel images={images} productTitle={product.title} />
+        </div>
+
+        {/* Desktop: vertical image carousel with controlled scroll */}
         <div
-          className="px-6 pt-4"
+          className="hidden lg:block px-6 pt-4"
           style={{ height: 'calc(100vh - var(--header-height))' }}
         >
           <VerticalImageCarousel images={images} productTitle={product.title} />
@@ -82,17 +89,17 @@ export default async function NewsstandProductPage({ params }: ProductPageProps)
 
         {/* Box 3 — product info */}
         <div className="flex flex-col border-t border-[#E5E5E5] bg-white lg:border-t-0 lg:border-l lg:justify-center">
-          <div className="px-6 pt-4 pb-12 lg:px-8 lg:pt-4 lg:pb-16">
+          <div className="px-4 pt-4 pb-6 lg:px-8 lg:pt-4 lg:pb-16">
             <h1 className="font-serif text-2xl md:text-3xl text-[#1A1A1A] uppercase tracking-wide">
               {product.title}
             </h1>
 
-            <div className="mt-8">
+            <div className="mt-4 lg:mt-8">
               <ProductForm variants={variants} productTitle={product.title} />
             </div>
 
             {(product.description || product.descriptionHtml) && (
-              <div className="mt-12 pt-8 border-t border-[#E5E5E5]">
+              <div className="mt-6 pt-6 border-t border-[#E5E5E5] lg:mt-12 lg:pt-8">
                 <div
                   className="text-[#6B6B6B] text-base leading-relaxed [&_p]:mb-4 [&_p:last-child]:mb-0 [&_a]:underline [&_a]:hover:text-black"
                   // biome-ignore lint/security/noDangerouslySetInnerHtml: Shopify product HTML from trusted source

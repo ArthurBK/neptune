@@ -61,26 +61,35 @@ export function ArticleGrid({
   const featuredArticles = useFeatured ? articles.slice(0, 3) : []
   const restArticles = useFeatured ? articles.slice(3) : articles
   const gapClass = size === 'compact' ? 'gap-6 md:gap-8' : 'gap-8 md:gap-12'
-  const gridClass = `grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 ${gapClass}`
+  const gridClass = `grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 ${gapClass}`
 
   const wrapperClass = size === 'compact' ? 'max-w-2xl mx-auto' : ''
 
   return (
     <div>
       {useFeatured && (
-        <div className={`grid grid-cols-1 lg:grid-cols-[3fr_2fr] ${gapClass} mb-8 md:mb-12 lg:max-h-[80vh]`}>
-          <div className="min-w-0 lg:max-h-[80vh]">
-            <CardFromArticle article={featuredArticles[0]} size="featured" fillHeight />
+        <>
+          {/* Mobile: single column, same card style one by one */}
+          <div className={`grid grid-cols-1 ${gapClass} mb-8 md:mb-12 lg:hidden`}>
+            {featuredArticles.map((article) => (
+              <CardFromArticle key={article._id} article={article} size={size === 'compact' ? 'compact' : 'default'} />
+            ))}
           </div>
-          <div className="min-w-0 flex flex-col gap-6 md:gap-8 lg:max-h-[80vh]">
-            <div className="flex-1 min-h-0">
-              <CardFromArticle article={featuredArticles[1]} size="compact" horizontal />
+          {/* Desktop: featured 2-column layout */}
+          <div className={`hidden lg:grid grid-cols-[3fr_2fr] ${gapClass} mb-8 md:mb-12 lg:max-h-[80vh]`}>
+            <div className="min-w-0 lg:max-h-[80vh]">
+              <CardFromArticle article={featuredArticles[0]} size="featured" fillHeight />
             </div>
-            <div className="flex-1 min-h-0">
-              <CardFromArticle article={featuredArticles[2]} size="compact" horizontal />
+            <div className="min-w-0 flex flex-col gap-6 md:gap-8 lg:max-h-[80vh]">
+              <div className="flex-1 min-h-0">
+                <CardFromArticle article={featuredArticles[1]} size="compact" horizontal />
+              </div>
+              <div className="flex-1 min-h-0">
+                <CardFromArticle article={featuredArticles[2]} size="compact" horizontal />
+              </div>
             </div>
           </div>
-        </div>
+        </>
       )}
       {restArticles.length > 0 && (
         <div className={`${gridClass} ${wrapperClass}`}>
