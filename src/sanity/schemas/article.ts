@@ -115,6 +115,7 @@ const ARTICLE_CATEGORIES = [
   { title: 'Interiors', value: 'interiors' },
   { title: 'Gardens', value: 'gardens' },
   { title: 'Arts', value: 'arts' },
+  { title: 'Fashion', value: 'fashion' },
 ]
 
 export const article = defineType({
