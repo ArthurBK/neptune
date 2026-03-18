@@ -21,6 +21,7 @@
   --font-serif: var(--font-cormorant), ui-serif, Georgia, serif;
   --font-accent: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
   --font-header: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --font-futura: Futura, "Futura PT", "Futura Std", "Trebuchet MS", Arial, sans-serif;
 }
 
 html {

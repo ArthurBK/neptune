@@ -8,10 +8,12 @@ const CATEGORY_LABELS: Record<string, string> = {
   objects: 'Objects',
   furniture: 'Furniture',
   books: 'Books',
-  clothing: 'Clothing',
+  clothing: 'Fashion',
   fashion: 'Fashion',
   scents: 'Scents',
 }
+
+const CATEGORY_ORDER = ['furniture', 'books', 'objects', 'scents', 'fashion', 'clothing'] as const
 
 type AffiliateProduct = {
   _id: string
@@ -35,7 +37,16 @@ export function MarketPageContent({ products }: MarketPageContentProps) {
     for (const p of products) {
       if (p.category) seen.add(p.category)
     }
-    return Array.from(seen).sort()
+    const list = Array.from(seen)
+    const orderIndex = new Map<string, number>(CATEGORY_ORDER.map((c, i) => [c, i]))
+    return list.sort((a, b) => {
+      const ai = orderIndex.get(a)
+      const bi = orderIndex.get(b)
+      if (ai != null && bi != null) return ai - bi
+      if (ai != null) return -1
+      if (bi != null) return 1
+      return a.localeCompare(b)
+    })
   }, [products])
 
   const filteredProducts = useMemo(() => {
@@ -47,25 +58,25 @@ export function MarketPageContent({ products }: MarketPageContentProps) {
     <main>
       <div className="max-w-[1400px] mx-auto px-6 md:px-12 lg:px-16 pt-8 md:pt-12 pb-16 md:pb-24">
         <header className="mb-12 md:mb-16 text-center">
-          <h1 className="font-serif text-2xl md:text-3xl uppercase tracking-wide text-[var(--neptune-red)]">
+          <h1 className="font-serif text-2xl md:text-3xl uppercase tracking-wide text-black">
             Neptune Market
           </h1>
-          <p className="mt-4 text-base text-[#6B6B6B] max-w-xl mx-auto">
-            Our editors independently curate all products featured on Neptune.
-            We may receive compensation from retailers and/or from purchases of
-            products through these links.
+          <p className="mt-4 text-base text-black max-w-2xl mx-auto">
+            Discover our curated shopping edit, featuring a variety of products, including books, objects of all kinds, furniture, and fashion gems that our editors adore and have on their wish lists (and soon, you will too!).
+            <br />
+            <br />Our editors independently curate all products featured on Neptune. We may receive compensation from retailers and/or from purchases of products through these links.
           </p>
         </header>
 
         {categories.length > 0 && (
           <nav
-            className="mb-10 md:mb-12 flex flex-wrap justify-center gap-6"
+            className="mb-10 md:mb-12 flex flex-wrap justify-center gap-6 font-header font-semibold"
             aria-label="Filter by category"
           >
             <button
               type="button"
               onClick={() => setSelectedCategory(null)}
-              className={`cursor-pointer bg-transparent text-sm tracking-[0.15em] uppercase text-black transition-colors hover:underline ${selectedCategory === null ? 'underline' : ''
+              className={`cursor-pointer bg-transparent text-[14px] tracking-[0.15em] uppercase text-black transition-colors hover:underline ${selectedCategory === null ? 'underline' : ''
                 }`}
             >
               All
@@ -75,7 +86,7 @@ export function MarketPageContent({ products }: MarketPageContentProps) {
                 key={cat}
                 type="button"
                 onClick={() => setSelectedCategory(cat)}
-                className={`cursor-pointer bg-transparent text-sm tracking-[0.15em] uppercase text-black transition-colors hover:underline ${selectedCategory === cat ? 'underline' : ''
+                className={`cursor-pointer bg-transparent text-[14px] tracking-[0.15em] uppercase text-black transition-colors hover:underline ${selectedCategory === cat ? 'underline' : ''
                   }`}
               >
                 {CATEGORY_LABELS[cat] ?? cat}

@@ -26,7 +26,7 @@ export function AffiliateProductCard({
       href={affiliateUrl}
       target="_blank"
       rel="noopener noreferrer"
-      className="group block"
+      className="group block cursor-pointer"
     >
       <div className="aspect-3/4 bg-[#E5E5E5] overflow-hidden">
         {imageUrl ? (
@@ -44,13 +44,13 @@ export function AffiliateProductCard({
           </div>
         )}
       </div>
-      <div className="mt-4">
-        <h3 className="font-serif text-xl text-[#1A1A1A] group-hover:underline line-clamp-2">
+      <div className="mt-2">
+        <h3 className="font-serif text-m text-black group-hover:underline line-clamp-2 leading-tight">
           {title}
         </h3>
-        <p className="mt-1 text-sm text-[#6B6B6B]">{brand}</p>
-        <p className="mt-1 text-[#1A1A1A]">
-          {/^[€$£]/.test(price ?? '') ? price : `€${price ?? ''}`}
+        <p className="font-header font-semibold text-[13px] text-black leading-tight">{brand}</p>
+        <p className="font-header text-[14px] text-black leading-tight">
+          {`$${(price ?? '').replace(/^[€$£]\s?/, '')}`}
         </p>
       </div>
     </a>

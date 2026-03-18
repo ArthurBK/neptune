@@ -21,6 +21,7 @@ import { categoryPage } from './categoryPage'
 import { contributor } from './contributor'
 import { photographer } from './photographer'
 import { siteSettings } from './siteSettings'
+import { marketPage } from './marketPage'
 
 export const schema: { types: SchemaTypeDefinition[] } = {
   types: [
@@ -36,6 +37,7 @@ export const schema: { types: SchemaTypeDefinition[] } = {
     contributor,
     photographer,
     affiliateProduct,
+    marketPage,
     adBanner,
     siteSettings,
     pteImageBlock,

@@ -126,9 +126,22 @@ export const AFFILIATE_PRODUCTS_QUERY = `
   }
 `
 
+// Ordered affiliate products for Market page (manual drag-and-drop order in Studio)
+export const MARKET_PAGE_PRODUCTS_QUERY = `
+  *[_type == "marketPage" && _id == "marketPage"][0].products[]->{
+    _id,
+    title,
+    brand,
+    price,
+    image,
+    affiliateUrl,
+    category
+  }
+`
+
 // Affiliate products by category (e.g. fashion)
 export const AFFILIATE_PRODUCTS_BY_CATEGORY_QUERY = `
-  *[_type == "affiliateProduct" && category == $category] | order(publishedAt desc) {
+  *[_type == "affiliateProduct" && category == $category] | order(sortOrder asc, publishedAt desc) {
     _id,
     title,
     brand,

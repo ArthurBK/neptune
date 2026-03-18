@@ -3,10 +3,10 @@ import Link from 'next/link'
 
 export function NewsstandCta() {
   return (
-    <div className="mt-8 md:mt-12 py-6 border-y border-[#E5E5E5] text-center">
+    <div className="mt-4 md:mt-6 mb-4 md:mb-6 text-center">
       <Link
         href="/newsstand"
-        className="flex flex-row items-center justify-center gap-3 text-[#6B6B6B] hover:text-black transition-colors group"
+        className="inline-flex flex-row items-center justify-center gap-3 py-3 md:py-4 border-y border-[#E5E5E5] text-[#6B6B6B] hover:text-black transition-colors group"
       >
         <Image
           src="/neptune_logo_orange.svg"
@@ -15,7 +15,7 @@ export function NewsstandCta() {
           height={16}
           className="h-4 w-auto"
         />
-        <span className="text-sm tracking-[0.2em] uppercase">
+        <span className="font-header font-normal text-sm tracking-[0.2em] uppercase text-black">
           Discover All Available Issues
         </span>
       </Link>

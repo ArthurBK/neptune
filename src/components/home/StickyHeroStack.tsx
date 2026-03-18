@@ -4,6 +4,8 @@ import type { ReactNode } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 
+import { useEffect, useRef, useState } from 'react'
+
 import { useOpenNewsletterModal } from '@/contexts/NewsletterModalContext'
 import { urlFor } from '@/sanity/lib/image'
 import { NewsstandCta } from '@/components/shared/NewsstandCta'
@@ -235,51 +237,70 @@ function NewsstandHeroContent({
 }) {
   const headline = title ?? products[0]?.title ?? ''
   const cta = ctaLabel ?? 'Discover our anniversary issue'
+  const [activeIndex, setActiveIndex] = useState(0)
+  const indexRef = useRef(0)
+
+  useEffect(() => {
+    if (products.length <= 1) return
+
+    const reduceMotion =
+      typeof window !== 'undefined' &&
+      window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches
+    if (reduceMotion) return
+
+    const tick = () => {
+      const nextIndex = (indexRef.current + 1) % products.length
+      indexRef.current = nextIndex
+      setActiveIndex(nextIndex)
+    }
+
+    const id = window.setInterval(tick, 2500)
+    return () => window.clearInterval(id)
+  }, [products.length])
+
+  const activeProduct = products[Math.min(activeIndex, Math.max(0, products.length - 1))]
 
   return (
     <div className="flex flex-col md:flex-row w-full min-w-0 h-full gap-0 items-stretch overflow-hidden bg-white">
       {/* Left: 6 product covers in 3x2 grid, padding on top */}
-      <div className="flex-1 min-w-0 min-h-0 flex overflow-hidden pt-8 md:pt-12 lg:pt-16">
-        <div className="grid grid-cols-3 grid-rows-2 gap-3 sm:gap-4 w-full h-full overflow-hidden">
-          {products.slice(0, 6).map((p, i) => (
-            <Link
-              key={`${p.handle}-${i}`}
-              href={`/newsstand/${p.handle}`}
-              className={`relative flex flex-col overflow-hidden bg-white w-full h-full min-h-0 ${i < 3 ? 'justify-end' : 'justify-start'}`}
-            >
-              <div className="relative w-full aspect-3/4 shrink-0">
-                {p.imageUrl ? (
+      <div className="flex-1 min-w-0 min-h-0 h-full flex flex-col overflow-hidden">
+        <div className="w-full h-full">
+          {activeProduct ? (
+            <Link href={`/newsstand/${activeProduct.handle}`} className="block w-full h-full">
+              <div className="relative w-full h-full">
+                {activeProduct.imageUrl ? (
                   <Image
-                    src={p.imageUrl}
-                    alt={p.imageAlt ?? p.title}
+                    key={activeProduct.imageUrl}
+                    src={activeProduct.imageUrl}
+                    alt={activeProduct.imageAlt ?? activeProduct.title}
                     fill
-                    className={`object-contain ${i < 3 ? 'object-bottom' : 'object-top'}`}
-                    sizes="(max-width: 768px) 50vw, 33vw"
-                    priority={priority && products.indexOf(p) < 2}
+                    className="object-contain object-right origin-right scale-[0.6] transition-opacity duration-300"
+                    sizes="(max-width: 768px) 100vw, 50vw"
+                    priority={priority && activeIndex === 0}
                   />
                 ) : (
                   <div className="absolute inset-0 flex items-center justify-center text-[#6B6B6B] text-sm">
-                    {p.title}
+                    {activeProduct.title}
                   </div>
                 )}
               </div>
             </Link>
-          ))}
+          ) : null}
         </div>
       </div>
 
       {/* Right: text content */}
       <div className="flex-1 min-w-0 flex flex-col justify-center px-6 md:px-10 lg:px-16 py-6 md:py-8">
-        <h2 className="font-serif font-bold text-xl md:text-2xl lg:text-3xl text-[#1A1A1A] tracking-wide mb-4 md:mb-6">
+        <h2 className="font-header font-extrabold text-xl md:text-2xl lg:text-3xl text-[#1A1A1A] tracking-wide mb-4 md:mb-6">
           {headline}
         </h2>
         {description ? (
-          <p className="text-base md:text-lg text-[#6B6B6B] mb-6 md:mb-8 leading-relaxed">
+          <p className="text-base md:text-lg text-black mb-6 md:mb-8 leading-relaxed">
             {description}
           </p>
         ) : null}
         <Link
-          href={`/newsstand/${featuredHandle}`}
+          href={"/newsstand"}
           className="font-header font-medium text-sm md:text-base tracking-[0.2em] uppercase text-[#1A1A1A] hover:underline underline-offset-4 w-fit"
         >
           {cta}
@@ -326,7 +347,7 @@ function NewsletterSectionContent({
           </button>
         </div>
         <div className="w-full max-w-3xl mt-5 md:mt-6">
-          <div className="relative w-full min-h-[65vh] md:min-h-[72vh]">
+          <div className="relative w-full min-h-[55vh] md:min-h-[62vh]">
             {imageUrl ? (
               <Image
                 src={imageUrl}
@@ -394,18 +415,18 @@ function ArticleSplitContent({
           {categoryHref && (
             <Link
               href={categoryHref}
-              className="text-xs tracking-[0.25em] uppercase text-[#6B6B6B] hover:text-black hover:underline underline-offset-2 transition-colors mb-3"
+              className="font-header font-extrabold text-[12px] tracking-[0.25em] uppercase text-[color:var(--neptune-logo-red)] hover:underline underline-offset-2 transition-colors mb-3"
             >
               Cover Story
             </Link>
           )}
           <Link href={href} className="group">
-            <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl text-[#1A1A1A] tracking-wide max-w-full break-words group-hover:opacity-80 transition-opacity">
+            <h2 className="font-bold font-serif text-3xl sm:text-4xl md:text-4xl text-black tracking-wide max-w-full break-words group-hover:opacity-80 group-hover:underline underline-offset-4 transition-opacity">
               {title}
             </h2>
           </Link>
           {subtitle && (
-            <p className="mt-3 text-base md:text-lg text-[#6B6B6B]">
+            <p className="mt-3 text-base md:text-lg text-black">
               by{' '}
               {subtitleHref ? (
                 <Link
@@ -419,12 +440,12 @@ function ArticleSplitContent({
               )}
             </p>
           )}
-          <Link
+          {/* <Link
             href={href}
             className="mt-4 font-accent text-sm tracking-[0.2em] lowercase text-[#1A1A1A] hover:opacity-80 transition-opacity inline-block"
           >
             read more
-          </Link>
+          </Link> */}
         </div>
       </div>
       {/* Below: Discover All Issues CTA (same as other pages: logo + text, centered, top/bottom border) */}
