@@ -316,6 +316,11 @@ export function Header({ transparent: _transparent }: { transparent?: boolean } 
                 onClick={() => setIsBurgerOpen(false)}
               />
             ))}
+            <NavLink
+              href="/contributors"
+              label="CONTRIBUTORS"
+              onClick={() => setIsBurgerOpen(false)}
+            />
             <button
               type="button"
               onClick={() => {

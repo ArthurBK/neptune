@@ -194,9 +194,56 @@ export const CONTRIBUTOR_SLUGS_QUERY = `
   *[_type == "contributor"] { "slug": slug.current }
 `
 
+// Contributors listing page (name + bio)
+export const CONTRIBUTORS_LIST_PAGE_QUERY = `
+  *[_type == "contributor"] | order(name asc) {
+    _id,
+    name,
+    "slug": slug.current,
+    bio
+  }
+`
+
+export const PHOTOGRAPHERS_LIST_PAGE_QUERY = `
+  *[_type == "photographer"] | order(name asc) {
+    _id,
+    name,
+    "slug": slug.current,
+    bio
+  }
+`
+
+export const PHOTOGRAPHER_BY_SLUG_QUERY = `
+  *[_type == "photographer" && slug.current == $slug][0] {
+    _id,
+    name,
+    "slug": slug.current,
+    bio,
+    portrait,
+    location
+  }
+`
+
+export const PHOTOGRAPHER_SLUGS_QUERY = `
+  *[_type == "photographer"] { "slug": slug.current }
+`
+
 // Articles by contributor (author reference)
 export const ARTICLES_BY_CONTRIBUTOR_QUERY = `
   *[_type == "article" && author->slug.current == $contributorSlug] | order(publishedAt desc) {
+    _id,
+    title,
+    "slug": slug.current,
+    category,
+    subcategory,
+    coverImage,
+    publishedAt,
+    "author": author->{ name, "slug": slug.current }
+  }
+`
+
+export const ARTICLES_BY_PHOTOGRAPHER_QUERY = `
+  *[_type == "article" && photographer->slug.current == $photographerSlug] | order(publishedAt desc) {
     _id,
     title,
     "slug": slug.current,
