@@ -7,6 +7,7 @@ import Link from 'next/link'
 import { useEffect, useRef, useState } from 'react'
 
 import { useOpenNewsletterModal } from '@/contexts/NewsletterModalContext'
+import { articleTitleSingleLine } from '@/lib/articleTitle'
 import { urlFor } from '@/sanity/lib/image'
 import { NewsstandCta } from '@/components/shared/NewsstandCta'
 
@@ -421,7 +422,7 @@ function ArticleSplitContent({
             </Link>
           )}
           <Link href={href} className="group">
-            <h2 className="font-bold font-serif text-3xl sm:text-4xl md:text-4xl text-black tracking-wide max-w-full break-words group-hover:opacity-80 group-hover:underline underline-offset-4 transition-opacity">
+            <h2 className="max-w-full whitespace-pre-line break-words font-serif text-3xl font-bold tracking-wide text-black group-hover:opacity-80 group-hover:underline underline-offset-4 transition-opacity sm:text-4xl md:text-4xl">
               {title}
             </h2>
           </Link>
@@ -710,7 +711,7 @@ function renderSectionContent(
         >
           <ArticleSplitContent
             imageUrl={imageUrl}
-            alt={article.coverImage?.alt ?? article.title}
+            alt={article.coverImage?.alt ?? articleTitleSingleLine(article.title)}
             title={article.title}
             subtitle={article.author?.name}
             subtitleHref={

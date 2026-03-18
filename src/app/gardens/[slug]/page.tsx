@@ -8,12 +8,20 @@ import {
   AD_BANNER_BY_PLACEMENT_QUERY,
   ARTICLE_BY_SLUG_QUERY,
   ARTICLE_SLUGS_BY_CATEGORY_QUERY,
-  RELATED_ARTICLES_BY_CATEGORY_QUERY,
 } from '@/sanity/lib/queries'
 
+import { articleTitleSingleLine } from '@/lib/articleTitle'
+import {
+  relatedArticlesFromSanity,
+  type RelatedArticleForCard,
+} from '@/lib/articleRelated'
 import { AdBanner } from '@/components/shared/AdBanner'
 import { ArticleBody } from '@/components/editorial/ArticleBody'
 import { ArticleCard } from '@/components/editorial/ArticleCard'
+import {
+  ArticleAffiliateProductsSection,
+  type ArticleAffiliateProduct,
+} from '@/components/editorial/ArticleAffiliateProductsSection'
 import { NewsstandCta } from '@/components/shared/NewsstandCta'
 
 export const revalidate = 86400
@@ -55,61 +63,51 @@ export default async function GardensArticlePage({ params }: ArticlePageProps) {
     ? urlFor(article.coverImage).width(1400).height(933).url()
     : null
 
-  const relatedArticles = await sanityFetch<ArticleCardData[]>(
-    RELATED_ARTICLES_BY_CATEGORY_QUERY,
-    { category: 'gardens', excludeId: article._id }
-  )
+  const relatedArticles = relatedArticlesFromSanity(article.relatedArticles)
 
   return (
     <main>
       <article>
-        {/* Hero — full-bleed with title + author overlay */}
+        {/* Hero — title above (black), image below */}
+        <header className="px-6 md:px-12 lg:px-16 pt-8 md:pt-10 pb-8 md:pb-10 text-center text-black">
+          {article.subcategory && (
+            <p className="mb-3 text-xs uppercase tracking-[0.25em] text-black/70">
+              {article.subcategory}
+            </p>
+          )}
+          <h1 className="mx-auto max-w-3xl whitespace-pre-line font-serif text-4xl leading-tight tracking-tight text-black md:text-5xl lg:text-6xl">
+            {article.title}
+          </h1>
+          <div className="mt-4 flex flex-col items-center gap-1 text-sm text-black/80">
+            {article.author && (
+              <p>
+                Words by{' '}
+                <Link
+                  href={`/contributors/${article.author.slug}`}
+                  className="uppercase text-black hover:underline underline-offset-2 transition-colors"
+                >
+                  {article.author.name}
+                </Link>
+              </p>
+            )}
+            {article.photographer && (
+              <p>
+                Photography{' '}
+                <span className="uppercase">{article.photographer.name}</span>
+              </p>
+            )}
+          </div>
+        </header>
         {coverImageUrl && (
-          <div className="relative w-full aspect-[4/5] md:aspect-[3/2] lg:aspect-[16/9] bg-[#0a0a0a]">
+          <div className="relative w-full aspect-[4/5] bg-[#0a0a0a] md:aspect-[3/2] lg:aspect-[16/9]">
             <Image
               src={coverImageUrl}
-              alt={article.coverImage?.alt ?? article.title}
+              alt={article.coverImage?.alt ?? articleTitleSingleLine(article.title)}
               fill
               sizes="100vw"
               className="object-cover"
               priority
             />
-            <div className="absolute inset-0 bg-linear-to-t from-black/60 via-black/20 to-transparent" />
-            <div className="absolute inset-0 flex flex-col items-center justify-end pb-12 md:pb-16 px-6 md:px-12 text-center">
-              <Link
-                href={`/${article.category}`}
-                className="text-xs tracking-[0.25em] uppercase text-white/80 hover:text-white hover:underline underline-offset-2 transition-colors mb-3"
-              >
-                Cover Story
-              </Link>
-              {article.subcategory && (
-                <p className="text-xs tracking-[0.25em] uppercase text-white/80 mb-3">
-                  {article.subcategory}
-                </p>
-              )}
-              <h1 className="font-serif text-5xl md:text-6xl lg:text-7xl text-white leading-tight tracking-tight max-w-3xl">
-                {article.title}
-              </h1>
-              <div className="mt-4 flex flex-col items-center gap-1 text-sm text-white/90">
-                {article.author && (
-                  <p>
-                    Written by{' '}
-                    <Link
-                      href={`/contributors/${article.author.slug}`}
-                      className="uppercase hover:text-white hover:underline underline-offset-2 transition-colors"
-                    >
-                      {article.author.name}
-                    </Link>
-                  </p>
-                )}
-                {article.photographer && (
-                  <p>
-                    Photographed by{' '}
-                    <span className="uppercase">{article.photographer.name}</span>
-                  </p>
-                )}
-              </div>
-            </div>
           </div>
         )}
 
@@ -144,12 +142,12 @@ export default async function GardensArticlePage({ params }: ArticlePageProps) {
           <NewsstandCta />
         </div>
 
-        {/* Related articles — same category */}
+        {/* Related articles — from Sanity */}
         {relatedArticles.length > 0 && (
           <div className="mt-24 pt-20 border-t border-[#E5E5E5]">
             <div className="max-w-[1400px] mx-auto px-6 md:px-12">
               <h2 className="font-serif text-3xl md:text-4xl text-[#1A1A1A] mb-12">
-                More in Gardens
+                Related
               </h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10 md:gap-16">
                 {relatedArticles.map((a) => (
@@ -159,7 +157,7 @@ export default async function GardensArticlePage({ params }: ArticlePageProps) {
                     slug={a.slug}
                     category={a.category}
                     subcategory={a.subcategory}
-                    coverImage={a.coverImage}
+                    coverImage={a.coverImage ?? {}}
                     author={a.author}
                   />
                 ))}
@@ -168,15 +166,7 @@ export default async function GardensArticlePage({ params }: ArticlePageProps) {
           </div>
         )}
 
-        {/* Affiliate disclosure */}
-        {article.affiliateProducts && article.affiliateProducts.length > 0 && (
-          <div className="max-w-[580px] mx-auto px-6 md:px-12 pb-20">
-            <p className="text-sm text-[#6B6B6B] italic">
-              Our editors independently curate all products. We may receive
-              compensation from purchases through these links.
-            </p>
-          </div>
-        )}
+        <ArticleAffiliateProductsSection products={article.affiliateProducts} />
       </article>
     </main>
   )
@@ -192,8 +182,8 @@ type ArticleData = {
   body: unknown
   author?: { name: string; slug: string } | null
   photographer?: { name: string } | null
-  relatedArticles?: unknown[]
-  affiliateProducts?: unknown[]
+  relatedArticles?: RelatedArticleForCard[]
+  affiliateProducts?: ArticleAffiliateProduct[]
 }
 
 type AdData = {
@@ -202,12 +192,3 @@ type AdData = {
   title?: string | null
 }
 
-type ArticleCardData = {
-  _id: string
-  title: string
-  slug: string
-  category: string
-  subcategory?: string | null
-  coverImage: { asset?: { _ref: string }; alt?: string }
-  author?: { name: string; slug: string } | null
-}

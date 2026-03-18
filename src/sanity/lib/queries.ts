@@ -78,7 +78,7 @@ export const ARTICLE_BY_SLUG_QUERY = `
     ...,
     "author": author->{ name, "slug": slug.current, bio, portrait },
     "photographer": photographer->{ name, "slug": slug.current },
-    "affiliateProducts": affiliateProducts[]->{ title, brand, price, image, affiliateUrl },
+    "affiliateProducts": affiliateProducts[]->{ _id, title, brand, price, image, affiliateUrl },
     "relatedArticles": relatedArticles[]->{ _id, title, "slug": slug.current, category, subcategory, coverImage, "author": author->{ name, "slug": slug.current } },
     "body": body[] {
       ...,
@@ -98,19 +98,6 @@ export const ARTICLE_BY_SLUG_QUERY = `
 // Article slugs for generateStaticParams
 export const ARTICLE_SLUGS_BY_CATEGORY_QUERY = `
   *[_type == "article" && category == $category] { "slug": slug.current }
-`
-
-// Related articles from same category (excluding current article)
-export const RELATED_ARTICLES_BY_CATEGORY_QUERY = `
-  *[_type == "article" && category == $category && _id != $excludeId] | order(publishedAt desc)[0...6] {
-    _id,
-    title,
-    "slug": slug.current,
-    category,
-    subcategory,
-    coverImage,
-    "author": author->{ name, "slug": slug.current }
-  }
 `
 
 // All affiliate products (for neptune market)

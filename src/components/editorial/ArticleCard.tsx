@@ -1,6 +1,7 @@
 import Image from 'next/image'
 import Link from 'next/link'
 
+import { articleTitleSingleLine } from '@/lib/articleTitle'
 import { urlFor } from '@/sanity/lib/image'
 
 interface ArticleCardProps {
@@ -31,6 +32,7 @@ export function ArticleCard({
   fillHeight = false,
   horizontal = false,
 }: ArticleCardProps) {
+  const displayTitle = articleTitleSingleLine(title)
   const isCompact = size === 'compact'
   const isFeatured = size === 'featured'
   const imageWidth = isCompact ? 400 : 600
@@ -64,7 +66,7 @@ export function ArticleCard({
               {imageUrl ? (
                 <Image
                   src={imageUrl}
-                  alt={coverImage?.alt ?? title}
+                  alt={coverImage?.alt ?? displayTitle}
                   fill
                   sizes="(max-width: 1024px) 50vw, 20vw"
                   className="object-cover transition-transform duration-300 ease-out group-hover:scale-[1.02]"
@@ -84,7 +86,7 @@ export function ArticleCard({
             )}
             <Link href={`/${category}/${slug}`}>
               <h3 className="font-serif text-[#1A1A1A] group-hover:underline line-clamp-3 text-sm leading-snug">
-                {title}
+                {displayTitle}
               </h3>
             </Link>
             {author && (
@@ -112,7 +114,7 @@ export function ArticleCard({
             {imageUrl ? (
               <Image
                 src={imageUrl}
-                alt={coverImage?.alt ?? title}
+                alt={coverImage?.alt ?? displayTitle}
                 width={imageWidth}
                 height={imageHeight}
                 sizes={imageSizes}
@@ -133,7 +135,7 @@ export function ArticleCard({
           )}
           <Link href={`/${category}/${slug}`}>
             <h3 className={`font-serif text-[#1A1A1A] group-hover:underline line-clamp-2 ${titleSizeClass}`}>
-              {title}
+              {displayTitle}
             </h3>
           </Link>
         </div>
@@ -157,7 +159,7 @@ export function ArticleCard({
             {imageUrl ? (
               <Image
                 src={imageUrl}
-                alt={coverImage?.alt ?? title}
+                alt={coverImage?.alt ?? displayTitle}
                 width={imageWidth}
                 height={imageHeight}
                 sizes={imageSizes}
@@ -184,7 +186,7 @@ export function ArticleCard({
             <h3
               className={`font-serif text-[#1A1A1A] group-hover:underline line-clamp-2 ${titleSizeClass}`}
             >
-              {title}
+              {displayTitle}
             </h3>
           </Link>
         </div>

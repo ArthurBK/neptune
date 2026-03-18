@@ -33,7 +33,7 @@ export default async function NewsstandPage() {
 
   return (
     <main>
-      <div className="max-w-screen-xl mx-auto px-6 md:px-12 lg:px-16 pt-8 md:pt-12 pb-16 md:pb-24">
+      <div className="max-w-screen-xl mx-auto px-6 md:px-12 lg:px-16 pt-4 md:pt-8 pb-16 md:pb-24">
         <header className="mb-8 md:mb-10 text-center">
           <h1 className="font-serif text-2xl md:text-3xl text-[#1A1A1A] uppercase tracking-wide">
             Newsstand

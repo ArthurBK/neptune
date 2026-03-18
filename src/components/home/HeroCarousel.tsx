@@ -1,6 +1,8 @@
 'use client'
 
 import Image from 'next/image'
+
+import { articleTitleSingleLine } from '@/lib/articleTitle'
 import Link from 'next/link'
 import { useCallback, useEffect, useState } from 'react'
 
@@ -95,7 +97,7 @@ export function HeroCarousel({ articles, featuredProduct }: HeroCarouselProps) {
                   {/* Image principale en contain — unoptimized pour netteté maximale */}
                   <Image
                     src={imageUrl}
-                    alt={article.coverImage?.alt ?? article.title}
+                    alt={article.coverImage?.alt ?? articleTitleSingleLine(article.title)}
                     fill
                     className="object-contain"
                     sizes="100vw"
@@ -118,7 +120,7 @@ export function HeroCarousel({ articles, featuredProduct }: HeroCarouselProps) {
               />
               {/* Titre centré */}
               <div className="absolute inset-0 flex flex-col items-center justify-center px-6 text-center">
-                <h2 className="font-serif text-5xl md:text-6xl lg:text-8xl text-white tracking-wide max-w-4xl [text-shadow:0_2px_20px_rgba(0,0,0,0.8),0_0_40px_rgba(0,0,0,0.6)]">
+                <h2 className="max-w-4xl whitespace-pre-line font-serif text-5xl tracking-wide text-white md:text-6xl lg:text-8xl [text-shadow:0_2px_20px_rgba(0,0,0,0.8),0_0_40px_rgba(0,0,0,0.6)]">
                   {article.title}
                 </h2>
                 {article.author && (

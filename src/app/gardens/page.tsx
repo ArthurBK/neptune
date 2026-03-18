@@ -48,7 +48,7 @@ export default async function GardensPage() {
 
   return (
     <main>
-      <div className="max-w-screen-xl mx-auto px-6 md:px-12 lg:px-16 pt-8 md:pt-12 pb-16 md:pb-24">
+      <div className="max-w-screen-xl mx-auto px-6 md:px-12 lg:px-16 pt-4 md:pt-8 pb-16 md:pb-24">
         {/* Ad banner */}
         {adBanner?.image && (
           <div className="mb-12 md:mb-16">

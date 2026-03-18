@@ -1,6 +1,7 @@
 import { unstable_cache } from 'next/cache'
 import { NextResponse } from 'next/server'
 
+import { articleTitleSingleLine } from '@/lib/articleTitle'
 import { shopifyFetch } from '@/lib/shopify/client'
 import { client } from '@/sanity/lib/client'
 import { ARTICLES_SEARCH_QUERY, CONTRIBUTORS_SEARCH_QUERY } from '@/sanity/lib/queries'
@@ -70,7 +71,7 @@ async function fetchSearch(q: string) {
   return {
     articles: articles.map((a) => ({
       _id: a._id,
-      title: a.title,
+      title: articleTitleSingleLine(a.title),
       slug: a.slug,
       category: a.category,
       coverImage: a.coverImage,

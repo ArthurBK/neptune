@@ -15,7 +15,7 @@ export function AdBanner({ image, linkUrl, title }: AdBannerProps) {
   if (!imageUrl) return null
 
   const content = (
-    <div className="relative w-full aspect-[3/1] md:aspect-[4/1] bg-[#E5E5E5] overflow-hidden">
+    <div className="relative h-[72px] w-full bg-[#E5E5E5] sm:h-[88px] md:h-[100px] overflow-hidden">
       <Image
         src={imageUrl}
         alt={title ?? 'Advertisement'}

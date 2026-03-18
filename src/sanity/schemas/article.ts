@@ -34,6 +34,7 @@ const pteImageBlock = defineType({
         list: [
           { title: 'Full width', value: 'full' },
           { title: 'Wide (bleed)', value: 'wide' },
+          { title: 'Center', value: 'center' },
           { title: 'Float left', value: 'left' },
           { title: 'Float right', value: 'right' },
         ],
@@ -127,14 +128,22 @@ export const article = defineType({
     defineField({
       name: 'title',
       title: 'Title',
-      type: 'string',
+      type: 'text',
+      rows: 4,
+      description: 'Press Enter for a line break (shown on the article page only).',
       validation: (rule) => rule.required(),
     }),
     defineField({
       name: 'slug',
       title: 'Slug',
       type: 'slug',
-      options: { source: 'title' },
+      options: {
+        source: (doc) =>
+          typeof doc?.title === 'string'
+            ? doc.title.replace(/\n/g, ' ').replace(/\s+/g, ' ').trim()
+            : '',
+        maxLength: 96,
+      },
       validation: (rule) => rule.required(),
     }),
     defineField({

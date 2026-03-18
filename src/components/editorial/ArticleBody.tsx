@@ -90,6 +90,8 @@ function createComponents(isFirstParagraph: { current: boolean }): PortableTextC
         const layoutClasses: Record<string, string> = {
           full: 'clear-both w-full my-6 md:my-8',
           wide: 'clear-both w-full my-6 md:my-8',
+          center:
+            'clear-both mx-auto w-full max-w-2xl md:max-w-3xl px-6 md:px-12 my-6 md:my-8',
           left: 'float-left mr-6 mb-4 w-full md:w-[50vw] shrink-0',
           right: 'float-right ml-6 mb-4 w-full md:w-[50vw] shrink-0',
         }
@@ -106,14 +108,18 @@ function createComponents(isFirstParagraph: { current: boolean }): PortableTextC
                   sizes={
                     layout === 'full' || layout === 'wide'
                       ? '100vw'
-                      : '(max-width: 768px) 100vw, 50vw'
+                      : layout === 'center'
+                        ? '(max-width: 768px) 100vw, 768px'
+                        : '(max-width: 768px) 100vw, 50vw'
                   }
                   className="object-cover"
                 />
               </div>
             </div>
             {value.caption && (
-              <figcaption className="mt-2 text-sm text-[#6B6B6B]">
+              <figcaption
+                className={`mt-2 text-sm text-[#6B6B6B] ${layout === 'center' ? 'text-center' : ''}`}
+              >
                 {value.caption}
               </figcaption>
             )}

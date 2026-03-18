@@ -56,15 +56,15 @@ export function MarketPageContent({ products }: MarketPageContentProps) {
 
   return (
     <main>
-      <div className="max-w-[1400px] mx-auto px-6 md:px-12 lg:px-16 pt-8 md:pt-12 pb-16 md:pb-24">
-        <header className="mb-12 md:mb-16 text-center">
+      <div className="max-w-[1400px] mx-auto px-6 md:px-12 lg:px-16 pt-4 md:pt-6 pb-16 md:pb-24">
+        <header className="mb-6 md:mb-10 text-center">
           <h1 className="font-serif text-2xl md:text-3xl uppercase tracking-wide text-black">
             Neptune Market
           </h1>
           <p className="mt-4 text-base text-black max-w-2xl mx-auto">
             Discover our curated shopping edit, featuring a variety of products, including books, objects of all kinds, furniture, and fashion gems that our editors adore and have on their wish lists (and soon, you will too!).
             <br />
-            <br />Our editors independently curate all products featured on Neptune. We may receive compensation from retailers and/or from purchases of products through these links.
+            <br /><span className="text-xs italic">Our editors independently curate all products featured on Neptune.<br />We may receive compensation from retailers and/or from purchases of products through these links.</span>
           </p>
         </header>
 
