@@ -302,40 +302,38 @@ function NewsletterSectionContent({
   priority?: boolean
 }) {
   const openModal = useOpenNewsletterModal()
-  const title = headline ?? 'Newsletters'
+  const title = headline ?? 'Newsletter'
   const introText =
     subtitle ??
-    'Sign up to the Neptune newsletters for an exclusive access to great interiors and great conversations.'
+    'For exclusive access to great interiors and great conversations, sign up for the Neptune Papers’ newsletter.'
 
   return (
     <div className="flex flex-col h-full w-full min-w-0 bg-white">
-      <div className="flex flex-col md:flex-row flex-1 min-h-0 w-full">
-        {/* Left: text (same column as article) */}
-        <div className="flex-1 min-w-0 flex flex-col justify-center px-6 md:px-10 lg:px-16 py-8 md:py-12">
-          <h2 className="font-serif text-2xl md:text-3xl text-[#1A1A1A] uppercase tracking-wide">
+      <div className="flex flex-col items-center justify-start flex-1 min-h-0 w-full px-6 md:px-10 lg:px-16 pt-[calc(var(--header-height)+1.5rem)] pb-8 md:pb-12 text-center">
+        <div className="w-full max-w-2xl">
+          <h2 className="font-serif text-2xl md:text-3xl text-black uppercase tracking-wide">
             {title}
           </h2>
-          <p className="mt-4 text-base text-[#6B6B6B] max-w-xl leading-relaxed">
+          <p className="mt-3 text-base text-black leading-relaxed">
             {introText}
           </p>
           <button
             type="button"
             onClick={openModal}
-            className="mt-8 font-header font-bold text-base tracking-[0.2em] uppercase text-black transition-colors hover:underline w-fit text-left"
+            className="mt-5 font-header font-bold text-base tracking-[0.2em] uppercase text-black transition-colors hover:underline w-fit mx-auto"
           >
-            Subscribe
+            Subscribe now
           </button>
         </div>
-        {/* Right: image (same as article column but with top padding so it sits below header) */}
-        <div className="flex-1 min-w-0 min-h-[40vh] md:min-h-0 flex flex-col pt-[var(--header-height)] bg-transparent overflow-visible">
-          <div className="flex-1 min-h-0 relative overflow-visible flex items-center justify-center">
+        <div className="w-full max-w-3xl mt-5 md:mt-6">
+          <div className="relative w-full min-h-[65vh] md:min-h-[72vh]">
             {imageUrl ? (
               <Image
                 src={imageUrl}
                 alt=""
                 fill
                 className="object-contain object-center"
-                sizes="50vw"
+                sizes="(max-width: 768px) 100vw, 50vw"
                 priority={priority}
               />
             ) : (
@@ -345,7 +343,7 @@ function NewsletterSectionContent({
         </div>
       </div>
       <div className="shrink-0 mt-auto">
-        <NewsstandCta />
+        {/* <NewsstandCta /> */}
       </div>
     </div>
   )
@@ -375,14 +373,14 @@ function ArticleSplitContent({
     <div className="flex flex-col h-full w-full min-w-0 bg-white">
       <div className="flex flex-col md:flex-row flex-1 min-h-0 w-full">
         {/* Left: image */}
-        <div className="flex-1 min-w-0 min-h-[40vh] md:min-h-0 relative bg-[#0a0a0a]">
+        <div className="flex-1 min-w-0 min-h-[30vh] md:min-h-0 relative  aspect-[16/9]">
           {imageUrl ? (
             <Link href={href} className="block absolute inset-0">
               <Image
                 src={imageUrl}
                 alt={alt}
                 fill
-                className="object-cover"
+                className="object-contain object-right"
                 sizes="50vw"
                 priority={priority}
               />

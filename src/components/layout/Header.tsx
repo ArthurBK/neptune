@@ -51,7 +51,7 @@ function NavLink({
     <Link
       href={href}
       onClick={onClick}
-      className={`font-header font-medium text-xs tracking-[0.1em] [word-spacing:0.15em] uppercase transition-colors ${bold ? 'font-bold' : ''} ${textClass} ${className ?? ''}`}
+      className={`font-header font-medium text-[13px] tracking-[0.1em] [word-spacing:0.15em] uppercase transition-colors ${bold ? 'font-bold' : ''} ${textClass} ${className ?? ''}`}
     >
       {label}
     </Link>
@@ -161,7 +161,7 @@ export function Header({ transparent: _transparent }: { transparent?: boolean } 
             </button>
             <NavLink
               href="/newsletters"
-              label="NEWSLETTERS"
+              label="NEWSLETTER"
               transparent={lightText}
               className="hidden md:inline-block"
             />
@@ -322,7 +322,7 @@ export function Header({ transparent: _transparent }: { transparent?: boolean } 
                 setIsBurgerOpen(false)
                 setIsSearchOpen(true)
               }}
-              className="text-left text-xs tracking-[0.2em] [word-spacing:0.3em] uppercase text-[#6B6B6B] hover:text-black transition-colors py-2 font-header font-medium"
+              className="text-left text-[13px] tracking-[0.2em] [word-spacing:0.3em] uppercase text-[#6B6B6B] hover:text-black transition-colors py-2 font-header font-medium"
             >
               Search
             </button>
@@ -332,7 +332,7 @@ export function Header({ transparent: _transparent }: { transparent?: boolean } 
                 setIsBurgerOpen(false)
                 setIsCartOpen(true)
               }}
-              className="text-left text-xs tracking-[0.2em] [word-spacing:0.3em] uppercase text-[#6B6B6B] hover:text-black transition-colors py-2 font-header font-medium"
+              className="text-left text-[13px] tracking-[0.2em] [word-spacing:0.3em] uppercase text-[#6B6B6B] hover:text-black transition-colors py-2 font-header font-medium"
             >
               Cart {cartCount != null && cartCount > 0 && `(${cartCount})`}
             </button>
