@@ -1,5 +1,6 @@
 import { DocumentTextIcon } from '@sanity/icons'
 import { defineField, defineType } from 'sanity'
+import { captionRichTextType } from './lib/captionRichText'
 
 export const categoryPage = defineType({
   name: 'categoryPage',
@@ -15,7 +16,7 @@ export const categoryPage = defineType({
       description: 'Image shown below the newsstand CTA on the Interiors page',
       fields: [
         { name: 'alt', title: 'Alt text', type: 'string' },
-        { name: 'caption', title: 'Caption', type: 'string' },
+        defineField({ name: 'caption', title: 'Caption', ...captionRichTextType }),
       ],
     }),
     defineField({
@@ -26,7 +27,7 @@ export const categoryPage = defineType({
       description: 'Image shown below the newsstand CTA on the Arts page',
       fields: [
         { name: 'alt', title: 'Alt text', type: 'string' },
-        { name: 'caption', title: 'Caption', type: 'string' },
+        defineField({ name: 'caption', title: 'Caption', ...captionRichTextType }),
       ],
     }),
     defineField({
@@ -37,7 +38,7 @@ export const categoryPage = defineType({
       description: 'Image shown below the newsstand CTA on the Gardens page',
       fields: [
         { name: 'alt', title: 'Alt text', type: 'string' },
-        { name: 'caption', title: 'Caption', type: 'string' },
+        defineField({ name: 'caption', title: 'Caption', ...captionRichTextType }),
       ],
     }),
     defineField({
@@ -48,7 +49,7 @@ export const categoryPage = defineType({
       description: 'Full-screen image shown at the bottom of the Fashion page',
       fields: [
         { name: 'alt', title: 'Alt text', type: 'string' },
-        { name: 'caption', title: 'Caption', type: 'string' },
+        defineField({ name: 'caption', title: 'Caption', ...captionRichTextType }),
       ],
     }),
   ],

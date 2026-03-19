@@ -1,5 +1,6 @@
 import { CogIcon } from '@sanity/icons'
 import { defineField, defineType } from 'sanity'
+import { captionRichTextType } from './lib/captionRichText'
 
 export const siteSettings = defineType({
   name: 'siteSettings',
@@ -48,7 +49,7 @@ export const siteSettings = defineType({
     defineField({
       name: 'newsletterImageLegend',
       title: 'Newsletter Image Legend',
-      type: 'string',
+      ...captionRichTextType,
       description: 'Small italic caption shown below the image',
       group: 'newsletter',
     }),

@@ -1,5 +1,28 @@
 import { DocumentTextIcon, ImageIcon } from '@sanity/icons'
 import { defineArrayMember, defineField, defineType } from 'sanity'
+import { captionRichTextType } from './lib/captionRichText'
+
+function captionToPlainText(value: unknown): string {
+  if (value == null) return ''
+  if (typeof value === 'string') return value
+  if (!Array.isArray(value)) return ''
+
+  return value
+    .map((block) => {
+      if (!block || typeof block !== 'object') return ''
+      const children = (block as { children?: unknown }).children
+      if (!Array.isArray(children)) return ''
+      return children
+        .map((child) => {
+          if (!child || typeof child !== 'object') return ''
+          const text = (child as { text?: unknown }).text
+          return typeof text === 'string' ? text : ''
+        })
+        .join('')
+    })
+    .join(' ')
+    .trim()
+}
 
 // Portable Text block: image with caption and alt
 const pteImageBlock = defineType({
@@ -18,7 +41,7 @@ const pteImageBlock = defineType({
     defineField({
       name: 'caption',
       title: 'Caption',
-      type: 'string',
+      ...captionRichTextType,
     }),
     defineField({
       name: 'alt',
@@ -44,7 +67,11 @@ const pteImageBlock = defineType({
     }),
   ],
   preview: {
-    select: { title: 'caption', media: 'image' },
+    select: { caption: 'caption', media: 'image' },
+    prepare: ({ caption, media }) => {
+      const title = captionToPlainText(caption)
+      return { title: title || 'Caption', media }
+    },
   },
 })
 
@@ -74,7 +101,7 @@ const pteImageGridBlock = defineType({
             defineField({
               name: 'caption',
               title: 'Caption',
-              type: 'string',
+              ...captionRichTextType,
             }),
           ],
         }),
@@ -174,7 +201,7 @@ export const article = defineType({
         defineField({
           name: 'caption',
           title: 'Caption',
-          type: 'string',
+          ...captionRichTextType,
           description: 'Optional caption shown under the cover image on the article page.',
         }),
       ],

@@ -3,6 +3,7 @@
 import Image from 'next/image'
 
 import { useOpenNewsletterModal } from '@/contexts/NewsletterModalContext'
+import { SanityCaption, hasCaptionContent } from '@/components/shared/SanityCaption'
 
 const DEFAULT_IMAGE =
   'https://images.unsplash.com/photo-1507842217343-583bb7270b66?w=1920&q=80'
@@ -11,7 +12,7 @@ interface NewsletterPageContentProps {
   headline?: string | null
   subtitle?: string | null
   imageUrl: string | null
-  imageLegend?: string | null
+  imageLegend?: unknown | null
 }
 
 export function NewsletterPageContent({
@@ -49,7 +50,7 @@ export function NewsletterPageContent({
       {/* Image from Sanity (below the text) */}
       {(imageUrl ?? DEFAULT_IMAGE) && (
         <>
-          <div className="relative w-full aspect-[16/10] md:aspect-[21/9] max-h-[60vh]">
+          <div className="relative w-full aspect-16/10 md:aspect-21/9 max-h-[60vh]">
             <Image
               src={imageUrl ?? DEFAULT_IMAGE}
               alt=""
@@ -59,9 +60,9 @@ export function NewsletterPageContent({
               priority
             />
           </div>
-          {imageLegend && (
+          {hasCaptionContent(imageLegend) && (
             <p className="px-6 md:px-12 pt-1.5 pb-6 text-center text-xs italic text-[#6B6B6B]">
-              {imageLegend}
+              <SanityCaption value={imageLegend} />
             </p>
           )}
         </>

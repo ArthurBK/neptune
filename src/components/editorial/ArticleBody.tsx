@@ -2,6 +2,7 @@ import { PortableText, type PortableTextComponents } from 'next-sanity'
 import Image from 'next/image'
 
 import { urlFor } from '@/sanity/lib/image'
+import { SanityCaption, hasCaptionContent } from '@/components/shared/SanityCaption'
 
 const TextWrapper = ({
   children,
@@ -87,6 +88,21 @@ function createComponents(isFirstParagraph: { current: boolean }): PortableTextC
       pteImageBlock: ({ value }) => {
         if (!value?.image) return null
         const layout = (value.layout as string) ?? 'full'
+        const isFloatLayout = layout === 'left' || layout === 'right'
+
+        // Sanity image metadata usually contains original dimensions.
+        // Use them (when available) to make the rendered height follow
+        // the picture's real aspect ratio, instead of forcing a fixed one.
+        const imageAsset = value.image as unknown as {
+          asset?: {
+            metadata?: { dimensions?: { width?: number; height?: number } }
+          }
+        }
+        const dimensions = imageAsset?.asset?.metadata?.dimensions
+        const aspectRatio =
+          isFloatLayout && dimensions?.width && dimensions?.height
+            ? `${dimensions.width} / ${dimensions.height}`
+            : null
         const layoutClasses: Record<string, string> = {
           full: 'clear-both w-full my-6 md:my-8',
           wide: 'clear-both w-full my-6 md:my-8',
@@ -96,11 +112,27 @@ function createComponents(isFirstParagraph: { current: boolean }): PortableTextC
           right: 'float-right ml-6 mb-4 w-full md:w-[50vw] shrink-0',
         }
         const figureClass = layoutClasses[layout] ?? layoutClasses.full
-        const imageUrl = urlFor(value.image).width(1400).height(1050).quality(90).url()
+        const imageWidth = 1400
+        const computedHeight =
+          dimensions?.width && dimensions?.height
+            ? Math.max(1, Math.round((imageWidth * dimensions.height) / dimensions.width))
+            : 1050
+        const imageUrl = urlFor(value.image)
+          .width(imageWidth)
+          .height(computedHeight)
+          .quality(90)
+          .url()
         return (
           <figure className={figureClass}>
             <div className="w-full">
-              <div className="relative aspect-[4/3] md:aspect-[16/10] bg-[#E5E5E5] overflow-hidden">
+              <div
+                className={
+                  isFloatLayout && aspectRatio
+                    ? 'relative bg-[#E5E5E5] overflow-hidden'
+                    : 'relative aspect-4/3 md:aspect-16/10 bg-[#E5E5E5] overflow-hidden'
+                }
+                style={isFloatLayout && aspectRatio ? { aspectRatio } : undefined}
+              >
                 <Image
                   src={imageUrl}
                   alt={value.alt ?? ''}
@@ -116,18 +148,23 @@ function createComponents(isFirstParagraph: { current: boolean }): PortableTextC
                 />
               </div>
             </div>
-            {value.caption && (
+            {hasCaptionContent(value.caption) && (
               <figcaption
                 className={`mt-2 text-sm text-[#6B6B6B] ${layout === 'center' ? 'text-center' : ''}`}
               >
-                {value.caption}
+                <SanityCaption value={value.caption} />
               </figcaption>
             )}
           </figure>
         )
       },
       pteImageGridBlock: ({ value }) => {
-        const images = (value?.images as Array<{ asset?: { _ref?: string }; alt?: string; caption?: string }>) ?? []
+        const images =
+          (value?.images as Array<{
+            asset?: { _ref?: string }
+            alt?: string
+            caption?: unknown
+          }>) ?? []
         if (images.length === 0) return null
         return (
           <div className="max-w-[1100px] mx-auto px-6 md:px-12 my-6 md:my-8">
@@ -139,7 +176,7 @@ function createComponents(isFirstParagraph: { current: boolean }): PortableTextC
                 const key = (img as { _key?: string })._key ?? `grid-img-${i}`
                 return (
                   <figure key={key} className="group overflow-hidden">
-                    <div className="relative aspect-[1/1] bg-[#E5E5E5] overflow-hidden">
+                    <div className="relative aspect-square bg-[#E5E5E5] overflow-hidden">
                       <Image
                         src={imageUrl}
                         alt={img.alt ?? ''}
@@ -148,9 +185,9 @@ function createComponents(isFirstParagraph: { current: boolean }): PortableTextC
                         className="object-cover transition-transform duration-300 group-hover:scale-[1.02]"
                       />
                     </div>
-                    {img.caption && (
-                      <figcaption className="mt-1 text-sm text-[#6B6B6B] whitespace-normal break-words">
-                        {img.caption}
+                    {hasCaptionContent(img.caption) && (
+                      <figcaption className="mt-1 text-sm text-[#6B6B6B] whitespace-normal wrap-break-word">
+                        <SanityCaption value={img.caption} />
                       </figcaption>
                     )}
                   </figure>
@@ -165,7 +202,7 @@ function createComponents(isFirstParagraph: { current: boolean }): PortableTextC
         const imageUrl = urlFor(value.adBanner.image).width(1200).url()
         const linkUrl = value.adBanner?.linkUrl
         const content = (
-          <div className="relative w-full aspect-[3/1] bg-[#E5E5E5] overflow-hidden">
+          <div className="relative w-full aspect-3/1 bg-[#E5E5E5] overflow-hidden">
             <Image
               src={imageUrl}
               alt="Advertisement"

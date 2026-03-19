@@ -1,10 +1,11 @@
 import Image from 'next/image'
 
 import { urlFor } from '@/sanity/lib/image'
+import { SanityCaption, hasCaptionContent } from '@/components/shared/SanityCaption'
 
 interface CategoryPageImageProps {
   image:
-    | { asset?: { _ref: string }; alt?: string; caption?: string }
+    | { asset?: { _ref: string }; alt?: string; caption?: unknown }
     | null
     | undefined
 }
@@ -13,8 +14,6 @@ export function CategoryPageImage({ image }: CategoryPageImageProps) {
   if (!image?.asset) return null
 
   const imageUrl = urlFor(image).width(2560).quality(90).url()
-
-  const caption = image.caption?.trim() || null
 
   return (
     <div className="mt-8">
@@ -27,8 +26,10 @@ export function CategoryPageImage({ image }: CategoryPageImageProps) {
           className="object-cover"
         />
       </div>
-      {caption && (
-        <p className="mt-3 text-center text-sm italic text-[#6B6B6B]">{caption}</p>
+      {hasCaptionContent(image.caption) && (
+        <p className="mt-3 text-center text-sm italic text-[#6B6B6B]">
+          <SanityCaption value={image.caption} />
+        </p>
       )}
     </div>
   )

@@ -32,9 +32,9 @@ export default async function InteriorsPage() {
       title?: string | null
     } | null>(AD_BANNER_BY_PLACEMENT_QUERY, { placement: 'category-top' }),
     sanityFetch<{
-      interiorsImage?: { asset?: { _ref: string }; alt?: string; caption?: string } | null
-      artsImage?: { asset?: { _ref: string }; alt?: string; caption?: string } | null
-      gardensImage?: { asset?: { _ref: string }; alt?: string; caption?: string } | null
+      interiorsImage?: { asset?: { _ref: string }; alt?: string; caption?: unknown } | null
+      artsImage?: { asset?: { _ref: string }; alt?: string; caption?: unknown } | null
+      gardensImage?: { asset?: { _ref: string }; alt?: string; caption?: unknown } | null
     } | null>(CATEGORY_PAGE_QUERY),
   ])
 

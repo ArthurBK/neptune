@@ -25,6 +25,7 @@ import {
 } from '@/components/editorial/ArticleAffiliateProductsSection'
 import { NewsstandCta } from '@/components/shared/NewsstandCta'
 import { LinkedIssuePreview } from '@/components/commerce/LinkedIssuePreview'
+import { SanityCaption, hasCaptionContent } from '@/components/shared/SanityCaption'
 
 export const revalidate = 86400
 
@@ -112,10 +113,10 @@ export default async function GardensArticlePage({ params }: ArticlePageProps) {
                 priority
               />
             </div>
-            {article.coverImage?.caption && (
+            {hasCaptionContent(article.coverImage?.caption) && (
               <div className="px-6 md:px-12 lg:px-16 mt-3 text-center">
                 <p className="text-sm italic text-[#6B6B6B]">
-                  {article.coverImage.caption}
+                  <SanityCaption value={article.coverImage?.caption} />
                 </p>
               </div>
             )}
@@ -200,7 +201,7 @@ type ArticleData = {
   category: string
   subcategory?: string | null
   linkedIssue?: string | null
-  coverImage?: { asset?: { _ref: string }; alt?: string; caption?: string }
+  coverImage?: { asset?: { _ref: string }; alt?: string; caption?: unknown }
   body: unknown
   author?: { name: string; slug: string } | null
   photographer?: { name: string } | null

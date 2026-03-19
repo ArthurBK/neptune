@@ -11,7 +11,7 @@ export default async function NewslettersPage() {
     newsletterHeadline?: string | null
     newsletterSubtitle?: string | null
     newsletterImage?: { asset?: { _ref: string } } | null
-    newsletterImageLegend?: string | null
+    newsletterImageLegend?: unknown | null
   } | null>(SITE_SETTINGS_QUERY)
 
   const imageUrl =
