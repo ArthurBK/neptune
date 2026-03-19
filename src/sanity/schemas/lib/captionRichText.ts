@@ -16,6 +16,5 @@ export const captionRichTextType = {
       },
     },
   ],
-  validation: (rule) => rule.max(3),
 }
 

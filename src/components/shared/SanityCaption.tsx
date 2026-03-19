@@ -1,4 +1,5 @@
 import { PortableText, type PortableTextComponents } from 'next-sanity'
+import type { TypedObject } from '@portabletext/types'
 
 const captionComponents: PortableTextComponents = {
   block: {
@@ -44,6 +45,7 @@ export function SanityCaption({ value }: { value: unknown }) {
 
   if (typeof value === 'string') return value.trim()
 
-  return <PortableText value={value as unknown} components={captionComponents} />
+  // `hasCaptionContent` ensures we're dealing with a non-empty block array.
+  return <PortableText value={value as TypedObject[]} components={captionComponents} />
 }
 
