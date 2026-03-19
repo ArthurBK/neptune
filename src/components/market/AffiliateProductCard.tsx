@@ -17,7 +17,8 @@ export function AffiliateProductCard({
   image,
   affiliateUrl,
 }: AffiliateProductCardProps) {
-  const imageUrl = image?.asset ? urlFor(image).width(600).height(750).url() : null
+  // Fetch higher-res images since the market grid displays them larger on desktop.
+  const imageUrl = image?.asset ? urlFor(image).width(900).height(1200).url() : null
 
   if (!affiliateUrl) return null
 
@@ -28,18 +29,18 @@ export function AffiliateProductCard({
       rel="noopener noreferrer"
       className="group block cursor-pointer"
     >
-      <div className="aspect-3/4 bg-[#E5E5E5] overflow-hidden">
+      <div className="aspect-3/4 overflow-hidden">
         {imageUrl ? (
           <Image
             src={imageUrl}
             alt={image?.alt ?? title}
-            width={600}
-            height={800}
-            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+            width={900}
+            height={1200}
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
             className="w-full h-full object-cover transition-transform duration-300 ease-out group-hover:scale-[1.02]"
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center text-[#6B6B6B]">
+          <div className="w-full h-full flex items-center justify-center text-[#1A1A1A]">
             No image
           </div>
         )}

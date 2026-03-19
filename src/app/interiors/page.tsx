@@ -32,9 +32,9 @@ export default async function InteriorsPage() {
       title?: string | null
     } | null>(AD_BANNER_BY_PLACEMENT_QUERY, { placement: 'category-top' }),
     sanityFetch<{
-      interiorsImage?: { asset?: { _ref: string }; alt?: string } | null
-      artsImage?: { asset?: { _ref: string }; alt?: string } | null
-      gardensImage?: { asset?: { _ref: string }; alt?: string } | null
+      interiorsImage?: { asset?: { _ref: string }; alt?: string; caption?: string } | null
+      artsImage?: { asset?: { _ref: string }; alt?: string; caption?: string } | null
+      gardensImage?: { asset?: { _ref: string }; alt?: string; caption?: string } | null
     } | null>(CATEGORY_PAGE_QUERY),
   ])
 
@@ -50,7 +50,7 @@ export default async function InteriorsPage() {
 
   return (
     <main>
-      <div className="max-w-screen-xl mx-auto px-6 md:px-12 lg:px-16 pt-4 md:pt-8 pb-16 md:pb-24">
+      <div className="max-w-7xl mx-auto px-6 md:px-12 lg:px-16 pt-4 md:pt-8 pb-16 md:pb-24">
         {/* Ad banner */}
         {adBanner?.image && (
           <div className="mb-12 md:mb-16">

@@ -24,7 +24,7 @@ export function ProductCard({
   return (
     <article className={`group ${compact ? 'max-w-[200px]' : ''}`}>
       <Link href={`/newsstand/${handle}`} className="block overflow-hidden">
-        <div className="aspect-3/4 bg-[#E5E5E5] overflow-hidden">
+        <div className="aspect-3/4 overflow-hidden">
           {featuredImage?.url ? (
             <Image
               src={featuredImage.url}
@@ -41,7 +41,7 @@ export function ProductCard({
               className="w-full h-full object-cover transition-transform duration-300 ease-out group-hover:scale-[1.02]"
             />
           ) : (
-            <div className="w-full h-full flex items-center justify-center text-[#6B6B6B] text-sm">
+            <div className="w-full h-full flex items-center justify-center text-[#1A1A1A] text-sm">
               No image
             </div>
           )}

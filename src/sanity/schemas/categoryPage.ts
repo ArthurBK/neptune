@@ -15,6 +15,7 @@ export const categoryPage = defineType({
       description: 'Image shown below the newsstand CTA on the Interiors page',
       fields: [
         { name: 'alt', title: 'Alt text', type: 'string' },
+        { name: 'caption', title: 'Caption', type: 'string' },
       ],
     }),
     defineField({
@@ -25,6 +26,7 @@ export const categoryPage = defineType({
       description: 'Image shown below the newsstand CTA on the Arts page',
       fields: [
         { name: 'alt', title: 'Alt text', type: 'string' },
+        { name: 'caption', title: 'Caption', type: 'string' },
       ],
     }),
     defineField({
@@ -35,6 +37,7 @@ export const categoryPage = defineType({
       description: 'Image shown below the newsstand CTA on the Gardens page',
       fields: [
         { name: 'alt', title: 'Alt text', type: 'string' },
+        { name: 'caption', title: 'Caption', type: 'string' },
       ],
     }),
     defineField({
@@ -45,6 +48,7 @@ export const categoryPage = defineType({
       description: 'Full-screen image shown at the bottom of the Fashion page',
       fields: [
         { name: 'alt', title: 'Alt text', type: 'string' },
+        { name: 'caption', title: 'Caption', type: 'string' },
       ],
     }),
   ],

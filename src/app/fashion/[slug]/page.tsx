@@ -11,6 +11,7 @@ import {
 } from '@/sanity/lib/queries'
 
 import { articleTitleSingleLine } from '@/lib/articleTitle'
+import { formatPersonName } from '@/lib/personName'
 import {
   relatedArticlesFromSanity,
   type RelatedArticleForCard,
@@ -23,6 +24,7 @@ import {
   type ArticleAffiliateProduct,
 } from '@/components/editorial/ArticleAffiliateProductsSection'
 import { NewsstandCta } from '@/components/shared/NewsstandCta'
+import { LinkedIssuePreview } from '@/components/commerce/LinkedIssuePreview'
 
 export const revalidate = 86400
 
@@ -71,7 +73,7 @@ export default async function FashionArticlePage({ params }: ArticlePageProps) {
         {/* Hero — title above (black), image below */}
         <header className="px-6 md:px-12 lg:px-16 pt-8 md:pt-10 pb-8 md:pb-10 text-center text-black">
           {article.subcategory && (
-            <p className="mb-3 text-xs uppercase tracking-[0.25em] text-black/70">
+            <p className="mb-3 font-header text-xs font-bold uppercase tracking-[0.25em] text-(--neptune-logo-red)">
               {article.subcategory}
             </p>
           )}
@@ -84,31 +86,40 @@ export default async function FashionArticlePage({ params }: ArticlePageProps) {
                 Words by{' '}
                 <Link
                   href={`/contributors/${article.author.slug}`}
-                  className="uppercase text-black hover:underline underline-offset-2 transition-colors"
+                  className="text-black hover:underline underline-offset-2 transition-colors"
                 >
-                  {article.author.name}
+                  {formatPersonName(article.author.name)}
                 </Link>
               </p>
             )}
             {article.photographer && (
               <p>
                 Photography{' '}
-                <span className="uppercase">{article.photographer.name}</span>
+                <span>{formatPersonName(article.photographer.name)}</span>
               </p>
             )}
           </div>
         </header>
         {coverImageUrl && (
-          <div className="relative w-full aspect-[4/5] bg-[#0a0a0a] md:aspect-[3/2] lg:aspect-[16/9]">
-            <Image
-              src={coverImageUrl}
-              alt={article.coverImage?.alt ?? articleTitleSingleLine(article.title)}
-              fill
-              sizes="100vw"
-              className="object-cover"
-              priority
-            />
-          </div>
+          <>
+            <div className="relative w-full aspect-4/5 bg-[#0a0a0a] md:aspect-3/2 lg:aspect-video">
+              <Image
+                src={coverImageUrl}
+                alt={article.coverImage?.alt ?? articleTitleSingleLine(article.title)}
+                fill
+                sizes="100vw"
+                className="object-cover"
+                priority
+              />
+            </div>
+            {article.coverImage?.caption && (
+              <div className="px-6 md:px-12 lg:px-16 mt-3 text-center">
+                <p className="text-sm italic text-[#6B6B6B]">
+                  {article.coverImage.caption}
+                </p>
+              </div>
+            )}
+          </>
         )}
 
         {/* Ad banner top */}
@@ -138,28 +149,33 @@ export default async function FashionArticlePage({ params }: ArticlePageProps) {
         )}
 
         {/* Newsstand CTA */}
-        <div className="mt-20">
+        <div className="mt-12">
           <NewsstandCta />
         </div>
 
         {/* Related articles — from Sanity */}
         {relatedArticles.length > 0 && (
-          <div className="mt-24 pt-20 border-t border-[#E5E5E5]">
+          <div className="mt-12 pt-12">
             <div className="max-w-[1400px] mx-auto px-6 md:px-12">
-              <h2 className="font-serif text-3xl md:text-4xl text-[#1A1A1A] mb-12">
-                Related
+              <h2 className="font-serif text-3xl md:text-4xl text-[#1A1A1A] mb-10 text-center uppercase tracking-[0.02em]">
+                YOU MAY ALSO LIKE
               </h2>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10 md:gap-16">
+              <div className="flex flex-wrap justify-center gap-10 md:gap-16">
                 {relatedArticles.map((a) => (
-                  <ArticleCard
+                  <div
                     key={a._id}
-                    title={a.title}
-                    slug={a.slug}
-                    category={a.category}
-                    subcategory={a.subcategory}
-                    coverImage={a.coverImage ?? {}}
-                    author={a.author}
-                  />
+                    className="max-w-[260px]"
+                  >
+                    <ArticleCard
+                      title={a.title}
+                      slug={a.slug}
+                      category={a.category}
+                      subcategory={a.subcategory}
+                      coverImage={a.coverImage ?? {}}
+                      author={a.author}
+                      size="compact"
+                    />
+                  </div>
                 ))}
               </div>
             </div>
@@ -167,6 +183,11 @@ export default async function FashionArticlePage({ params }: ArticlePageProps) {
         )}
 
         <ArticleAffiliateProductsSection products={article.affiliateProducts} />
+
+        {/* Linked Issue — Shopify product handle stored in Sanity */}
+        {article.linkedIssue ? (
+          <LinkedIssuePreview handle={article.linkedIssue} />
+        ) : null}
       </article>
     </main>
   )
@@ -178,7 +199,8 @@ type ArticleData = {
   slug: { current: string }
   category: string
   subcategory?: string | null
-  coverImage?: { asset?: { _ref: string }; alt?: string }
+  linkedIssue?: string | null
+  coverImage?: { asset?: { _ref: string }; alt?: string; caption?: string }
   body: unknown
   author?: { name: string; slug: string } | null
   photographer?: { name: string } | null

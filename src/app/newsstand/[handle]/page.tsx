@@ -88,7 +88,7 @@ export default async function NewsstandProductPage({ params }: ProductPageProps)
         </div>
 
         {/* Box 3 — product info */}
-        <div className="flex flex-col border-t border-[#E5E5E5] bg-white lg:border-t-0 lg:border-l lg:justify-center">
+        <div className="flex flex-col bg-white lg:justify-center">
           <div className="px-4 pt-4 pb-6 lg:px-8 lg:pt-4 lg:pb-16">
             <h1 className="font-serif text-2xl md:text-3xl text-[#1A1A1A] uppercase tracking-wide">
               {product.title}
@@ -99,7 +99,7 @@ export default async function NewsstandProductPage({ params }: ProductPageProps)
             </div>
 
             {(product.description || product.descriptionHtml) && (
-              <div className="mt-6 pt-6 border-t border-[#E5E5E5] lg:mt-12 lg:pt-8">
+              <div className="mt-6 lg:mt-6">
                 <div
                   className="text-[#6B6B6B] text-base leading-relaxed [&_p]:mb-4 [&_p:last-child]:mb-0 [&_a]:underline [&_a]:hover:text-black"
                   // biome-ignore lint/security/noDangerouslySetInnerHtml: Shopify product HTML from trusted source
@@ -111,10 +111,10 @@ export default async function NewsstandProductPage({ params }: ProductPageProps)
         </div>
       </div>
 
-      <div className="max-w-screen-xl mx-auto px-6 md:px-12 lg:px-16 py-12 md:py-16">
+      <div className="max-w-screen-xl mx-auto px-6 md:px-12 lg:px-16 ">
 
         {/* You May Also Like */}
-        <div className="mt-16 pt-16 border-t border-[#E5E5E5] text-center">
+        <div className="pt-16 border-t border-[#E5E5E5] text-center">
           <h2 className="font-serif text-4xl text-[#1A1A1A] mb-8">
             You May Also Like
           </h2>

@@ -258,10 +258,10 @@ export const ARTICLES_BY_PHOTOGRAPHER_QUERY = `
 // Category page images (Interiors, Arts, Gardens, Fashion)
 export const CATEGORY_PAGE_QUERY = `
   *[_type == "categoryPage" && _id == "categoryPage"][0] {
-    interiorsImage,
-    artsImage,
-    gardensImage,
-    fashionImage
+    interiorsImage{asset, alt, caption, hotspot},
+    artsImage{asset, alt, caption, hotspot},
+    gardensImage{asset, alt, caption, hotspot},
+    fashionImage{asset, alt, caption, hotspot}
   }
 `
 

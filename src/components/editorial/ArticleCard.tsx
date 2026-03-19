@@ -80,7 +80,7 @@ export function ArticleCard({
           </Link>
           <div className="flex flex-col justify-center min-w-0">
             {subcategory && (
-              <p className="tracking-[0.2em] uppercase text-[#6B6B6B] mb-1 text-xs">
+              <p className="tracking-[0.2em] uppercase font-header font-bold text-(--neptune-logo-red) mb-1 text-xs">
                 {subcategory}
               </p>
             )}
@@ -110,7 +110,7 @@ export function ArticleCard({
           href={`/${category}/${slug}`}
           className="block lg:flex-1 lg:min-h-0 overflow-hidden"
         >
-          <div className="aspect-[3/4] lg:aspect-auto lg:h-full bg-[#E5E5E5] overflow-hidden">
+          <div className="aspect-3/4 lg:aspect-auto lg:h-full bg-[#E5E5E5] overflow-hidden">
             {imageUrl ? (
               <Image
                 src={imageUrl}
@@ -129,7 +129,7 @@ export function ArticleCard({
         </Link>
         <div className="mt-2 lg:shrink-0">
           {subcategory && (
-            <p className="tracking-[0.2em] uppercase text-[#6B6B6B] mb-1 text-xs">
+            <p className="tracking-[0.2em] uppercase font-header font-bold text-(--neptune-logo-red) mb-1 text-xs">
               {subcategory}
             </p>
           )}
@@ -177,7 +177,7 @@ export function ArticleCard({
         <div className={isCompact ? 'mt-3' : 'mt-4'}>
           {subcategory && (
             <p
-              className={`tracking-[0.2em] uppercase text-[#6B6B6B] mb-1 ${isCompact ? 'text-xs' : 'text-sm'}`}
+              className={`tracking-[0.2em] uppercase font-header font-bold text-(--neptune-logo-red) mb-1 ${isCompact ? 'text-xs' : 'text-sm'}`}
             >
               {subcategory}
             </p>

@@ -56,7 +56,7 @@ export function MarketPageContent({ products }: MarketPageContentProps) {
 
   return (
     <main>
-      <div className="max-w-[1400px] mx-auto px-6 md:px-12 lg:px-16 pt-4 md:pt-6 pb-16 md:pb-24">
+      <div className="max-w-[1600px] mx-auto px-4 md:px-8 lg:px-12 pt-4 md:pt-6 pb-16 md:pb-24">
         <header className="mb-6 md:mb-10 text-center">
           <h1 className="font-serif text-2xl md:text-3xl uppercase tracking-wide text-black">
             Neptune Market
@@ -96,7 +96,7 @@ export function MarketPageContent({ products }: MarketPageContentProps) {
         )}
 
         {filteredProducts.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 md:gap-12">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-4 gap-6 md:gap-8">
             {filteredProducts.map((product) => (
               <AffiliateProductCard
                 key={product._id}

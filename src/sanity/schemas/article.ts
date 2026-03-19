@@ -171,6 +171,12 @@ export const article = defineType({
           type: 'string',
           validation: (rule) => rule.required(),
         }),
+        defineField({
+          name: 'caption',
+          title: 'Caption',
+          type: 'string',
+          description: 'Optional caption shown under the cover image on the article page.',
+        }),
       ],
       validation: (rule) => rule.required(),
     }),

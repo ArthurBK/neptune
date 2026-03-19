@@ -26,7 +26,7 @@ function createComponents(isFirstParagraph: { current: boolean }): PortableTextC
             <p
               className={
                 isFirst
-                  ? 'text-[#1A1A1A] leading-[1.75] text-[24px] md:text-[28px] font-bold'
+                  ? 'text-[#1A1A1A] leading-[1.85] text-[20px] md:text-[22px]'
                   : 'text-[#1A1A1A] leading-[1.85] text-[20px] md:text-[22px]'
               }
             >
@@ -130,25 +130,26 @@ function createComponents(isFirstParagraph: { current: boolean }): PortableTextC
         const images = (value?.images as Array<{ asset?: { _ref?: string }; alt?: string; caption?: string }>) ?? []
         if (images.length === 0) return null
         return (
-          <div className="max-w-[900px] mx-auto px-6 md:px-12 my-6 md:my-8">
-            <div className="grid grid-cols-3 gap-3 md:gap-6">
+          <div className="max-w-[1100px] mx-auto px-6 md:px-12 my-6 md:my-8">
+            <div className="grid grid-cols-3 gap-4 md:gap-7">
               {images.map((img, i) => {
-                const imageUrl = img?.asset ? urlFor(img).width(600).height(450).quality(90).url() : null
+                // Use a higher-res, square-ish crop so the grid feels bigger on the page.
+                const imageUrl = img?.asset ? urlFor(img).width(800).height(800).quality(90).url() : null
                 if (!imageUrl) return null
                 const key = (img as { _key?: string })._key ?? `grid-img-${i}`
                 return (
                   <figure key={key} className="group overflow-hidden">
-                    <div className="relative aspect-[4/3] bg-[#E5E5E5] overflow-hidden">
+                    <div className="relative aspect-[1/1] bg-[#E5E5E5] overflow-hidden">
                       <Image
                         src={imageUrl}
                         alt={img.alt ?? ''}
                         fill
-                        sizes="(max-width: 768px) 33vw, 400px"
+                        sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
                         className="object-cover transition-transform duration-300 group-hover:scale-[1.02]"
                       />
                     </div>
                     {img.caption && (
-                      <figcaption className="mt-1 text-sm text-[#6B6B6B] line-clamp-2">
+                      <figcaption className="mt-1 text-sm text-[#6B6B6B] whitespace-normal break-words">
                         {img.caption}
                       </figcaption>
                     )}
