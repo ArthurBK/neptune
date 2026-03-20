@@ -422,7 +422,7 @@ function NewsletterSectionContent({
             )}
           </div>
         </div>
-        <div className="flex-1 md:basis-1/2 min-w-0 flex items-center justify-center px-6 md:px-10 lg:px-16 pt-[calc(var(--header-height)+1.5rem)] md:pt-0 pb-8 md:pb-12 text-center">
+        <div className="flex-1 md:basis-1/2 min-w-0 mt-[var(--header-height)] h-[calc(var(--section-height,100vh)-var(--header-height))] flex items-center justify-center px-6 md:px-10 lg:px-16 text-center">
           <div className="w-full max-w-2xl">
             <h2 className="font-serif text-2xl md:text-3xl text-black uppercase tracking-wide">
               {title}
@@ -438,14 +438,14 @@ function NewsletterSectionContent({
               Subscribe now
             </button>
             {rightImageUrl ? (
-              <div className="mt-6 mx-auto w-full max-w-[240px]">
-                <div className="relative aspect-[4/5] overflow-hidden border-4 border-white shadow-sm">
+              <div className="mt-6 mx-auto w-full max-w-lg">
+                <div className="relative w-full h-[320px] md:h-[360px] overflow-hidden">
                   <Image
                     src={rightImageUrl}
                     alt=""
                     fill
-                    className="object-cover object-center"
-                    sizes="(max-width: 768px) 70vw, 240px"
+                    className="object-contain object-center"
+                    sizes="(max-width: 768px) 90vw, 420px"
                   />
                 </div>
               </div>
