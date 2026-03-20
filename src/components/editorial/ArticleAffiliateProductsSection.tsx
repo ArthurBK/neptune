@@ -24,7 +24,7 @@ export function ArticleAffiliateProductsSection({
 
   return (
     <section
-      className="mt-12 pt-16 pb-12 md:pb-10"
+      className="mt-6 pt-8 pb-12 md:pb-10"
       aria-label="Featured products from this story"
     >
       <div className="mx-auto max-w-[1400px] px-6 md:px-12 lg:px-16">

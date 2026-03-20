@@ -30,17 +30,43 @@ const homeImageBlock = defineType({
   icon: ImageIcon,
   fields: [
     defineField({
-      name: 'image',
-      title: 'Image',
-      type: 'image',
-      options: { hotspot: true },
+      name: 'layout',
+      title: 'Layout',
+      type: 'string',
+      initialValue: 'single',
+      options: {
+        list: [
+          { title: 'Single (full page)', value: 'single' },
+          { title: 'Split (left + right)', value: 'split' },
+        ],
+        layout: 'radio',
+      },
       validation: (rule) => rule.required(),
     }),
     defineField({
+      name: 'image',
+      title: 'Image (single layout)',
+      type: 'image',
+      options: { hotspot: true },
+      hidden: ({ parent }) => parent?.layout === 'split',
+      validation: (rule) =>
+        rule.custom((value, context) => {
+          const layout = (context.parent as { layout?: string } | undefined)?.layout ?? 'single'
+          if (layout === 'single' && !value) return 'Image is required for single layout.'
+          return true
+        }),
+    }),
+    defineField({
       name: 'alt',
-      title: 'Alt text',
+      title: 'Alt text (single layout)',
       type: 'string',
-      validation: (rule) => rule.required(),
+      hidden: ({ parent }) => parent?.layout === 'split',
+      validation: (rule) =>
+        rule.custom((value, context) => {
+          const layout = (context.parent as { layout?: string } | undefined)?.layout ?? 'single'
+          if (layout === 'single' && !value) return 'Alt text is required for single layout.'
+          return true
+        }),
     }),
     defineField({
       name: 'title',
@@ -50,14 +76,82 @@ const homeImageBlock = defineType({
     }),
     defineField({
       name: 'linkUrl',
-      title: 'Link URL',
+      title: 'Link URL (single layout)',
       type: 'url',
-      description: 'Optional — where to go when clicked',
+      hidden: ({ parent }) => parent?.layout === 'split',
+      description: 'Optional - where to go when clicked',
+    }),
+    defineField({
+      name: 'leftImage',
+      title: 'Left image (split layout)',
+      type: 'image',
+      options: { hotspot: true },
+      hidden: ({ parent }) => parent?.layout !== 'split',
+      validation: (rule) =>
+        rule.custom((value, context) => {
+          const layout = (context.parent as { layout?: string } | undefined)?.layout ?? 'single'
+          if (layout === 'split' && !value) return 'Left image is required for split layout.'
+          return true
+        }),
+    }),
+    defineField({
+      name: 'leftAlt',
+      title: 'Left alt text (split layout)',
+      type: 'string',
+      hidden: ({ parent }) => parent?.layout !== 'split',
+      validation: (rule) =>
+        rule.custom((value, context) => {
+          const layout = (context.parent as { layout?: string } | undefined)?.layout ?? 'single'
+          if (layout === 'split' && !value) return 'Left alt text is required for split layout.'
+          return true
+        }),
+    }),
+    defineField({
+      name: 'leftLinkUrl',
+      title: 'Left link URL (split layout)',
+      type: 'url',
+      hidden: ({ parent }) => parent?.layout !== 'split',
+      description: 'Optional - where to go when clicking the left image.',
+    }),
+    defineField({
+      name: 'rightImage',
+      title: 'Right image (split layout)',
+      type: 'image',
+      options: { hotspot: true },
+      hidden: ({ parent }) => parent?.layout !== 'split',
+      validation: (rule) =>
+        rule.custom((value, context) => {
+          const layout = (context.parent as { layout?: string } | undefined)?.layout ?? 'single'
+          if (layout === 'split' && !value) return 'Right image is required for split layout.'
+          return true
+        }),
+    }),
+    defineField({
+      name: 'rightAlt',
+      title: 'Right alt text (split layout)',
+      type: 'string',
+      hidden: ({ parent }) => parent?.layout !== 'split',
+      validation: (rule) =>
+        rule.custom((value, context) => {
+          const layout = (context.parent as { layout?: string } | undefined)?.layout ?? 'single'
+          if (layout === 'split' && !value) return 'Right alt text is required for split layout.'
+          return true
+        }),
+    }),
+    defineField({
+      name: 'rightLinkUrl',
+      title: 'Right link URL (split layout)',
+      type: 'url',
+      hidden: ({ parent }) => parent?.layout !== 'split',
+      description: 'Optional - where to go when clicking the right image.',
     }),
   ],
   preview: {
-    select: { title: 'title', media: 'image' },
-    prepare: ({ title }) => ({ title: title || 'Image' }),
+    select: { title: 'title', layout: 'layout', media: 'image', splitMedia: 'leftImage' },
+    prepare: ({ title, layout, media, splitMedia }) => ({
+      title: title || (layout === 'split' ? 'Image (split)' : 'Image'),
+      media: layout === 'split' ? splitMedia : media,
+    }),
   },
 })
 

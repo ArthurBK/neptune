@@ -11,12 +11,12 @@ type ShopifyFeaturedImage = {
 
 type ProductByHandleHeroResponse = {
   product:
-    | {
-        title: string
-        handle: string
-        featuredImage: ShopifyFeaturedImage | null
-      }
-    | null
+  | {
+    title: string
+    handle: string
+    featuredImage: ShopifyFeaturedImage | null
+  }
+  | null
 }
 
 export async function LinkedIssuePreview({ handle }: { handle: string }) {
@@ -31,38 +31,31 @@ export async function LinkedIssuePreview({ handle }: { handle: string }) {
     product?.featuredImage?.altText ?? product?.title ?? 'Linked issue'
 
   return (
-    <div className="mt-12 pb-16">
+    <div className="mt-12">
       <div className="mx-auto max-w-[1400px] px-6 md:px-12 lg:px-16 text-center">
-        <p className="font-header text-xs font-bold uppercase tracking-[0.25em] text-(--neptune-logo-red) mb-3">
-          Linked Issue
-        </p>
+        <Link
+          href={`/newsstand/${handle}`}
+          className="block mx-auto mb-4 text-center font-serif text-3xl md:text-4xl text-[#1A1A1A] uppercase tracking-[0.02em] transition-colors hover:text-black"
+        >
+          Read the full issue
+        </Link>
 
         {featuredImageUrl ? (
           <Link
             href={`/newsstand/${handle}`}
             className="group inline-flex items-center justify-center gap-6 rounded-sm transition-colors hover:text-black"
           >
-            <span className="relative inline-block h-[160px] w-[120px] overflow-hidden bg-[#E5E5E5] md:h-[220px] md:w-[160px]">
+            <span className="relative inline-block h-[260px] w-[200px] overflow-hidden bg-[#E5E5E5] md:h-[350px] md:w-[260px]">
               <Image
                 src={featuredImageUrl}
                 alt={featuredImageAlt}
                 fill
-                sizes="(max-width: 768px) 120px, 160px"
+                sizes="(max-width: 768px) 200px, 260px"
                 className="object-cover transition-transform duration-300 ease-out group-hover:scale-[1.06]"
               />
             </span>
-            <span className="text-sm uppercase tracking-[0.2em] text-[#6B6B6B] group-hover:underline underline-offset-4">
-              View the linked issue
-            </span>
           </Link>
-        ) : (
-          <Link
-            href={`/newsstand/${handle}`}
-            className="inline-block text-xs uppercase tracking-[0.2em] text-[#6B6B6B] transition-colors hover:text-black hover:underline"
-          >
-            View the linked issue
-          </Link>
-        )}
+        ) : null}
       </div>
     </div>
   )

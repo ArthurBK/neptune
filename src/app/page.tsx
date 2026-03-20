@@ -29,9 +29,16 @@ type HomePageSection = {
     author?: { name: string; slug: string } | null
   }
   image?: { asset?: { _ref: string }; alt?: string } | null
+  layout?: 'single' | 'split'
   alt?: string
   title?: string | null
   linkUrl?: string | null
+  leftImage?: { asset?: { _ref: string }; alt?: string } | null
+  leftAlt?: string
+  leftLinkUrl?: string | null
+  rightImage?: { asset?: { _ref: string }; alt?: string } | null
+  rightAlt?: string
+  rightLinkUrl?: string | null
   product?: {
     _id: string
     title: string
@@ -107,17 +114,39 @@ export default async function Home() {
             author: block.article.author,
           },
         })
-      } else if (block._type === 'homeImageBlock' && block.image) {
-        sections.push({
-          type: 'image',
-          data: {
-            _key: block._key,
-            image: block.image,
-            alt: block.alt ?? '',
-            title: block.title,
-            linkUrl: block.linkUrl,
-          },
-        })
+      } else if (block._type === 'homeImageBlock') {
+        if (
+          block.layout === 'split' &&
+          block.leftImage &&
+          block.rightImage
+        ) {
+          sections.push({
+            type: 'image',
+            data: {
+              _key: block._key,
+              layout: 'split',
+              leftImage: block.leftImage,
+              leftAlt: block.leftAlt ?? '',
+              leftLinkUrl: block.leftLinkUrl,
+              rightImage: block.rightImage,
+              rightAlt: block.rightAlt ?? '',
+              rightLinkUrl: block.rightLinkUrl,
+              title: block.title,
+            },
+          })
+        } else if (block.image) {
+          sections.push({
+            type: 'image',
+            data: {
+              _key: block._key,
+              layout: 'single',
+              image: block.image,
+              alt: block.alt ?? '',
+              title: block.title,
+              linkUrl: block.linkUrl,
+            },
+          })
+        }
       } else if (block._type === 'homeProductBlock' && block.product) {
         sections.push({
           type: 'affiliateProduct',

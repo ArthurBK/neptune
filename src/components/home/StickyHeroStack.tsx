@@ -33,10 +33,17 @@ export type HomeSection =
     type: 'image'
     data: {
       _key?: string
-      image: { asset?: { _ref: string }; alt?: string }
-      alt: string
+      layout?: 'single' | 'split'
+      image?: { asset?: { _ref: string }; alt?: string }
+      alt?: string
       title?: string | null
       linkUrl?: string | null
+      leftImage?: { asset?: { _ref: string }; alt?: string }
+      leftAlt?: string
+      leftLinkUrl?: string | null
+      rightImage?: { asset?: { _ref: string }; alt?: string }
+      rightAlt?: string
+      rightLinkUrl?: string | null
     }
   }
   | {
@@ -218,6 +225,70 @@ function ImageOnlyContent({
     )
   }
   return <div className="block h-full w-full">{inner}</div>
+}
+
+function SplitImageContent({
+  leftImageUrl,
+  rightImageUrl,
+  leftAlt,
+  rightAlt,
+  leftHref,
+  rightHref,
+  priority = false,
+}: {
+  leftImageUrl: string | null
+  rightImageUrl: string | null
+  leftAlt: string
+  rightAlt: string
+  leftHref?: string | null
+  rightHref?: string | null
+  priority?: boolean
+}) {
+  const renderHalf = (
+    imageUrl: string | null,
+    alt: string,
+    href?: string | null,
+    isPriority?: boolean
+  ) => {
+    const inner = (
+      <div className="relative w-full h-full min-w-0 overflow-hidden bg-[#E5E5E5]">
+        {imageUrl ? (
+          <Image
+            src={imageUrl}
+            alt={alt}
+            fill
+            className="object-cover"
+            sizes="50vw"
+            priority={isPriority}
+          />
+        ) : null}
+      </div>
+    )
+    if (href && href !== '#') {
+      const isExternal = href.startsWith('http')
+      return isExternal ? (
+        <a href={href} target="_blank" rel="noopener noreferrer" className="block h-full w-full">
+          {inner}
+        </a>
+      ) : (
+        <Link href={href} className="block h-full w-full">
+          {inner}
+        </Link>
+      )
+    }
+    return <div className="block h-full w-full">{inner}</div>
+  }
+
+  return (
+    <div className="w-full h-full min-w-0 flex overflow-hidden">
+      <div className="flex-1 min-w-0 h-full">
+        {renderHalf(leftImageUrl, leftAlt, leftHref, priority)}
+      </div>
+      <div className="flex-1 min-w-0 h-full">
+        {renderHalf(rightImageUrl, rightAlt, rightHref, false)}
+      </div>
+    </div>
+  )
 }
 
 /** Newsstand hero: 6 product covers (left) + text (right) */
@@ -731,19 +802,35 @@ function renderSectionContent(
     }
   }
   if (item.type === 'image') {
-    const { image, alt, linkUrl } = item.data
-    const imageUrl = image?.asset
-      ? urlFor(image).width(2400).quality(95).format('webp').url()
+    const { layout, image, alt, linkUrl, leftImage, leftAlt, leftLinkUrl, rightImage, rightAlt, rightLinkUrl } = item.data
+    const imageUrl = image?.asset ? urlFor(image).width(2400).quality(95).format('webp').url() : null
+    const leftImageUrl = leftImage?.asset
+      ? urlFor(leftImage).width(1800).quality(95).format('webp').url()
+      : null
+    const rightImageUrl = rightImage?.asset
+      ? urlFor(rightImage).width(1800).quality(95).format('webp').url()
       : null
     return {
       content: (
-        <ImageOnlyContent
-          imageUrl={imageUrl}
-          alt={alt ?? ''}
-          href={linkUrl ?? '#'}
-          asLink={!!linkUrl}
-          priority={priority}
-        />
+        layout === 'split' ? (
+          <SplitImageContent
+            leftImageUrl={leftImageUrl}
+            rightImageUrl={rightImageUrl}
+            leftAlt={leftAlt ?? ''}
+            rightAlt={rightAlt ?? ''}
+            leftHref={leftLinkUrl ?? '#'}
+            rightHref={rightLinkUrl ?? '#'}
+            priority={priority}
+          />
+        ) : (
+          <ImageOnlyContent
+            imageUrl={imageUrl}
+            alt={alt ?? ''}
+            href={linkUrl ?? '#'}
+            asLink={!!linkUrl}
+            priority={priority}
+          />
+        )
       ),
       key: item.data._key ?? `image-${index}`,
       keyProp: item.data._key ?? `image-${index}`,

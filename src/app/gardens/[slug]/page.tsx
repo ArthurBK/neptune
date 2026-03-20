@@ -137,7 +137,7 @@ export default async function GardensArticlePage({ params }: ArticlePageProps) {
         )}
 
         {/* Article body — text → 3 images row → text → full-width hero → repeat */}
-        <div className="pt-2 pb-8">
+        <div className="pt-2 pb-4">
           <ArticleBody value={article.body} />
         </div>
 
@@ -155,14 +155,19 @@ export default async function GardensArticlePage({ params }: ArticlePageProps) {
           </div>
         )}
 
+        {/* Linked Issue — Shopify product handle stored in Sanity */}
+        {article.linkedIssue ? (
+          <LinkedIssuePreview handle={article.linkedIssue} />
+        ) : null}
+
         {/* Newsstand CTA */}
-        <div className="mt-12">
+        <div className="mt-6">
           <NewsstandCta />
         </div>
 
         {/* Related articles — from Sanity */}
         {relatedArticles.length > 0 && (
-          <div className="mt-12 pt-12">
+          <div className="mt-6 pt-12">
             <div className="max-w-[1400px] mx-auto px-6 md:px-12">
               <h2 className="font-serif text-3xl md:text-4xl text-[#1A1A1A] mb-10 text-center uppercase tracking-[0.02em]">
                 YOU MAY ALSO LIKE
@@ -191,10 +196,6 @@ export default async function GardensArticlePage({ params }: ArticlePageProps) {
 
         <ArticleAffiliateProductsSection products={article.affiliateProducts} />
 
-        {/* Linked Issue — Shopify product handle stored in Sanity */}
-        {article.linkedIssue ? (
-          <LinkedIssuePreview handle={article.linkedIssue} />
-        ) : null}
       </article>
     </main>
   )

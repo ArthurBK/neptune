@@ -15,10 +15,17 @@ export const HOME_PAGE_QUERY = `
         }
       },
       _type == "homeImageBlock" => {
+        layout,
         image,
         alt,
         title,
-        linkUrl
+        linkUrl,
+        leftImage,
+        leftAlt,
+        leftLinkUrl,
+        rightImage,
+        rightAlt,
+        rightLinkUrl
       },
       _type == "homeProductBlock" => {
         "product": product->{
