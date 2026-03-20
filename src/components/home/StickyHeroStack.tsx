@@ -281,11 +281,11 @@ function SplitImageContent({
   }
 
   return (
-    <div className="w-full h-full min-w-0 flex overflow-hidden">
-      <div className="flex-1 min-w-0 h-full">
+    <div className="w-full h-full min-w-0 flex flex-col md:flex-row overflow-hidden">
+      <div className="flex-1 min-w-0 h-1/2 md:h-full">
         {renderHalf(leftImageUrl, leftAlt, leftHref, priority)}
       </div>
-      <div className="flex-1 min-w-0 h-full">
+      <div className="flex-1 min-w-0 h-1/2 md:h-full">
         {renderHalf(rightImageUrl, rightAlt, rightHref, false)}
       </div>
     </div>
@@ -347,7 +347,7 @@ function NewsstandHeroContent({
                     src={activeProduct.imageUrl}
                     alt={activeProduct.imageAlt ?? activeProduct.title}
                     fill
-                    className="object-contain object-right origin-right scale-[0.6] transition-opacity duration-300"
+                    className="object-contain object-center md:object-right origin-center md:origin-right scale-[0.9] md:scale-[0.6] transition-opacity duration-300"
                     sizes="(max-width: 768px) 100vw, 50vw"
                     priority={priority && activeIndex === 0}
                   />
@@ -363,7 +363,7 @@ function NewsstandHeroContent({
       </div>
 
       {/* Right: text content */}
-      <div className="flex-1 min-w-0 flex flex-col justify-center px-6 md:px-10 lg:px-16 py-6 md:py-8">
+      <div className="flex-1 min-w-0 flex flex-col justify-center px-0 md:px-10 lg:px-16 py-6 md:py-8">
         <h2 className="font-header font-extrabold text-xl md:text-2xl lg:text-3xl text-[#1A1A1A] tracking-wide mb-4 md:mb-6">
           {headline}
         </h2>
@@ -438,7 +438,7 @@ function NewsletterSectionContent({
               Subscribe now
             </button>
             {rightImageUrl ? (
-              <div className="mt-6 mx-auto w-full max-w-lg">
+              <div className="hidden md:block mt-6 mx-auto w-full max-w-lg">
                 <div className="relative w-full h-[320px] md:h-[360px] overflow-hidden">
                   <Image
                     src={rightImageUrl}
@@ -491,7 +491,7 @@ function ArticleSplitContent({
                 src={imageUrl}
                 alt={alt}
                 fill
-                className="object-contain object-right"
+                className="object-contain object-center md:object-right"
                 sizes="50vw"
                 priority={priority}
               />
