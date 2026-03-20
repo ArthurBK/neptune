@@ -3,6 +3,7 @@ import Image from 'next/image'
 
 import { urlFor } from '@/sanity/lib/image'
 import { SanityCaption, hasCaptionContent } from '@/components/shared/SanityCaption'
+import { ImageGridLightbox } from '@/components/editorial/ImageGridLightbox'
 
 const TextWrapper = ({
   children,
@@ -98,40 +99,59 @@ function createComponents(isFirstParagraph: { current: boolean }): PortableTextC
             metadata?: { dimensions?: { width?: number; height?: number } }
           }
         }
-        const dimensions = imageAsset?.asset?.metadata?.dimensions
+        const blockAny = value as { imageDimensions?: { width?: number; height?: number } }
+        const dimensions =
+          imageAsset?.asset?.metadata?.dimensions ?? blockAny.imageDimensions
         const aspectRatio =
-          isFloatLayout && dimensions?.width && dimensions?.height
+          dimensions?.width && dimensions?.height
             ? `${dimensions.width} / ${dimensions.height}`
             : null
         const layoutClasses: Record<string, string> = {
-          full: 'clear-both w-full my-6 md:my-8',
-          wide: 'clear-both w-full my-6 md:my-8',
-          center:
-            'clear-both mx-auto w-full max-w-2xl md:max-w-3xl px-6 md:px-12 my-6 md:my-8',
-          left: 'float-left mr-6 mb-4 w-full md:w-[50vw] shrink-0',
-          right: 'float-right ml-6 mb-4 w-full md:w-[50vw] shrink-0',
+          full: 'clear-both mx-auto w-full px-6 md:px-12 my-6 md:my-8',
+          wide: 'clear-both mx-auto w-full px-6 md:px-12 my-6 md:my-8',
+          center: 'clear-both mx-auto w-full px-6 md:px-12 my-6 md:my-8',
+          // Float images inwards a bit so they don't hug the page edge.
+          left: 'float-left ml-4 mr-6 mb-4 w-full shrink-0',
+          right: 'float-right mr-4 ml-6 mb-4 w-full shrink-0',
+        }
+        // Enforce max-width via inline style so it's guaranteed regardless of Tailwind compilation.
+        const layoutMaxWidths: Record<string, string> = {
+          full: '100vw',
+          wide: '70vw',
+          center: '850px',
+          left: '30vw',
+          right: '30vw',
         }
         const figureClass = layoutClasses[layout] ?? layoutClasses.full
-        const imageWidth = 1400
+        const figureMaxWidth = layoutMaxWidths[layout] ?? layoutMaxWidths.full
+        // Request a higher-res rendition from Sanity to avoid browser upscaling.
+        // (Your code passes a single `src` string to Next Image, so it can't pick a better size.)
+        const imageWidth =
+          isFloatLayout
+            ? 1400
+            : layout === 'center'
+              ? 1100
+              : layout === 'wide'
+                ? 1300
+                : 1200
+        const defaultHeight = Math.round(imageWidth * 0.75)
         const computedHeight =
           dimensions?.width && dimensions?.height
             ? Math.max(1, Math.round((imageWidth * dimensions.height) / dimensions.width))
-            : 1050
+            : defaultHeight
         const imageUrl = urlFor(value.image)
           .width(imageWidth)
           .height(computedHeight)
           .quality(90)
           .url()
         return (
-          <figure className={figureClass}>
+          <figure className={figureClass} style={{ maxWidth: figureMaxWidth }}>
             <div className="w-full">
               <div
                 className={
-                  isFloatLayout && aspectRatio
-                    ? 'relative bg-[#E5E5E5] overflow-hidden'
-                    : 'relative aspect-4/3 md:aspect-16/10 bg-[#E5E5E5] overflow-hidden'
+                  aspectRatio ? 'relative bg-[#E5E5E5] overflow-hidden' : 'relative aspect-4/3 md:aspect-16/10 bg-[#E5E5E5] overflow-hidden'
                 }
-                style={isFloatLayout && aspectRatio ? { aspectRatio } : undefined}
+                style={aspectRatio ? { aspectRatio } : undefined}
               >
                 <Image
                   src={imageUrl}
@@ -145,6 +165,7 @@ function createComponents(isFirstParagraph: { current: boolean }): PortableTextC
                         : '(max-width: 768px) 100vw, 50vw'
                   }
                   className="object-cover"
+                  unoptimized
                 />
               </div>
             </div>
@@ -164,38 +185,43 @@ function createComponents(isFirstParagraph: { current: boolean }): PortableTextC
             asset?: { _ref?: string }
             alt?: string
             caption?: unknown
+            imageDimensions?: { width?: number; height?: number }
+            captionSpansGrid?: boolean
           }>) ?? []
         if (images.length === 0) return null
-        return (
-          <div className="max-w-[1100px] mx-auto px-6 md:px-12 my-6 md:my-8">
-            <div className="grid grid-cols-3 gap-4 md:gap-7">
-              {images.map((img, i) => {
-                // Use a higher-res, square-ish crop so the grid feels bigger on the page.
-                const imageUrl = img?.asset ? urlFor(img).width(800).height(800).quality(90).url() : null
-                if (!imageUrl) return null
-                const key = (img as { _key?: string })._key ?? `grid-img-${i}`
-                return (
-                  <figure key={key} className="group overflow-hidden">
-                    <div className="relative aspect-square bg-[#E5E5E5] overflow-hidden">
-                      <Image
-                        src={imageUrl}
-                        alt={img.alt ?? ''}
-                        fill
-                        sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                        className="object-cover transition-transform duration-300 group-hover:scale-[1.02]"
-                      />
-                    </div>
-                    {hasCaptionContent(img.caption) && (
-                      <figcaption className="mt-1 text-sm text-[#6B6B6B] whitespace-normal wrap-break-word">
-                        <SanityCaption value={img.caption} />
-                      </figcaption>
-                    )}
-                  </figure>
-                )
-              })}
-            </div>
-          </div>
-        )
+        const gridImages = images
+          .map((img, i) => {
+            const thumbUrl = img?.asset
+              ? urlFor(img).width(1000).height(1000).quality(90).url()
+              : null
+            if (!thumbUrl) return null
+
+            // For the modal carousel, request a rendition that matches the image's
+            // original aspect ratio so it doesn't look "resized".
+            const originalWidth = img.imageDimensions?.width
+            const originalHeight = img.imageDimensions?.height
+            const fullUrl =
+              img?.asset && originalWidth && originalHeight
+                ? (() => {
+                    const targetWidth = 2000
+                    const targetHeight = Math.max(1, Math.round((targetWidth * originalHeight) / originalWidth))
+                    return urlFor(img).width(targetWidth).height(targetHeight).quality(90).url()
+                  })()
+                : urlFor(img).width(2000).height(1334).quality(90).url() // fallback: portrait-ish
+
+            const id = (img as { _key?: string })._key ?? `grid-img-${i}`
+            return {
+              id,
+              thumbUrl,
+              fullUrl,
+              alt: img.alt || 'Image',
+              caption: img.caption,
+              captionSpansGrid: img.captionSpansGrid,
+            }
+          })
+          .filter((x): x is NonNullable<typeof x> => x !== null)
+
+        return <ImageGridLightbox images={gridImages} />
       },
       adBannerEmbedBlock: ({ value }) => {
         if (!value?.adBanner?.image) return null

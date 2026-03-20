@@ -63,7 +63,7 @@ export default async function ArtsArticlePage({ params }: ArticlePageProps) {
   if (!article) notFound()
 
   const coverImageUrl = article.coverImage?.asset
-    ? urlFor(article.coverImage).width(1400).height(933).url()
+    ? urlFor(article.coverImage).width(2400).height(1600).quality(90).url()
     : null
 
   const relatedArticles = relatedArticlesFromSanity(article.relatedArticles)
@@ -95,8 +95,13 @@ export default async function ArtsArticlePage({ params }: ArticlePageProps) {
             )}
             {article.photographer && (
               <p>
-                Photography{' '}
-                <span>{formatPersonName(article.photographer.name)}</span>
+                Photography by{' '}
+                <Link
+                  href={`/contributors/photographer/${article.photographer.slug}`}
+                  className="text-black hover:underline underline-offset-2 transition-colors"
+                >
+                  {formatPersonName(article.photographer.name)}
+                </Link>
               </p>
             )}
           </div>
@@ -111,6 +116,7 @@ export default async function ArtsArticlePage({ params }: ArticlePageProps) {
                 sizes="100vw"
                 className="object-cover"
                 priority
+                unoptimized
               />
             </div>
             {hasCaptionContent(article.coverImage?.caption) && (
@@ -204,7 +210,7 @@ type ArticleData = {
   coverImage?: { asset?: { _ref: string }; alt?: string; caption?: unknown }
   body: unknown
   author?: { name: string; slug: string } | null
-  photographer?: { name: string } | null
+  photographer?: { name: string; slug: string } | null
   relatedArticles?: RelatedArticleForCard[]
   affiliateProducts?: ArticleAffiliateProduct[]
 }

@@ -103,6 +103,23 @@ const pteImageGridBlock = defineType({
               title: 'Caption',
               ...captionRichTextType,
             }),
+            defineField({
+              name: 'captionSpansGrid',
+              title: 'Caption spans full grid',
+              type: 'boolean',
+              initialValue: false,
+              description:
+                'When enabled, this image’s caption is rendered once below the whole grid (spanning the full width).',
+              validation: (rule) =>
+                rule.custom((value, context) => {
+                  if (!value) return true
+                  const caption = (context.parent as { caption?: unknown } | undefined)?.caption
+                  if (!Array.isArray(caption) || caption.length === 0) {
+                    return 'Caption is required when “Caption spans full grid” is enabled.'
+                  }
+                  return true
+                }),
+            }),
           ],
         }),
       ],

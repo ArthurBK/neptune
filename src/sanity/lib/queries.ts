@@ -82,6 +82,15 @@ export const ARTICLE_BY_SLUG_QUERY = `
     "relatedArticles": relatedArticles[]->{ _id, title, "slug": slug.current, category, subcategory, coverImage, "author": author->{ name, "slug": slug.current } },
     "body": body[] {
       ...,
+      _type == "pteImageBlock" => {
+        "imageDimensions": image.asset->metadata.dimensions
+      },
+      _type == "pteImageGridBlock" => {
+        "images": images[]{
+          ...,
+          "imageDimensions": asset->metadata.dimensions
+        }
+      },
       _type == "adBannerEmbedBlock" => {
         "adBanner": adBanner->{ image, linkUrl, title }
       },
