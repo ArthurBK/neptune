@@ -189,15 +189,21 @@ export default async function Home() {
           console.error('[Home] Shopify fetch for newsstand block:', err)
         }
       } else if (block._type === 'homeNewsletterBlock') {
-        const newsletterImage = block.image ?? settings?.newsletterImage ?? null
-        const newsletterImageUrl =
-          newsletterImage?.asset != null
-            ? urlFor(newsletterImage).width(2400).quality(95).format('webp').url()
+        const leftNewsletterImage = block.leftImage ?? settings?.newsletterImage ?? null
+        const rightNewsletterImage = block.rightImage ?? block.leftImage ?? settings?.newsletterImage ?? null
+        const leftNewsletterImageUrl =
+          leftNewsletterImage?.asset != null
+            ? urlFor(leftNewsletterImage).width(2400).quality(95).format('webp').url()
+            : null
+        const rightNewsletterImageUrl =
+          rightNewsletterImage?.asset != null
+            ? urlFor(rightNewsletterImage).width(1200).quality(95).format('webp').url()
             : null
         sections.push({
           type: 'newsletter',
           data: {
-            imageUrl: newsletterImageUrl,
+            leftImageUrl: leftNewsletterImageUrl,
+            rightImageUrl: rightNewsletterImageUrl,
             headline: block.headline ?? settings?.newsletterHeadline ?? null,
             subtitle: block.subtitle ?? settings?.newsletterSubtitle ?? null,
           },
@@ -234,11 +240,11 @@ export default async function Home() {
         collectionData?.collection?.products?.edges?.map((e) => toFeaturedProduct(e.node)) ?? []
       const allProductsNode = allProductsData?.products?.edges?.[0]?.node as
         | {
-            handle: string
-            title: string
-            featuredImage?: { url: string; altText: string | null }
-            images?: { edges: Array<{ node: { url: string; altText: string | null } }> }
-          }
+          handle: string
+          title: string
+          featuredImage?: { url: string; altText: string | null }
+          images?: { edges: Array<{ node: { url: string; altText: string | null } }> }
+        }
         | undefined
       const products =
         collectionProducts.length > 0

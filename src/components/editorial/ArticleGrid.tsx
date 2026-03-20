@@ -15,6 +15,8 @@ interface ArticleGridProps {
   size?: 'default' | 'compact'
   /** When true, first 3 articles use 2-column layout: left 1 large, right 2 stacked (half height each). */
   featuredLayout?: boolean
+  /** Disable Next image optimization for cards in this grid. */
+  unoptimizedImages?: boolean
 }
 
 function CardFromArticle({
@@ -22,11 +24,15 @@ function CardFromArticle({
   size,
   fillHeight,
   horizontal,
+  unoptimizedImages,
+  imageFit,
 }: {
   article: Article
   size: 'default' | 'compact' | 'featured'
   fillHeight?: boolean
   horizontal?: boolean
+  unoptimizedImages?: boolean
+  imageFit?: 'cover' | 'contain'
 }) {
   return (
     <ArticleCard
@@ -40,6 +46,8 @@ function CardFromArticle({
       size={size}
       fillHeight={fillHeight}
       horizontal={horizontal}
+      unoptimized={unoptimizedImages}
+      imageFit={imageFit}
     />
   )
 }
@@ -48,6 +56,7 @@ export function ArticleGrid({
   articles,
   size = 'default',
   featuredLayout = false,
+  unoptimizedImages = false,
 }: ArticleGridProps) {
   if (articles.length === 0) {
     return (
@@ -57,9 +66,9 @@ export function ArticleGrid({
     )
   }
 
-  const useFeatured = featuredLayout && articles.length >= 3
-  const featuredArticles = useFeatured ? articles.slice(0, 3) : []
-  const restArticles = useFeatured ? articles.slice(3) : articles
+  const useFeatured = featuredLayout && articles.length >= 4
+  const featuredArticles = useFeatured ? articles.slice(0, 4) : []
+  const restArticles = useFeatured ? articles.slice(4) : articles
   const gapClass = size === 'compact' ? 'gap-6 md:gap-8' : 'gap-8 md:gap-12'
   const gridClass = `grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 ${gapClass}`
 
@@ -72,20 +81,30 @@ export function ArticleGrid({
           {/* Mobile: single column, same card style one by one */}
           <div className={`grid grid-cols-1 ${gapClass} mb-8 md:mb-12 lg:hidden`}>
             {featuredArticles.map((article) => (
-              <CardFromArticle key={article._id} article={article} size={size === 'compact' ? 'compact' : 'default'} />
+              <CardFromArticle
+                key={article._id}
+                article={article}
+                size={size === 'compact' ? 'compact' : 'default'}
+                unoptimizedImages={unoptimizedImages}
+              />
             ))}
           </div>
           {/* Desktop: featured 2-column layout */}
-          <div className={`hidden lg:grid grid-cols-[3fr_2fr] ${gapClass} mb-8 md:mb-12 lg:max-h-[80vh]`}>
-            <div className="min-w-0 lg:max-h-[80vh]">
-              <CardFromArticle article={featuredArticles[0]} size="featured" fillHeight />
-            </div>
-            <div className="min-w-0 flex flex-col gap-6 md:gap-8 lg:max-h-[80vh]">
-              <div className="flex-1 min-h-0">
-                <CardFromArticle article={featuredArticles[1]} size="compact" horizontal />
+          <div className={`hidden lg:grid grid-cols-[minmax(0,460px)_minmax(0,360px)] ${gapClass} mb-8 md:mb-12 justify-center items-stretch`}>
+            <div className="min-w-0 w-full h-full grid grid-rows-[1.6fr_0.8fr] gap-6 md:gap-8">
+              <div className="min-h-0">
+                <CardFromArticle article={featuredArticles[0]} size="default" fillHeight unoptimizedImages={unoptimizedImages} />
               </div>
-              <div className="flex-1 min-h-0">
-                <CardFromArticle article={featuredArticles[2]} size="compact" horizontal />
+              <div className="min-h-0 w-full max-w-[240px] mx-auto">
+                <CardFromArticle article={featuredArticles[3]} size="compact" fillHeight unoptimizedImages={unoptimizedImages} imageFit="contain" />
+              </div>
+            </div>
+            <div className="min-w-0 w-full flex flex-col gap-6 md:gap-8">
+              <div>
+                <CardFromArticle article={featuredArticles[1]} size="compact" unoptimizedImages={unoptimizedImages} imageFit="contain" />
+              </div>
+              <div>
+                <CardFromArticle article={featuredArticles[2]} size="compact" unoptimizedImages={unoptimizedImages} imageFit="contain" />
               </div>
             </div>
           </div>
@@ -103,6 +122,7 @@ export function ArticleGrid({
               coverImage={article.coverImage}
               author={article.author}
               size={size}
+              unoptimized={unoptimizedImages}
             />
           ))}
         </div>

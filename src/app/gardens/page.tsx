@@ -56,6 +56,7 @@ export default async function GardensPage() {
               image={adBanner.image}
               linkUrl={adBanner.linkUrl}
               title={adBanner.title}
+              unoptimized
             />
           </div>
         )}
@@ -71,10 +72,10 @@ export default async function GardensPage() {
         </header>
 
         {/* Article grid */}
-        <ArticleGrid articles={typedArticles} size="compact" featuredLayout />
+        <ArticleGrid articles={typedArticles} size="compact" featuredLayout unoptimizedImages />
 
         {/* Newsstand CTA */}
-        <NewsstandCta />
+        <NewsstandCta unoptimizedLogo />
       </div>
 
       {/* Category page image — fullscreen */}

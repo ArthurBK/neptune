@@ -23,6 +23,7 @@ export function CategoryPageImage({ image }: CategoryPageImageProps) {
           alt={image.alt ?? ''}
           fill
           sizes="100vw"
+          unoptimized
           className="object-cover"
         />
       </div>

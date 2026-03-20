@@ -7,9 +7,10 @@ interface AdBannerProps {
   image: { asset?: { _ref: string } }
   linkUrl?: string | null
   title?: string | null
+  unoptimized?: boolean
 }
 
-export function AdBanner({ image, linkUrl, title }: AdBannerProps) {
+export function AdBanner({ image, linkUrl, title, unoptimized = false }: AdBannerProps) {
   const imageUrl = image?.asset ? urlFor(image).width(1200).url() : null
 
   if (!imageUrl) return null
@@ -21,6 +22,7 @@ export function AdBanner({ image, linkUrl, title }: AdBannerProps) {
         alt={title ?? 'Advertisement'}
         fill
         sizes="100vw"
+        unoptimized={unoptimized}
         className="object-cover"
       />
     </div>

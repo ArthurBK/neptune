@@ -19,6 +19,12 @@ interface ArticleCardProps {
   fillHeight?: boolean
   /** When true, image and text are side by side (image left, text right). */
   horizontal?: boolean
+  /** Disable Next image optimization for sharper source rendering. */
+  unoptimized?: boolean
+  /** Control image fitting behavior. */
+  imageFit?: 'cover' | 'contain'
+  /** Optional extra classes applied to image element only. */
+  imageClassName?: string
 }
 
 export function ArticleCard({
@@ -31,6 +37,9 @@ export function ArticleCard({
   size = 'default',
   fillHeight = false,
   horizontal = false,
+  unoptimized = false,
+  imageFit = 'cover',
+  imageClassName,
 }: ArticleCardProps) {
   const displayTitle = articleTitleSingleLine(title)
   const isCompact = size === 'compact'
@@ -51,6 +60,7 @@ export function ArticleCard({
   const imageContainerClass = fillHeight
     ? 'flex-1 min-h-0 bg-[#E5E5E5] overflow-hidden'
     : 'aspect-[3/4] bg-[#E5E5E5] overflow-hidden'
+  const imageFitClass = imageFit === 'contain' ? 'object-contain' : 'object-cover'
 
   const titleSizeClass = isCompact ? 'text-lg' : isFeatured ? 'text-2xl' : 'text-2xl'
 
@@ -69,7 +79,8 @@ export function ArticleCard({
                   alt={coverImage?.alt ?? displayTitle}
                   fill
                   sizes="(max-width: 1024px) 50vw, 20vw"
-                  className="object-cover transition-transform duration-300 ease-out group-hover:scale-[1.02]"
+                  unoptimized={unoptimized}
+                  className={`${imageFitClass} ${imageClassName ?? ''} transition-transform duration-300 ease-out group-hover:scale-[1.02]`}
                 />
               ) : (
                 <div className="w-full h-full flex items-center justify-center text-[#6B6B6B] text-sm">
@@ -118,7 +129,8 @@ export function ArticleCard({
                 width={imageWidth}
                 height={imageHeight}
                 sizes={imageSizes}
-                className="w-full h-full object-cover transition-transform duration-300 ease-out group-hover:scale-[1.02]"
+                unoptimized={unoptimized}
+                className={`w-full h-full ${imageFitClass} ${imageClassName ?? ''} transition-transform duration-300 ease-out group-hover:scale-[1.02]`}
               />
             ) : (
               <div className="w-full h-full flex items-center justify-center text-[#6B6B6B] text-sm">
@@ -163,7 +175,8 @@ export function ArticleCard({
                 width={imageWidth}
                 height={imageHeight}
                 sizes={imageSizes}
-                className="w-full h-full object-cover transition-transform duration-300 ease-out group-hover:scale-[1.02]"
+                unoptimized={unoptimized}
+                className={`w-full h-full ${imageFitClass} ${imageClassName ?? ''} transition-transform duration-300 ease-out group-hover:scale-[1.02]`}
               />
             ) : (
               <div

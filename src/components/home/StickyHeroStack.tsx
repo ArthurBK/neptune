@@ -69,7 +69,8 @@ export type HomeSection =
   | {
     type: 'newsletter'
     data: {
-      imageUrl: string | null
+      leftImageUrl: string | null
+      rightImageUrl: string | null
       headline?: string | null
       subtitle?: string | null
     }
@@ -384,12 +385,14 @@ function NewsstandHeroContent({
 
 /** Newsletter section: left = headline + subscribe button, right = image */
 function NewsletterSectionContent({
-  imageUrl,
+  leftImageUrl,
+  rightImageUrl,
   headline,
   subtitle,
   priority = false,
 }: {
-  imageUrl: string | null
+  leftImageUrl: string | null
+  rightImageUrl: string | null
   headline?: string | null
   subtitle?: string | null
   priority?: boolean
@@ -402,36 +405,51 @@ function NewsletterSectionContent({
 
   return (
     <div className="flex flex-col h-full w-full min-w-0 bg-white">
-      <div className="flex flex-col items-center justify-start flex-1 min-h-0 w-full px-6 md:px-10 lg:px-16 pt-[calc(var(--header-height)+1.5rem)] pb-8 md:pb-12 text-center">
-        <div className="w-full max-w-2xl">
-          <h2 className="font-serif text-2xl md:text-3xl text-black uppercase tracking-wide">
-            {title}
-          </h2>
-          <p className="mt-3 text-base text-black leading-relaxed">
-            {introText}
-          </p>
-          <button
-            type="button"
-            onClick={openModal}
-            className="mt-5 font-header font-bold text-base tracking-[0.2em] uppercase text-black transition-colors hover:underline w-fit mx-auto"
-          >
-            Subscribe now
-          </button>
-        </div>
-        <div className="w-full max-w-3xl mt-5 md:mt-6">
-          <div className="relative w-full min-h-[55vh] md:min-h-[62vh]">
-            {imageUrl ? (
+      <div className="flex flex-1 min-h-0 w-full flex-col md:flex-row">
+        <div className="flex-1 md:basis-1/2 min-w-0 min-h-[45vh] md:min-h-0 relative">
+          <div className="relative w-full h-full">
+            {leftImageUrl ? (
               <Image
-                src={imageUrl}
+                src={leftImageUrl}
                 alt=""
                 fill
-                className="object-contain object-center"
+                className="object-cover object-center"
                 sizes="(max-width: 768px) 100vw, 50vw"
                 priority={priority}
               />
             ) : (
               <div className="absolute inset-0 bg-transparent" />
             )}
+          </div>
+        </div>
+        <div className="flex-1 md:basis-1/2 min-w-0 flex items-center justify-center px-6 md:px-10 lg:px-16 pt-[calc(var(--header-height)+1.5rem)] md:pt-0 pb-8 md:pb-12 text-center">
+          <div className="w-full max-w-2xl">
+            <h2 className="font-serif text-2xl md:text-3xl text-black uppercase tracking-wide">
+              {title}
+            </h2>
+            <p className="mt-3 text-base text-black leading-relaxed">
+              {introText}
+            </p>
+            <button
+              type="button"
+              onClick={openModal}
+              className="mt-5 font-header font-bold text-base tracking-[0.2em] uppercase text-black transition-colors hover:underline w-fit mx-auto"
+            >
+              Subscribe now
+            </button>
+            {rightImageUrl ? (
+              <div className="mt-6 mx-auto w-full max-w-[240px]">
+                <div className="relative aspect-[4/5] overflow-hidden border-4 border-white shadow-sm">
+                  <Image
+                    src={rightImageUrl}
+                    alt=""
+                    fill
+                    className="object-cover object-center"
+                    sizes="(max-width: 768px) 70vw, 240px"
+                  />
+                </div>
+              </div>
+            ) : null}
           </div>
         </div>
       </div>
@@ -885,12 +903,13 @@ function renderSectionContent(
     }
   }
   if (item.type === 'newsletter') {
-    const { imageUrl, headline, subtitle } = item.data
+    const { leftImageUrl, rightImageUrl, headline, subtitle } = item.data
     return {
       content: (
         <div className="h-full w-full flex items-center">
           <NewsletterSectionContent
-            imageUrl={imageUrl}
+            leftImageUrl={leftImageUrl}
+            rightImageUrl={rightImageUrl}
             headline={headline}
             subtitle={subtitle}
             priority={priority}
@@ -902,6 +921,7 @@ function renderSectionContent(
       zIndex,
       bgWhite: true,
       bgTransparent: false,
+      noPadding: true,
     }
   }
   return null

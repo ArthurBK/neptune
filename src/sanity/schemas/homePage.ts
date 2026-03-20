@@ -279,23 +279,36 @@ const homeNewsletterBlock = defineType({
       description: 'Text below the headline on the left. Falls back to Site Settings → Newsletter if empty.',
     }),
     defineField({
-      name: 'image',
-      title: 'Image',
+      name: 'leftImage',
+      title: 'Left image',
       type: 'image',
       options: { hotspot: true },
-      description: 'Image on the right. Falls back to Site Settings → Newsletter if empty.',
+      description: 'Large image shown on the left side of the newsletter section.',
       fields: [
         defineField({
           name: 'alt',
-          title: 'Alt text',
+          title: 'Left alt text',
           type: 'string',
-          validation: (rule) => rule.required(),
+        }),
+      ],
+    }),
+    defineField({
+      name: 'rightImage',
+      title: 'Right image (below text)',
+      type: 'image',
+      options: { hotspot: true },
+      description: 'Smaller image shown below the text on the right side.',
+      fields: [
+        defineField({
+          name: 'alt',
+          title: 'Right alt text',
+          type: 'string',
         }),
       ],
     }),
   ],
   preview: {
-    select: { headline: 'headline', media: 'image' },
+    select: { headline: 'headline', media: 'leftImage' },
     prepare: ({ headline, media }) => ({
       title: headline ? `Newsletter: ${headline}` : 'Newsletter',
       media,

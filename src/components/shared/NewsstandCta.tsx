@@ -1,7 +1,7 @@
 import Image from 'next/image'
 import Link from 'next/link'
 
-export function NewsstandCta() {
+export function NewsstandCta({ unoptimizedLogo = false }: { unoptimizedLogo?: boolean }) {
   return (
     <div className="mt-4 md:mt-6 mb-4 md:mb-6 text-center">
       <Link
@@ -13,9 +13,10 @@ export function NewsstandCta() {
           alt="Neptune"
           width={98}
           height={16}
+          unoptimized={unoptimizedLogo}
           className="h-4 w-auto"
         />
-        <span className="font-header font-normal text-sm tracking-[0.2em] uppercase text-black">
+        <span className="font-futura font-normal text-sm tracking-[0.2em] uppercase text-black">
           Discover All Available Issues
         </span>
       </Link>

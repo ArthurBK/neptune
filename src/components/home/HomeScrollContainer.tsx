@@ -37,10 +37,10 @@ interface HomeScrollContainerProps {
   children?: React.ReactNode
 }
 
-/** Sections with dark backgrounds (video, full-bleed image) use white header text. */
+/** Only video sections use white header text. */
 function isSectionDark(section: HomeSection | undefined): boolean {
   if (!section) return false
-  return section.type === 'video' || section.type === 'image'
+  return section.type === 'video'
 }
 
 export function HomeScrollContainer({ sections, children }: HomeScrollContainerProps) {
@@ -63,9 +63,11 @@ export function HomeScrollContainer({ sections, children }: HomeScrollContainerP
     if (targetIndex === currentIndexRef.current && !isScrollingRef.current) return
 
     currentIndexRef.current = targetIndex
+    const targetSection = sections[targetIndex]
+    setHeaderVariant(isSectionDark(targetSection) ? 'dark' : 'light')
     isScrollingRef.current = true
     el.scrollTo({ top: targetIndex * sectionHeight, behavior: 'smooth' })
-  }, [])
+  }, [sections, setHeaderVariant])
 
   const goToSectionRef = useRef(goToSection)
   useEffect(() => {
@@ -115,7 +117,12 @@ export function HomeScrollContainer({ sections, children }: HomeScrollContainerP
     if (!el || sections.length === 0) return
 
     const updateVariant = () => {
-      const section = sections[currentIndexRef.current]
+      const sectionHeight = el.clientHeight
+      if (sectionHeight <= 0) return
+      const rawIndex = Math.round(el.scrollTop / sectionHeight)
+      const index = Math.max(0, Math.min(rawIndex, sections.length - 1))
+      currentIndexRef.current = index
+      const section = sections[index]
       setHeaderVariant(isSectionDark(section) ? 'dark' : 'light')
     }
 

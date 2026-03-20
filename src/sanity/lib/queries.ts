@@ -47,7 +47,8 @@ export const HOME_PAGE_QUERY = `
       _type == "homeNewsletterBlock" => {
         headline,
         subtitle,
-        image
+        leftImage,
+        rightImage
       }
     }
   }

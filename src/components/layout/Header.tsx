@@ -44,14 +44,14 @@ function NavLink({
       : pathname === baseHref || pathname.startsWith(`${baseHref}/`)
 
   const textClass = transparent
-    ? 'text-white hover:text-[#63382E]'
+    ? 'text-white hover:text-white/90'
     : 'text-black hover:text-[#63382E]'
 
   return (
     <Link
       href={href}
       onClick={onClick}
-      className={`font-header font-medium text-[13px] tracking-[0.1em] [word-spacing:0.15em] uppercase transition-colors ${bold ? 'font-bold' : ''} ${textClass} ${className ?? ''}`}
+      className={`font-futura font-medium text-[13px] tracking-[0.1em] [word-spacing:0.15em] uppercase transition-colors ${bold ? 'font-bold' : ''} ${textClass} ${className ?? ''}`}
     >
       {label}
     </Link>
@@ -116,7 +116,6 @@ export function Header({ transparent: _transparent }: { transparent?: boolean } 
   const isHomePage = pathname === '/'
   const hasSolidBg = !isHomePage
   const lightText = isHomePage && variant === 'dark'
-
   const headerClass =
     'fixed left-0 right-0 top-0 z-50 w-full flex flex-col overflow-x-hidden overflow-y-visible border-b transition-colors shrink-0'
   const headerStyle: CSSProperties = {
@@ -131,7 +130,7 @@ export function Header({ transparent: _transparent }: { transparent?: boolean } 
   }
   const iconClass = lightText
     ? 'text-white hover:text-white/90 transition-colors'
-    : 'text-[#6B6B6B] hover:text-black transition-colors'
+    : 'text-black hover:text-[#63382E] transition-colors'
 
   return (
     <header className={headerClass} style={headerStyle}>
@@ -327,7 +326,7 @@ export function Header({ transparent: _transparent }: { transparent?: boolean } 
                 setIsBurgerOpen(false)
                 setIsSearchOpen(true)
               }}
-              className="text-left text-[13px] tracking-[0.2em] [word-spacing:0.3em] uppercase text-[#6B6B6B] hover:text-black transition-colors py-2 font-header font-medium"
+              className="text-left text-[13px] tracking-[0.2em] [word-spacing:0.3em] uppercase text-[#6B6B6B] hover:text-black transition-colors py-2 font-futura font-medium"
             >
               Search
             </button>
@@ -337,7 +336,7 @@ export function Header({ transparent: _transparent }: { transparent?: boolean } 
                 setIsBurgerOpen(false)
                 setIsCartOpen(true)
               }}
-              className="text-left text-[13px] tracking-[0.2em] [word-spacing:0.3em] uppercase text-[#6B6B6B] hover:text-black transition-colors py-2 font-header font-medium"
+              className="text-left text-[13px] tracking-[0.2em] [word-spacing:0.3em] uppercase text-[#6B6B6B] hover:text-black transition-colors py-2 font-futura font-medium"
             >
               Cart {cartCount != null && cartCount > 0 && `(${cartCount})`}
             </button>
