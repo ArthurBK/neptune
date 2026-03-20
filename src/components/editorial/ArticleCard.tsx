@@ -25,6 +25,8 @@ interface ArticleCardProps {
   imageFit?: 'cover' | 'contain'
   /** Optional extra classes applied to image element only. */
   imageClassName?: string
+  /** Optional aspect ratio class for non-fill layouts. */
+  imageAspectClass?: string
 }
 
 export function ArticleCard({
@@ -40,6 +42,7 @@ export function ArticleCard({
   unoptimized = false,
   imageFit = 'cover',
   imageClassName,
+  imageAspectClass = 'aspect-[3/4]',
 }: ArticleCardProps) {
   const displayTitle = articleTitleSingleLine(title)
   const isCompact = size === 'compact'
@@ -59,7 +62,7 @@ export function ArticleCard({
 
   const imageContainerClass = fillHeight
     ? 'flex-1 min-h-0 bg-[#E5E5E5] overflow-hidden'
-    : 'aspect-[3/4] bg-[#E5E5E5] overflow-hidden'
+    : `${imageAspectClass} bg-[#E5E5E5] overflow-hidden`
   const imageFitClass = imageFit === 'contain' ? 'object-contain' : 'object-cover'
 
   const titleSizeClass = isCompact ? 'text-lg' : isFeatured ? 'text-2xl' : 'text-2xl'

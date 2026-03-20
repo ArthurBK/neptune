@@ -26,6 +26,7 @@ function CardFromArticle({
   horizontal,
   unoptimizedImages,
   imageFit,
+  imageAspectClass,
 }: {
   article: Article
   size: 'default' | 'compact' | 'featured'
@@ -33,6 +34,7 @@ function CardFromArticle({
   horizontal?: boolean
   unoptimizedImages?: boolean
   imageFit?: 'cover' | 'contain'
+  imageAspectClass?: string
 }) {
   return (
     <ArticleCard
@@ -48,6 +50,7 @@ function CardFromArticle({
       horizontal={horizontal}
       unoptimized={unoptimizedImages}
       imageFit={imageFit}
+      imageAspectClass={imageAspectClass}
     />
   )
 }
@@ -95,8 +98,14 @@ export function ArticleGrid({
               <div className="min-h-0">
                 <CardFromArticle article={featuredArticles[0]} size="default" fillHeight unoptimizedImages={unoptimizedImages} />
               </div>
-              <div className="min-h-0 w-full max-w-[240px] mx-auto">
-                <CardFromArticle article={featuredArticles[3]} size="compact" fillHeight unoptimizedImages={unoptimizedImages} imageFit="contain" />
+              <div className="min-h-0 w-full">
+                <CardFromArticle
+                  article={featuredArticles[3]}
+                  size="compact"
+                  unoptimizedImages={unoptimizedImages}
+                  imageFit="cover"
+                  imageAspectClass="aspect-[16/9]"
+                />
               </div>
             </div>
             <div className="min-w-0 w-full flex flex-col gap-6 md:gap-8">
