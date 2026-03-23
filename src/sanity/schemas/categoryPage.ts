@@ -6,8 +6,19 @@ type ArticleRefItem = {
   _ref?: string
 }
 
+type FieldValidation = NonNullable<Parameters<typeof defineField>[0]['validation']>
+
 function categoryArticlesValidation(expectedCategory: string) {
-  return (rule: Parameters<typeof defineField>[0]['validation'] extends (arg: infer R) => unknown ? R : never) =>
+  return ((rule: {
+    unique: () => {
+      custom: (
+        validator: (
+          items: unknown,
+          context: { getClient: (args: { apiVersion: string }) => { fetch: <T>(query: string, params?: unknown) => Promise<T> } }
+        ) => Promise<true | string> | true | string
+      ) => unknown
+    }
+  }) =>
     rule.unique().custom(async (items, context) => {
       if (!Array.isArray(items) || items.length === 0) return true
 
@@ -32,7 +43,7 @@ function categoryArticlesValidation(expectedCategory: string) {
 
       const ids = wrong.map((row) => row._id).join(', ')
       return `Contains article(s) not in "${expectedCategory}": ${ids}`
-    })
+    })) as FieldValidation
 }
 
 export const categoryPage = defineType({
