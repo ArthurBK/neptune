@@ -114,10 +114,11 @@ export function Header({ transparent: _transparent }: { transparent?: boolean } 
 
   const pathname = usePathname()
   const isHomePage = pathname === '/'
-  const hasSolidBg = !isHomePage
+  // Keep header transparent until client mount to prevent a white flash.
+  const hasSolidBg = pathname == null ? false : !isHomePage
   const lightText = isHomePage && variant === 'dark'
   const headerClass =
-    'fixed left-0 right-0 top-0 z-50 w-full flex flex-col overflow-x-hidden overflow-y-visible border-b transition-colors shrink-0'
+    'fixed left-0 right-0 top-0 z-50 w-full flex flex-col border-b transition-colors shrink-0'
   const headerStyle: CSSProperties = {
     height: 'var(--header-height)',
     minHeight: 'var(--header-height)',
@@ -142,7 +143,7 @@ export function Header({ transparent: _transparent }: { transparent?: boolean } 
               type="button"
               aria-label={isBurgerOpen ? 'Close menu' : 'Open menu'}
               aria-expanded={isBurgerOpen}
-              onClick={() => setIsBurgerOpen(!isBurgerOpen)}
+              onClick={() => setIsBurgerOpen((prev) => !prev)}
               className={`w-10 h-10 flex flex-col justify-center items-center gap-1.5 ${iconClass}`}
             >
               <span
@@ -293,56 +294,55 @@ export function Header({ transparent: _transparent }: { transparent?: boolean } 
         </nav>
       </div>
 
-      {/* Burger menu — slides from left */}
-      <>
-        <div
-          className={`fixed inset-0 z-40 bg-black/20 transition-opacity duration-300 md:z-40 ${isBurgerOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
-            }`}
-          onClick={() => setIsBurgerOpen(false)}
-          aria-hidden
-        />
-        <aside
-          className={`fixed top-0 left-0 bottom-0 z-50 w-72 max-w-[85vw] bg-white border-r border-[#E5E5E5] shadow-xl transition-transform duration-300 ease-out ${isBurgerOpen ? 'translate-x-0' : '-translate-x-full'
-            }`}
-          aria-hidden={!isBurgerOpen}
-        >
-          <nav className="flex flex-col gap-3 px-6 py-8">
-            {NAV_ITEMS.map((item) => (
-              <NavLink
-                key={item.href}
-                href={item.href}
-                label={item.label}
-                onClick={() => setIsBurgerOpen(false)}
-              />
-            ))}
+      {/* Burger menu drawer — lives inside the header in the DOM but
+          fixed-positioned to the viewport. overflow-x-hidden has been
+          removed from the header so iOS Safari cannot clip this panel. */}
+      <div
+        className={`fixed inset-0 z-40 bg-black/20 transition-opacity duration-300 ${isBurgerOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}
+        onClick={() => setIsBurgerOpen(false)}
+        aria-hidden
+      />
+      <aside
+        className={`fixed top-0 left-0 h-dvh w-64 max-w-[75vw] z-50 bg-white border-r border-[#E5E5E5] shadow-xl transition-transform duration-300 ease-out overflow-y-auto overscroll-contain ${isBurgerOpen ? 'translate-x-0' : '-translate-x-full'}`}
+        aria-hidden={!isBurgerOpen}
+        style={{ WebkitOverflowScrolling: 'touch' } as CSSProperties}
+      >
+        <nav className="flex min-h-full flex-col gap-3 px-6 pt-8 pb-12">
+          {NAV_ITEMS.map((item) => (
             <NavLink
-              href="/contributors"
-              label="CONTRIBUTORS"
+              key={item.href}
+              href={item.href}
+              label={item.label}
               onClick={() => setIsBurgerOpen(false)}
             />
-            <button
-              type="button"
-              onClick={() => {
-                setIsBurgerOpen(false)
-                setIsSearchOpen(true)
-              }}
-              className="text-left text-[13px] tracking-[0.2em] [word-spacing:0.3em] uppercase text-[#6B6B6B] hover:text-black transition-colors py-2 font-futura font-medium"
-            >
-              Search
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                setIsBurgerOpen(false)
-                setIsCartOpen(true)
-              }}
-              className="text-left text-[13px] tracking-[0.2em] [word-spacing:0.3em] uppercase text-[#6B6B6B] hover:text-black transition-colors py-2 font-futura font-medium"
-            >
-              Cart {cartCount != null && cartCount > 0 && `(${cartCount})`}
-            </button>
-          </nav>
-        </aside>
-      </>
+          ))}
+          <NavLink
+            href="/contributors"
+            label="CONTRIBUTORS"
+            onClick={() => setIsBurgerOpen(false)}
+          />
+          <button
+            type="button"
+            onClick={() => {
+              setIsBurgerOpen(false)
+              setIsSearchOpen(true)
+            }}
+            className="text-left text-[13px] tracking-[0.2em] [word-spacing:0.3em] uppercase text-[#6B6B6B] hover:text-black transition-colors py-2 font-futura font-medium"
+          >
+            Search
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              setIsBurgerOpen(false)
+              setIsCartOpen(true)
+            }}
+            className="text-left text-[13px] tracking-[0.2em] [word-spacing:0.3em] uppercase text-[#6B6B6B] hover:text-black transition-colors py-2 font-futura font-medium"
+          >
+            Cart {cartCount != null && cartCount > 0 && `(${cartCount})`}
+          </button>
+        </nav>
+      </aside>
 
       <SearchModal isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
       <CartPreview isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />

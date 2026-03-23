@@ -2,6 +2,8 @@
 
 import Link from 'next/link'
 
+import { CountrySelector } from '@/components/commerce/CountrySelector'
+
 const FOOTER_LINKS = [
   { label: 'ABOUT', href: '/about' },
   { label: 'CONTACT', href: '/contact' },
@@ -24,7 +26,7 @@ export function Footer({ instagramUrl }: { instagramUrl?: string | null }) {
               </Link>
             ))}
             <Link href="/newsletters" className="hover:text-black transition-colors">
-              NEWSLETTERS
+              NEWSLETTER
             </Link>
             <a
               href={instagramUrl ?? 'https://www.instagram.com/neptune_papers/'}
@@ -52,6 +54,8 @@ export function Footer({ instagramUrl }: { instagramUrl?: string | null }) {
               </svg>
             </a>
           </nav>
+
+          <CountrySelector />
 
           <p className="font-futura font-medium text-[13px] text-black">
             © {new Date().getFullYear()} Neptune Papers. All rights reserved.

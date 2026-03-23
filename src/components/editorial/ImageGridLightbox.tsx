@@ -12,6 +12,8 @@ type GridImage = {
   alt: string
   caption?: unknown
   captionSpansGrid?: boolean
+  width?: number
+  height?: number
 }
 
 export function ImageGridLightbox({ images }: { images: GridImage[] }) {
@@ -48,7 +50,6 @@ export function ImageGridLightbox({ images }: { images: GridImage[] }) {
       if (e.key === 'ArrowRight') go((activeIndex ?? 0) + 1)
     }
 
-    // Prevent background scroll while modal is open.
     const prevOverflow = document.body.style.overflow
     document.body.style.overflow = 'hidden'
     window.addEventListener('keydown', onKeyDown)
@@ -140,23 +141,18 @@ export function ImageGridLightbox({ images }: { images: GridImage[] }) {
               <button
                 type="button"
                 onClick={() => setActiveIndex(i)}
-                className="block w-full text-left cursor-pointer"
+                className="block w-full text-left cursor-zoom-in focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#1A1A1A]"
                 aria-label={`Open image ${i + 1} of ${images.length}`}
               >
-                <div
-                  // Fixed portrait aspect ratio so every tile has the same size.
-                  style={{ aspectRatio: '3 / 4' }}
-                  className="relative bg-[#E5E5E5] overflow-hidden"
-                >
-                  <Image
-                    src={img.thumbUrl}
-                    alt={img.alt || 'Image'}
-                    fill
-                    sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                    className="object-cover"
-                    unoptimized
-                  />
-                </div>
+                <Image
+                  src={img.thumbUrl}
+                  alt={img.alt || 'Image'}
+                  width={img.width ?? 1000}
+                  height={img.height ?? 1000}
+                  sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                  className="w-full h-auto"
+                  unoptimized
+                />
               </button>
 
               {shouldRenderPerImageCaptions && hasCaptionContent(img.caption) && (
@@ -179,7 +175,6 @@ export function ImageGridLightbox({ images }: { images: GridImage[] }) {
         <div
           className="fixed inset-0 z-1000 bg-black/75 flex items-center justify-center p-6"
           onMouseDown={(e) => {
-            // Close only when clicking the backdrop.
             if (e.target === e.currentTarget) close()
           }}
         >
@@ -226,4 +221,3 @@ export function ImageGridLightbox({ images }: { images: GridImage[] }) {
     </>
   )
 }
-

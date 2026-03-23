@@ -1,4 +1,3 @@
-import Image from 'next/image'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 
@@ -20,6 +19,7 @@ import {
   type ArticleAffiliateProduct,
 } from '@/components/editorial/ArticleAffiliateProductsSection'
 import { NewsstandCta } from '@/components/shared/NewsstandCta'
+import { ClickableHeroImage } from '@/components/editorial/ClickableHeroImage'
 import { LinkedIssuePreview } from '@/components/commerce/LinkedIssuePreview'
 import { SanityCaption, hasCaptionContent } from '@/components/shared/SanityCaption'
 
@@ -27,7 +27,7 @@ export const revalidate = 86400
 
 export async function generateStaticParams() {
   const slugs = await client.fetch<{ slug: string }[]>(
-    `*[_type == "article" && category == "interiors"] { "slug": slug.current }`
+    `*[_type == "article" && (category == "interiors" || "interiors" in categories)] { "slug": slug.current }`
   )
   return slugs.map((s) => ({ slug: s.slug }))
 }
@@ -103,17 +103,10 @@ export default async function InteriorsArticlePage({ params }: ArticlePageProps)
         </header>
         {coverImageUrl && (
           <>
-            <div className="relative w-full aspect-4/5 bg-[#0a0a0a] md:aspect-3/2 lg:aspect-video">
-              <Image
-                src={coverImageUrl}
-                alt={article.coverImage?.alt ?? articleTitleSingleLine(article.title)}
-                fill
-                sizes="100vw"
-                className="object-cover"
-                priority
-                unoptimized
-              />
-            </div>
+            <ClickableHeroImage
+              src={coverImageUrl}
+              alt={article.coverImage?.alt ?? articleTitleSingleLine(article.title)}
+            />
             {hasCaptionContent(article.coverImage?.caption) && (
               <div className="px-6 md:px-12 lg:px-16 mt-3 text-center">
                 <p className="text-sm italic text-[#6B6B6B]">

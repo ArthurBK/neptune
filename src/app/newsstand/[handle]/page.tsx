@@ -1,4 +1,3 @@
-import Link from 'next/link'
 import { notFound } from 'next/navigation'
 
 import { shopifyFetch } from '@/lib/shopify/client'
@@ -17,6 +16,7 @@ import { ProductCard } from '@/components/commerce/ProductCard'
 import { ProductForm } from '@/components/commerce/ProductForm'
 import { HorizontalImageCarousel } from '@/components/commerce/HorizontalImageCarousel'
 import { VerticalImageCarousel } from '@/components/commerce/VerticalImageCarousel'
+import { NewsstandCta } from '@/components/shared/NewsstandCta'
 
 export const revalidate = 3600
 
@@ -90,18 +90,18 @@ export default async function NewsstandProductPage({ params }: ProductPageProps)
         {/* Box 3 — product info */}
         <div className="flex flex-col bg-white lg:justify-center">
           <div className="px-4 pt-4 pb-6 lg:px-8 lg:pt-4 lg:pb-16">
-            <h1 className="font-serif text-2xl md:text-3xl text-[#1A1A1A] uppercase tracking-wide">
+            <h1 className="font-serif text-xl md:text-2xl text-[#1A1A1A] uppercase tracking-wide">
               {product.title}
             </h1>
 
-            <div className="mt-4 lg:mt-8">
-              <ProductForm variants={variants} productTitle={product.title} />
+            <div className="lg:mt-1">
+              <ProductForm variants={variants} productTitle={product.title} productHandle={product.handle} />
             </div>
 
             {(product.description || product.descriptionHtml) && (
               <div className="mt-6 lg:mt-6">
                 <div
-                  className="text-[#6B6B6B] text-base leading-relaxed [&_p]:mb-4 [&_p:last-child]:mb-0 [&_a]:underline [&_a]:hover:text-black"
+                  className="font-header font-light antialiased text-black text-sm leading-relaxed [&_p]:mb-4 [&_p:last-child]:mb-0 [&_a]:underline [&_a]:hover:text-black [&_strong]:font-bold [&_b]:font-bold [&_em]:italic [&_i]:italic [&_ul]:list-disc [&_ul]:pl-5 [&_ul]:mb-4 [&_ol]:list-decimal [&_ol]:pl-5 [&_ol]:mb-4 [&_li]:mb-1"
                   // biome-ignore lint/security/noDangerouslySetInnerHtml: Shopify product HTML from trusted source
                   dangerouslySetInnerHTML={{ __html: product.descriptionHtml }}
                 />
@@ -116,7 +116,7 @@ export default async function NewsstandProductPage({ params }: ProductPageProps)
         {/* You May Also Like */}
         <div className="pt-16 border-t border-[#E5E5E5] text-center">
           <h2 className="font-serif text-4xl text-[#1A1A1A] mb-8">
-            You May Also Like
+            YOU MAY ALSO LIKE
           </h2>
           {relatedProducts.length > 0 ? (
             <div className="flex flex-wrap justify-center gap-6 md:gap-8">
@@ -125,12 +125,7 @@ export default async function NewsstandProductPage({ params }: ProductPageProps)
               ))}
             </div>
           ) : null}
-          <Link
-            href="/newsstand"
-            className="mt-8 inline-block text-base tracking-[0.2em] uppercase text-[#6B6B6B] hover:text-black transition-colors"
-          >
-            ← Discover all available issues
-          </Link>
+          <NewsstandCta />
         </div>
       </div>
     </main>

@@ -49,3 +49,9 @@ body {
 .animate-bounce-subtle {
   animation: bounce-subtle 2.2s ease-in-out infinite;
 }
+
+.category-centered-line {
+  width: min(33.333%, 28rem);
+  margin-inline: auto;
+  border-top: 1px solid #e5e5e5;
+}

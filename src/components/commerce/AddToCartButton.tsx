@@ -16,6 +16,7 @@ interface AddToCartButtonProps {
   productTitle: string
   label?: string
   className?: string
+  countryCode?: string
 }
 
 /** Extract numeric ID from Shopify GID (e.g. gid://shopify/ProductVariant/123 -> 123) */
@@ -29,6 +30,7 @@ export function AddToCartButton({
   productTitle,
   label = 'Add to Cart',
   className = '',
+  countryCode,
 }: AddToCartButtonProps) {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -49,6 +51,7 @@ export function AddToCartButton({
           variantId: variant.id,
           quantity: 1,
           ...(cartId && { cartId }),
+          ...(countryCode && { countryCode }),
         }),
       })
       const data = await res.json()
@@ -90,7 +93,7 @@ export function AddToCartButton({
         type="button"
         onClick={handleAddToCart}
         disabled={!variant.availableForSale || isLoading}
-        className={`cursor-pointer bg-transparent text-black text-sm uppercase tracking-[0.2em] transition-opacity hover:opacity-70 hover:underline disabled:opacity-50 disabled:cursor-not-allowed ${className}`}
+        className={`font-futura text-center cursor-pointer bg-black text-white text-sm uppercase tracking-[0.2em] px-6 py-3 text-center transition-opacity hover:opacity-70 disabled:opacity-50 disabled:cursor-not-allowed ${className}`}
       >
         {isLoading ? 'Adding…' : added ? 'Added' : label}
       </button>

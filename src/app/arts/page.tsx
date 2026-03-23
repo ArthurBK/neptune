@@ -48,7 +48,7 @@ export default async function ArtsPage() {
 
   return (
     <main>
-      <div className="max-w-7xl mx-auto px-6 md:px-12 lg:px-16 pt-4 md:pt-8 pb-16 md:pb-24">
+      <div className="max-w-7xl mx-auto px-6 md:px-12 lg:px-16 pt-4 md:pt-8 pb-6 md:pb-10">
         {/* Ad banner */}
         {adBanner?.image && (
           <div className="mb-12 md:mb-16">
@@ -61,12 +61,14 @@ export default async function ArtsPage() {
           </div>
         )}
 
+        <div className="mx-auto mb-6 md:mb-8 h-px w-1/3 max-w-md bg-(--neptune-logo-red)" />
+
         {/* Category header */}
-        <header className="mb-12 md:mb-16 text-center">
-          <h1 className="font-serif text-2xl md:text-3xl text-[#1A1A1A] uppercase tracking-wide">
+        <header className="mb-6 md:mb-12 text-center font-futura">
+          <h1 className="font-serif font-bold text-3xl md:text-4xl text-[#1A1A1A] uppercase tracking-wide">
             Arts
           </h1>
-          <p className="mt-4 text-base text-[#6B6B6B] max-w-2xl mx-auto">
+          <p className="mt-2 text-sm md:text-[15px] text-black max-w-2xl mx-auto whitespace-pre-line font-[Helvetica,Arial,sans-serif]">
             {CATEGORY_DESCRIPTION.arts}
           </p>
         </header>
@@ -75,7 +77,9 @@ export default async function ArtsPage() {
         <ArticleGrid articles={typedArticles} size="compact" featuredLayout unoptimizedImages />
 
         {/* Newsstand CTA */}
-        <NewsstandCta unoptimizedLogo />
+        <div className="my-10 md:my-14">
+          <NewsstandCta unoptimizedLogo />
+        </div>
       </div>
 
       {/* Category page image — fullscreen */}

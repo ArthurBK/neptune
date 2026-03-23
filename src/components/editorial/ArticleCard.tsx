@@ -27,6 +27,8 @@ interface ArticleCardProps {
   imageClassName?: string
   /** Optional aspect ratio class for non-fill layouts. */
   imageAspectClass?: string
+  /** Optional title size/class override (e.g. "text-lg"). */
+  titleClassName?: string
 }
 
 export function ArticleCard({
@@ -43,6 +45,7 @@ export function ArticleCard({
   imageFit = 'cover',
   imageClassName,
   imageAspectClass = 'aspect-[3/4]',
+  titleClassName,
 }: ArticleCardProps) {
   const displayTitle = articleTitleSingleLine(title)
   const isCompact = size === 'compact'
@@ -50,7 +53,9 @@ export function ArticleCard({
   const imageWidth = isCompact ? 400 : 600
   const imageHeight = isCompact ? 533 : 800
   const imageUrl = coverImage?.asset
-    ? urlFor(coverImage).width(imageWidth).height(imageHeight).url()
+    ? horizontal
+      ? urlFor(coverImage).width(1200).height(800).quality(90).url()
+      : urlFor(coverImage).width(imageWidth).height(imageHeight).url()
     : null
 
   const imageSizes =
@@ -65,23 +70,24 @@ export function ArticleCard({
     : `${imageAspectClass} bg-[#E5E5E5] overflow-hidden`
   const imageFitClass = imageFit === 'contain' ? 'object-contain' : 'object-cover'
 
-  const titleSizeClass = isCompact ? 'text-lg' : isFeatured ? 'text-2xl' : 'text-2xl'
+  const titleSizeClass = titleClassName ?? (isCompact ? 'text-lg' : isFeatured ? 'text-2xl' : 'text-2xl')
+  const horizontalTitleClass = titleClassName ?? 'text-2xl md:text-4xl leading-tight'
 
   if (horizontal) {
     return (
       <article className="group h-full">
-        <div className="flex h-full gap-3">
+        <div className="mx-auto w-full md:max-w-[920px] flex h-full flex-col md:flex-row gap-4 md:gap-6 items-stretch">
           <Link
             href={`/${category}/${slug}`}
-            className="block w-4/5 shrink-0 overflow-hidden"
+            className="block w-full md:w-[40%] shrink-0 overflow-hidden"
           >
-            <div className="relative h-full bg-[#E5E5E5] overflow-hidden">
+            <div className="relative aspect-3/2 bg-[#E5E5E5] overflow-hidden">
               {imageUrl ? (
                 <Image
                   src={imageUrl}
                   alt={coverImage?.alt ?? displayTitle}
                   fill
-                  sizes="(max-width: 1024px) 50vw, 20vw"
+                  sizes="(max-width: 768px) 100vw, 48vw"
                   unoptimized={unoptimized}
                   className={`${imageFitClass} ${imageClassName ?? ''} transition-transform duration-300 ease-out group-hover:scale-[1.02]`}
                 />
@@ -92,25 +98,27 @@ export function ArticleCard({
               )}
             </div>
           </Link>
-          <div className="flex flex-col justify-center min-w-0">
-            {subcategory && (
-              <p className="tracking-[0.2em] text-[12px] uppercase font-header font-bold text-(--neptune-logo-red) mb-1 text-xs">
-                {subcategory}
-              </p>
-            )}
-            <Link href={`/${category}/${slug}`}>
-              <h3 className="font-serif text-[#1A1A1A] group-hover:underline line-clamp-3 text-sm leading-snug">
-                {displayTitle}
-              </h3>
-            </Link>
-            {author && (
-              <Link
-                href={`/contributors/${author.slug}`}
-                className="mt-1 block text-[#6B6B6B] hover:text-black hover:underline underline-offset-2 transition-colors text-xs"
-              >
-                By {author.name}
+          <div className="min-w-0 flex-1 flex items-center">
+            <div className="w-full max-w-[440px] text-left">
+              {subcategory && (
+                <p className="tracking-[0.2em] text-[12px] uppercase font-header font-bold text-(--neptune-logo-red) mb-1 text-xs">
+                  {subcategory}
+                </p>
+              )}
+              <Link href={`/${category}/${slug}`} className="block w-full text-left">
+                <h3 className={`font-serif text-[#1A1A1A] group-hover:underline line-clamp-3 ${horizontalTitleClass}`}>
+                  {displayTitle}
+                </h3>
               </Link>
-            )}
+              {author && (
+                <Link
+                  href={`/contributors/${author.slug}`}
+                  className="block w-full text-left text-[#6B6B6B] hover:text-black hover:underline underline-offset-2 transition-colors text-base"
+                >
+                  By {author.name}
+                </Link>
+              )}
+            </div>
           </div>
         </div>
       </article>
@@ -144,7 +152,7 @@ export function ArticleCard({
         </Link>
         <div className="mt-2 lg:shrink-0">
           {subcategory && (
-            <p className="tracking-[0.2em] text-[12px]uppercase font-header font-bold text-(--neptune-logo-red) mb-1 text-xs">
+            <p className="tracking-[0.2em] text-[12px] uppercase font-header font-bold text-(--neptune-logo-red) mb-1 text-xs">
               {subcategory}
             </p>
           )}
@@ -157,7 +165,7 @@ export function ArticleCard({
         {author && (
           <Link
             href={`/contributors/${author.slug}`}
-            className="mt-1 block lg:shrink-0 text-[#6B6B6B] hover:text-black hover:underline underline-offset-2 transition-colors text-sm"
+            className="block lg:shrink-0 text-[#6B6B6B] hover:text-black hover:underline underline-offset-2 transition-colors text-sm"
           >
             By {author.name}
           </Link>
@@ -210,7 +218,7 @@ export function ArticleCard({
       {author && (
         <Link
           href={`/contributors/${author.slug}`}
-          className={`mt-1 block text-[#6B6B6B] hover:text-black hover:underline underline-offset-2 transition-colors ${isCompact ? 'text-sm' : 'text-base'}`}
+          className={`block text-[#6B6B6B] hover:text-black hover:underline underline-offset-2 transition-colors ${isCompact ? 'text-sm' : 'text-base'}`}
         >
           By {author.name}
         </Link>

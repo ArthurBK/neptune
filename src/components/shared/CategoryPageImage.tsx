@@ -5,9 +5,9 @@ import { SanityCaption, hasCaptionContent } from '@/components/shared/SanityCapt
 
 interface CategoryPageImageProps {
   image:
-    | { asset?: { _ref: string }; alt?: string; caption?: unknown }
-    | null
-    | undefined
+  | { asset?: { _ref: string }; alt?: string; caption?: unknown }
+  | null
+  | undefined
 }
 
 export function CategoryPageImage({ image }: CategoryPageImageProps) {
@@ -16,7 +16,7 @@ export function CategoryPageImage({ image }: CategoryPageImageProps) {
   const imageUrl = urlFor(image).width(2560).quality(90).url()
 
   return (
-    <div className="mt-8">
+    <div className="">
       <div className="relative w-full h-screen bg-[#E5E5E5] overflow-hidden">
         <Image
           src={imageUrl}
@@ -28,7 +28,7 @@ export function CategoryPageImage({ image }: CategoryPageImageProps) {
         />
       </div>
       {hasCaptionContent(image.caption) && (
-        <p className="mt-3 text-center text-sm italic text-[#6B6B6B]">
+        <p className="mt-3 text-center text-sm italic text-black">
           <SanityCaption value={image.caption} />
         </p>
       )}

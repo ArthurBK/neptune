@@ -10,10 +10,11 @@ import type { CartCreateResponse, CartLinesAddResponse } from '@/lib/shopify/typ
 export async function POST(request: Request) {
   try {
     const body = await request.json()
-    const { variantId, quantity = 1, cartId } = body as {
+    const { variantId, quantity = 1, cartId, countryCode } = body as {
       variantId: string
       quantity?: number
       cartId?: string
+      countryCode?: string
     }
 
     if (!variantId) {
@@ -51,9 +52,13 @@ export async function POST(request: Request) {
       })
     }
 
+    const cartInput: Record<string, unknown> = { lines }
+    if (countryCode) {
+      cartInput.buyerIdentity = { countryCode }
+    }
     const data = await shopifyFetch<CartCreateResponse>({
       query: CART_CREATE_MUTATION,
-      variables: { input: { lines } },
+      variables: { input: cartInput },
       cache: 'no-store',
     })
     const result = data.cartCreate

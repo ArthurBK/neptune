@@ -58,7 +58,7 @@ export function ProductCard({
           </h3>
         </Link>
         <p
-          className={`mt-1 text-[#1A1A1A] ${
+          className={`font-futura mt-1 text-[#1A1A1A] ${
             compact ? 'text-sm' : size === 'small' ? 'text-sm' : 'text-base'
           }`}
         >

@@ -1,4 +1,3 @@
-import Image from 'next/image'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 
@@ -18,6 +17,7 @@ import {
 } from '@/lib/articleRelated'
 import { AdBanner } from '@/components/shared/AdBanner'
 import { ArticleBody } from '@/components/editorial/ArticleBody'
+import { ClickableHeroImage } from '@/components/editorial/ClickableHeroImage'
 import { ArticleCard } from '@/components/editorial/ArticleCard'
 import {
   ArticleAffiliateProductsSection,
@@ -108,17 +108,10 @@ export default async function GardensArticlePage({ params }: ArticlePageProps) {
         </header>
         {coverImageUrl && (
           <>
-            <div className="relative w-full aspect-4/5 bg-[#0a0a0a] md:aspect-3/2 lg:aspect-video">
-              <Image
-                src={coverImageUrl}
-                alt={article.coverImage?.alt ?? articleTitleSingleLine(article.title)}
-                fill
-                sizes="100vw"
-                className="object-cover"
-                priority
-                unoptimized
-              />
-            </div>
+            <ClickableHeroImage
+              src={coverImageUrl}
+              alt={article.coverImage?.alt ?? articleTitleSingleLine(article.title)}
+            />
             {hasCaptionContent(article.coverImage?.caption) && (
               <div className="px-6 md:px-12 lg:px-16 mt-3 text-center">
                 <p className="text-sm italic text-[#6B6B6B]">

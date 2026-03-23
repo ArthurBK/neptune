@@ -294,6 +294,31 @@ export const CART_LINES_UPDATE_MUTATION = `
   }
 `
 
+export const SHOP_CURRENCIES_QUERY = `
+  query ShopCurrencies {
+    shop {
+      paymentSettings {
+        enabledPresentmentCurrencies
+      }
+    }
+  }
+`
+
+export const PRODUCT_PRICE_CONTEXT_QUERY = `
+  query ProductPriceContext($handle: String!, $country: CountryCode!) @inContext(country: $country) {
+    product(handle: $handle) {
+      variants(first: 10) {
+        edges {
+          node {
+            id
+            price { amount currencyCode }
+          }
+        }
+      }
+    }
+  }
+`
+
 export const CART_LINES_REMOVE_MUTATION = `
   mutation CartLinesRemove($cartId: ID!, $lineIds: [ID!]!) {
     cartLinesRemove(cartId: $cartId, lineIds: $lineIds) {

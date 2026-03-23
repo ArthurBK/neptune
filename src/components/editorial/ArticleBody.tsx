@@ -4,6 +4,7 @@ import Image from 'next/image'
 import { urlFor } from '@/sanity/lib/image'
 import { SanityCaption, hasCaptionContent } from '@/components/shared/SanityCaption'
 import { ImageGridLightbox } from '@/components/editorial/ImageGridLightbox'
+import { ClickableSingleImage } from '@/components/editorial/ClickableSingleImage'
 
 const TextWrapper = ({
   children,
@@ -91,9 +92,6 @@ function createComponents(isFirstParagraph: { current: boolean }): PortableTextC
         const layout = (value.layout as string) ?? 'full'
         const isFloatLayout = layout === 'left' || layout === 'right'
 
-        // Sanity image metadata usually contains original dimensions.
-        // Use them (when available) to make the rendered height follow
-        // the picture's real aspect ratio, instead of forcing a fixed one.
         const imageAsset = value.image as unknown as {
           asset?: {
             metadata?: { dimensions?: { width?: number; height?: number } }
@@ -110,11 +108,9 @@ function createComponents(isFirstParagraph: { current: boolean }): PortableTextC
           full: 'clear-both mx-auto w-full px-6 md:px-12 my-6 md:my-8',
           wide: 'clear-both mx-auto w-full px-6 md:px-12 my-6 md:my-8',
           center: 'clear-both mx-auto w-full px-6 md:px-12 my-6 md:my-8',
-          // Float images inwards a bit so they don't hug the page edge.
           left: 'float-left ml-4 mr-6 mb-4 w-full shrink-0',
           right: 'float-right mr-4 ml-6 mb-4 w-full shrink-0',
         }
-        // Enforce max-width via inline style so it's guaranteed regardless of Tailwind compilation.
         const layoutMaxWidths: Record<string, string> = {
           full: '100vw',
           wide: '70vw',
@@ -124,8 +120,6 @@ function createComponents(isFirstParagraph: { current: boolean }): PortableTextC
         }
         const figureClass = layoutClasses[layout] ?? layoutClasses.full
         const figureMaxWidth = layoutMaxWidths[layout] ?? layoutMaxWidths.full
-        // Request a higher-res rendition from Sanity to avoid browser upscaling.
-        // (Your code passes a single `src` string to Next Image, so it can't pick a better size.)
         const imageWidth =
           isFloatLayout
             ? 1400
@@ -144,30 +138,36 @@ function createComponents(isFirstParagraph: { current: boolean }): PortableTextC
           .height(computedHeight)
           .quality(90)
           .url()
+
+        // Full-res URL for the modal
+        const fullWidth = 2000
+        const fullHeight =
+          dimensions?.width && dimensions?.height
+            ? Math.max(1, Math.round((fullWidth * dimensions.height) / dimensions.width))
+            : Math.round(fullWidth * 0.75)
+        const fullUrl = urlFor(value.image)
+          .width(fullWidth)
+          .height(fullHeight)
+          .quality(90)
+          .url()
+
+        const sizes =
+          layout === 'full' || layout === 'wide'
+            ? '100vw'
+            : layout === 'center'
+              ? '(max-width: 768px) 100vw, 768px'
+              : '(max-width: 768px) 100vw, 50vw'
+
         return (
           <figure className={figureClass} style={{ maxWidth: figureMaxWidth }}>
             <div className="w-full">
-              <div
-                className={
-                  aspectRatio ? 'relative bg-[#E5E5E5] overflow-hidden' : 'relative aspect-4/3 md:aspect-16/10 bg-[#E5E5E5] overflow-hidden'
-                }
-                style={aspectRatio ? { aspectRatio } : undefined}
-              >
-                <Image
-                  src={imageUrl}
-                  alt={value.alt ?? ''}
-                  fill
-                  sizes={
-                    layout === 'full' || layout === 'wide'
-                      ? '100vw'
-                      : layout === 'center'
-                        ? '(max-width: 768px) 100vw, 768px'
-                        : '(max-width: 768px) 100vw, 50vw'
-                  }
-                  className="object-cover"
-                  unoptimized
-                />
-              </div>
+              <ClickableSingleImage
+                src={imageUrl}
+                alt={value.alt ?? ''}
+                fullSrc={fullUrl}
+                sizes={sizes}
+                aspectRatio={aspectRatio}
+              />
             </div>
             {hasCaptionContent(value.caption) && (
               <figcaption
@@ -191,15 +191,15 @@ function createComponents(isFirstParagraph: { current: boolean }): PortableTextC
         if (images.length === 0) return null
         const gridImages = images
           .map((img, i) => {
+            const originalWidth = img.imageDimensions?.width
+            const originalHeight = img.imageDimensions?.height
+
+            // Preserve natural aspect ratio — no forced height crop
             const thumbUrl = img?.asset
-              ? urlFor(img).width(1000).height(1000).quality(90).url()
+              ? urlFor(img).width(1000).quality(90).url()
               : null
             if (!thumbUrl) return null
 
-            // For the modal carousel, request a rendition that matches the image's
-            // original aspect ratio so it doesn't look "resized".
-            const originalWidth = img.imageDimensions?.width
-            const originalHeight = img.imageDimensions?.height
             const fullUrl =
               img?.asset && originalWidth && originalHeight
                 ? (() => {
@@ -207,7 +207,7 @@ function createComponents(isFirstParagraph: { current: boolean }): PortableTextC
                     const targetHeight = Math.max(1, Math.round((targetWidth * originalHeight) / originalWidth))
                     return urlFor(img).width(targetWidth).height(targetHeight).quality(90).url()
                   })()
-                : urlFor(img).width(2000).height(1334).quality(90).url() // fallback: portrait-ish
+                : urlFor(img).width(2000).height(1334).quality(90).url()
 
             const id = (img as { _key?: string })._key ?? `grid-img-${i}`
             return {
@@ -217,6 +217,8 @@ function createComponents(isFirstParagraph: { current: boolean }): PortableTextC
               alt: img.alt || 'Image',
               caption: img.caption,
               captionSpansGrid: img.captionSpansGrid,
+              width: originalWidth,
+              height: originalHeight,
             }
           })
           .filter((x): x is NonNullable<typeof x> => x !== null)
