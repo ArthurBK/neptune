@@ -125,5 +125,14 @@ export function formatPrice(amount: string, currencyCode: string): string {
   return new Intl.NumberFormat('fr-FR', {
     style: 'currency',
     currency: currencyCode,
-  }).format(parseFloat(amount))
+  }).format(Number.parseFloat(amount))
+}
+
+export function formatPriceNoDecimals(amount: string, currencyCode: string): string {
+  return new Intl.NumberFormat('fr-FR', {
+    style: 'currency',
+    currency: currencyCode,
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  }).format(Number.parseFloat(amount))
 }

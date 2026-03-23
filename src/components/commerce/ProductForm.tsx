@@ -9,7 +9,7 @@ import {
 } from '@/lib/currency'
 import { clearCart } from '@/lib/cart'
 import type { ProductVariant } from '@/lib/shopify/types'
-import { formatPrice } from '@/lib/shopify/types'
+import { formatPriceNoDecimals } from '@/lib/shopify/types'
 
 interface ProductFormProps {
   variants: ProductVariant[]
@@ -103,7 +103,7 @@ export function ProductForm({ variants, productTitle, productHandle }: ProductFo
       )}
 
       <p className={`font-futura text-2xl text-[#1A1A1A] transition-opacity duration-150 ${priceReady ? 'opacity-100' : 'opacity-0'}`}>
-        {formatPrice(displayPrice.amount, displayPrice.currencyCode)}
+        {formatPriceNoDecimals(displayPrice.amount, displayPrice.currencyCode)}
       </p>
 
       <AddToCartButton

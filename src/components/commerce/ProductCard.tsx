@@ -3,7 +3,7 @@ import Link from 'next/link'
 
 import { AddToCartButton } from './AddToCartButton'
 import type { ShopifyProduct } from '@/lib/shopify/types'
-import { formatPrice } from '@/lib/shopify/types'
+import { formatPriceNoDecimals } from '@/lib/shopify/types'
 
 interface ProductCardProps {
   product: ShopifyProduct
@@ -50,22 +50,22 @@ export function ProductCard({
       <div className={compact ? 'mt-2' : size === 'small' ? 'mt-3' : 'mt-4'}>
         <Link href={`/newsstand/${handle}`}>
           <h3
-            className={`font-serif text-[#1A1A1A] group-hover:underline line-clamp-2 ${
-              compact ? 'text-base' : size === 'small' ? 'text-lg' : 'text-2xl'
+            className={`font-serif text-center text-[#1A1A1A] group-hover:underline line-clamp-2 ${
+              compact ? 'text-sm' : size === 'small' ? 'text-base' : 'text-xl'
             }`}
           >
             {title}
           </h3>
         </Link>
         <p
-          className={`font-futura mt-1 text-[#1A1A1A] ${
-            compact ? 'text-sm' : size === 'small' ? 'text-sm' : 'text-base'
+          className={`font-futura mt-1 text-center text-[#1A1A1A] ${
+            compact ? 'text-xs' : size === 'small' ? 'text-xs' : 'text-sm'
           }`}
         >
-          {formatPrice(price.amount, price.currencyCode)}
+          {formatPriceNoDecimals(price.amount, price.currencyCode)}
         </p>
         {!compact && firstVariant?.availableForSale && (
-          <div className="mt-3 opacity-0 group-hover:opacity-100 transition-opacity">
+          <div className="mt-3 opacity-0 group-hover:opacity-100 transition-opacity flex justify-center">
             <AddToCartButton
               variant={firstVariant}
               productTitle={title}

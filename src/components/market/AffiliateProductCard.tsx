@@ -10,6 +10,32 @@ interface AffiliateProductCardProps {
   affiliateUrl: string
 }
 
+function formatAffiliatePrice(rawPrice: string): string {
+  const normalized = (rawPrice ?? '').trim()
+  if (!normalized) return ''
+
+  const symbolToCurrency: Record<string, string> = {
+    '$': 'USD',
+    '€': 'EUR',
+    '£': 'GBP',
+  }
+
+  const symbol = normalized[0]
+  const currencyCode = symbolToCurrency[symbol] ?? 'USD'
+  const amount = normalized
+    .replace(/^[^\d-]+/, '')
+    .replace(/[^\d.,-]/g, '')
+    .replace(',', '.')
+
+  if (!amount || Number.isNaN(Number.parseFloat(amount))) return normalized
+  return new Intl.NumberFormat('fr-FR', {
+    style: 'currency',
+    currency: currencyCode,
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  }).format(Number.parseFloat(amount))
+}
+
 export function AffiliateProductCard({
   title,
   brand,
@@ -45,13 +71,13 @@ export function AffiliateProductCard({
           </div>
         )}
       </div>
-      <div className="mt-2">
+      <div className="mt-2 text-center">
         <h3 className="font-serif text-m text-black group-hover:underline line-clamp-2 leading-tight">
           {title}
         </h3>
         <p className="font-header font-semibold text-[13px] text-black leading-tight">{brand}</p>
-        <p className="font-header text-[14px] text-black leading-tight">
-          {`$${(price ?? '').replace(/^[€$£]\s?/, '')}`}
+        <p className="mt-2 font-futura text-xs text-black leading-tight">
+          {formatAffiliatePrice(price)}
         </p>
       </div>
     </a>

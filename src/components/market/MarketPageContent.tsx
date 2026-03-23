@@ -61,7 +61,7 @@ export function MarketPageContent({ products }: MarketPageContentProps) {
           <h1 className="font-serif text-2xl md:text-3xl uppercase tracking-wide text-black">
             Neptune Market
           </h1>
-          <p className="mt-4 text-base text-black max-w-2xl mx-auto">
+          <p className="mt-4 text-base text-black text-center max-w-2xl mx-auto">
             Discover our curated shopping edit, featuring a variety of products, including books, objects of all kinds, furniture, and fashion gems that our editors adore and have on their wish lists (and soon, you will too!).
             <br />
             <br /><span className="text-xs italic">Our editors independently curate all products featured on Neptune.<br />We may receive compensation from retailers and/or from purchases of products through these links.</span>
@@ -109,7 +109,7 @@ export function MarketPageContent({ products }: MarketPageContentProps) {
             ))}
           </div>
         ) : (
-          <p className="text-[#6B6B6B]">
+          <p className="text-[#6B6B6B] text-center">
             {selectedCategory
               ? `No products in ${CATEGORY_LABELS[selectedCategory] ?? selectedCategory}.`
               : 'No products yet.'}

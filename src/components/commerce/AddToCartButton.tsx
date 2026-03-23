@@ -93,7 +93,7 @@ export function AddToCartButton({
         type="button"
         onClick={handleAddToCart}
         disabled={!variant.availableForSale || isLoading}
-        className={`font-futura text-center cursor-pointer bg-black text-white text-sm uppercase tracking-[0.2em] px-6 py-3 text-center transition-opacity hover:opacity-70 disabled:opacity-50 disabled:cursor-not-allowed ${className}`}
+        className={`font-futura text-center cursor-pointer bg-black text-white text-xs uppercase tracking-[0.15em] px-4 py-2 transition-opacity hover:opacity-70 disabled:opacity-50 disabled:cursor-not-allowed ${className}`}
       >
         {isLoading ? 'Adding…' : added ? 'Added' : label}
       </button>
