@@ -67,6 +67,13 @@ export default async function GardensArticlePage({ params }: ArticlePageProps) {
     : null
 
   const relatedArticles = relatedArticlesFromSanity(article.relatedArticles)
+  const publishedDate = article.publishedAt
+    ? new Date(article.publishedAt).toLocaleDateString('en-GB', {
+        day: '2-digit',
+        month: 'long',
+        year: 'numeric',
+      })
+    : null
 
   return (
     <main>
@@ -102,6 +109,11 @@ export default async function GardensArticlePage({ params }: ArticlePageProps) {
                 >
                   {formatPersonName(article.photographer.name)}
                 </Link>
+              </p>
+            )}
+            {publishedDate && (
+              <p className="font-futura text-xs tracking-[0.08em] uppercase text-black/70 mt-1">
+                {publishedDate}
               </p>
             )}
           </div>
@@ -199,6 +211,7 @@ type ArticleData = {
   title: string
   slug: { current: string }
   category: string
+  publishedAt?: string | null
   subcategory?: string | null
   linkedIssue?: string | null
   coverImage?: { asset?: { _ref: string }; alt?: string; caption?: unknown }

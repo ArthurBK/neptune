@@ -241,7 +241,6 @@ export const article = defineType({
       name: 'publishedAt',
       title: 'Published At',
       type: 'datetime',
-      validation: (rule) => rule.required(),
     }),
     defineField({
       name: 'body',
