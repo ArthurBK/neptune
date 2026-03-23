@@ -1,6 +1,7 @@
 import { DocumentTextIcon, ImageIcon } from '@sanity/icons'
 import { defineArrayMember, defineField, defineType } from 'sanity'
 import { captionRichTextType } from './lib/captionRichText'
+import { HexColorInput } from '../components/HexColorInput'
 
 function captionToPlainText(value: unknown): string {
   if (value == null) return ''
@@ -163,6 +164,24 @@ const ARTICLE_CATEGORIES = [
   { title: 'Fashion', value: 'fashion' },
 ]
 
+const ARTICLE_FONT_FAMILIES = [
+  { title: 'Serif (default)', value: 'serif' },
+  { title: 'Futura', value: 'futura' },
+  { title: 'Header', value: 'header' },
+  { title: 'Sans-serif', value: 'sans' },
+]
+
+const ARTICLE_TEXT_SIZES = [
+  { title: 'Small', value: 'sm' },
+  { title: 'Medium (default)', value: 'md' },
+  { title: 'Large', value: 'lg' },
+]
+
+const INLINE_FONT_SIZE_OPTIONS = Array.from({ length: 45 }, (_, i) => {
+  const px = i + 6
+  return { title: `${px}px`, value: px }
+})
+
 export const article = defineType({
   name: 'article',
   title: 'Article',
@@ -191,11 +210,21 @@ export const article = defineType({
       validation: (rule) => rule.required(),
     }),
     defineField({
+      name: 'categories',
+      title: 'Categories',
+      type: 'array',
+      description: 'Select one or more categories where this article should appear.',
+      of: [defineArrayMember({ type: 'string' })],
+      options: { list: ARTICLE_CATEGORIES },
+      validation: (rule) => rule.required().min(1).unique(),
+    }),
+    defineField({
       name: 'category',
-      title: 'Category',
+      title: 'Legacy Category',
       type: 'string',
       options: { list: ARTICLE_CATEGORIES },
-      validation: (rule) => rule.required(),
+      hidden: true,
+      readOnly: true,
     }),
     defineField({
       name: 'subcategory',
@@ -243,6 +272,49 @@ export const article = defineType({
       type: 'datetime',
     }),
     defineField({
+      name: 'typography',
+      title: 'Typography',
+      type: 'object',
+      options: { collapsible: true, collapsed: true },
+      fields: [
+        defineField({
+          name: 'fontFamily',
+          title: 'Font family',
+          type: 'string',
+          options: { list: ARTICLE_FONT_FAMILIES },
+          initialValue: 'serif',
+        }),
+        defineField({
+          name: 'textColor',
+          title: 'Text color (hex)',
+          type: 'string',
+          description: 'Optional. Example: #1A1A1A',
+          components: { input: HexColorInput },
+          validation: (rule) =>
+            rule.custom((value) => {
+              if (!value) return true
+              if (typeof value !== 'string') return 'Must be a string'
+              const isHex = /^#(?:[0-9a-fA-F]{3}){1,2}$/.test(value.trim())
+              return isHex ? true : 'Use a valid hex color like #1A1A1A'
+            }),
+        }),
+        defineField({
+          name: 'titleSize',
+          title: 'Title size',
+          type: 'string',
+          options: { list: ARTICLE_TEXT_SIZES },
+          initialValue: 'md',
+        }),
+        defineField({
+          name: 'bodySize',
+          title: 'Body size',
+          type: 'string',
+          options: { list: ARTICLE_TEXT_SIZES },
+          initialValue: 'md',
+        }),
+      ],
+    }),
+    defineField({
       name: 'body',
       title: 'Body',
       type: 'array',
@@ -274,6 +346,40 @@ export const article = defineType({
                     type: 'reference',
                     to: [{ type: 'affiliateProduct' }],
                     validation: (rule) => rule.required(),
+                  }),
+                ],
+              },
+              {
+                name: 'textStyle',
+                type: 'object',
+                title: 'Text Style',
+                fields: [
+                  defineField({
+                    name: 'textColor',
+                    title: 'Text color (hex)',
+                    type: 'string',
+                    description: 'Example: #1A1A1A',
+                    components: { input: HexColorInput },
+                    validation: (rule) =>
+                      rule.custom((value) => {
+                        if (!value) return true
+                        if (typeof value !== 'string') return 'Must be a string'
+                        const isHex = /^#(?:[0-9a-fA-F]{3}){1,2}$/.test(value.trim())
+                        return isHex ? true : 'Use a valid hex color like #1A1A1A'
+                      }),
+                  }),
+                  defineField({
+                    name: 'fontFamily',
+                    title: 'Font family',
+                    type: 'string',
+                    options: { list: ARTICLE_FONT_FAMILIES },
+                  }),
+                  defineField({
+                    name: 'fontSize',
+                    title: 'Font size',
+                    type: 'number',
+                    options: { list: INLINE_FONT_SIZE_OPTIONS },
+                    validation: (rule) => rule.integer().min(6).max(50),
                   }),
                 ],
               },

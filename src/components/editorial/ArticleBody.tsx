@@ -18,7 +18,29 @@ const TextWrapper = ({
   </div>
 )
 
-function createComponents(isFirstParagraph: { current: boolean }): PortableTextComponents {
+interface TypographyOptions {
+  fontFamilyClass: string
+  bodySizeClass: string
+  textColor?: string
+}
+
+function createComponents(
+  isFirstParagraph: { current: boolean },
+  typography: TypographyOptions,
+): PortableTextComponents {
+  const inlineFontClassByValue: Record<string, string> = {
+    serif: 'font-serif',
+    futura: 'font-futura',
+    header: 'font-header',
+    sans: 'font-[Helvetica,Arial,sans-serif]',
+  }
+
+  const normalizeHexColor = (value: unknown): string | undefined => {
+    if (typeof value !== 'string') return undefined
+    const trimmed = value.trim()
+    return /^#(?:[0-9a-fA-F]{3}){1,2}$/.test(trimmed) ? trimmed : undefined
+  }
+
   return {
     block: {
       normal: ({ children }) => {
@@ -27,11 +49,8 @@ function createComponents(isFirstParagraph: { current: boolean }): PortableTextC
         return (
           <TextWrapper className={isFirst ? 'mt-10 mb-8' : 'mb-4'}>
             <p
-              className={
-                isFirst
-                  ? 'text-[#1A1A1A] leading-[1.85] text-[20px] md:text-[22px]'
-                  : 'text-[#1A1A1A] leading-[1.85] text-[20px] md:text-[22px]'
-              }
+              className={`${typography.fontFamilyClass} ${typography.bodySizeClass} leading-[1.85]`}
+              style={{ color: typography.textColor ?? '#1A1A1A' }}
             >
               {children}
             </p>
@@ -40,28 +59,43 @@ function createComponents(isFirstParagraph: { current: boolean }): PortableTextC
       },
       h2: ({ children }) => (
         <TextWrapper className="mt-8 mb-3">
-          <h2 className="font-serif text-3xl md:text-4xl text-[#1A1A1A] leading-tight">
+          <h2
+            className={`${typography.fontFamilyClass} text-3xl md:text-4xl leading-tight`}
+            style={{ color: typography.textColor ?? '#1A1A1A' }}
+          >
             {children}
           </h2>
         </TextWrapper>
       ),
       h3: ({ children }) => (
         <TextWrapper className="mt-6 mb-2">
-          <h3 className="font-serif text-2xl md:text-3xl text-[#1A1A1A] leading-tight">
+          <h3
+            className={`${typography.fontFamilyClass} text-2xl md:text-3xl leading-tight`}
+            style={{ color: typography.textColor ?? '#1A1A1A' }}
+          >
             {children}
           </h3>
         </TextWrapper>
       ),
       blockquote: ({ children }) => (
         <TextWrapper className="my-6">
-          <blockquote className="border-l-2 border-[#1A1A1A] pl-8 text-[#1A1A1A] text-2xl md:text-3xl leading-relaxed">
+          <blockquote
+            className={`${typography.fontFamilyClass} border-l-2 pl-8 text-2xl md:text-3xl leading-relaxed`}
+            style={{
+              color: typography.textColor ?? '#1A1A1A',
+              borderColor: typography.textColor ?? '#1A1A1A',
+            }}
+          >
             {children}
           </blockquote>
         </TextWrapper>
       ),
       pullQuote: ({ children }) => (
         <div className="w-full my-8">
-          <blockquote className="font-serif text-4xl md:text-5xl text-center leading-snug text-[#1A1A1A]">
+          <blockquote
+            className={`${typography.fontFamilyClass} text-4xl md:text-5xl text-center leading-snug`}
+            style={{ color: typography.textColor ?? '#1A1A1A' }}
+          >
             {children}
           </blockquote>
         </div>
@@ -80,9 +114,32 @@ function createComponents(isFirstParagraph: { current: boolean }): PortableTextC
             target="_blank"
             rel="noopener noreferrer"
             className="underline hover:no-underline text-[#1A1A1A]"
+            style={{ color: typography.textColor ?? '#1A1A1A' }}
           >
             {children}
           </a>
+        )
+      },
+      textStyle: ({ value, children }) => {
+        const fontFamilyValue =
+          typeof value?.fontFamily === 'string' ? value.fontFamily : undefined
+        const fontSizeValue = typeof value?.fontSize === 'number' ? value.fontSize : undefined
+        const color = normalizeHexColor(value?.textColor)
+
+        const className = [fontFamilyValue ? inlineFontClassByValue[fontFamilyValue] : '']
+          .filter(Boolean)
+          .join(' ')
+
+        return (
+          <span
+            className={className || undefined}
+            style={{
+              ...(color ? { color } : {}),
+              ...(fontSizeValue ? { fontSize: `${fontSizeValue}px` } : {}),
+            }}
+          >
+            {children}
+          </span>
         )
       },
     },
@@ -203,10 +260,10 @@ function createComponents(isFirstParagraph: { current: boolean }): PortableTextC
             const fullUrl =
               img?.asset && originalWidth && originalHeight
                 ? (() => {
-                    const targetWidth = 2000
-                    const targetHeight = Math.max(1, Math.round((targetWidth * originalHeight) / originalWidth))
-                    return urlFor(img).width(targetWidth).height(targetHeight).quality(90).url()
-                  })()
+                  const targetWidth = 2000
+                  const targetHeight = Math.max(1, Math.round((targetWidth * originalHeight) / originalWidth))
+                  return urlFor(img).width(targetWidth).height(targetHeight).quality(90).url()
+                })()
                 : urlFor(img).width(2000).height(1334).quality(90).url()
 
             const id = (img as { _key?: string })._key ?? `grid-img-${i}`
@@ -258,15 +315,30 @@ function createComponents(isFirstParagraph: { current: boolean }): PortableTextC
 
 interface ArticleBodyProps {
   value: unknown
+  fontFamilyClass?: string
+  bodySizeClass?: string
+  textColor?: string
 }
 
-export function ArticleBody({ value }: ArticleBodyProps) {
+export function ArticleBody({
+  value,
+  fontFamilyClass = 'font-serif',
+  bodySizeClass = 'text-[20px] md:text-[22px]',
+  textColor,
+}: ArticleBodyProps) {
   const isFirstParagraph = { current: true }
   if (!value || !Array.isArray(value)) return null
   return (
     <div className="w-full">
       <article className="overflow-x-visible">
-        <PortableText value={value} components={createComponents(isFirstParagraph)} />
+        <PortableText
+          value={value}
+          components={createComponents(isFirstParagraph, {
+            fontFamilyClass,
+            bodySizeClass,
+            textColor,
+          })}
+        />
       </article>
     </div>
   )

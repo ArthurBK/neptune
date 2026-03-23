@@ -6,6 +6,7 @@ import { urlFor } from '@/sanity/lib/image'
 import { AD_BANNER_BY_PLACEMENT_QUERY, ARTICLE_BY_SLUG_QUERY } from '@/sanity/lib/queries'
 
 import { articleTitleSingleLine } from '@/lib/articleTitle'
+import { resolveArticleTypography, type ArticleTypography } from '@/lib/articleTypography'
 import { formatPersonName } from '@/lib/personName'
 import {
   relatedArticlesFromSanity,
@@ -27,7 +28,7 @@ export const revalidate = 86400
 
 export async function generateStaticParams() {
   const slugs = await client.fetch<{ slug: string }[]>(
-    `*[_type == "article" && category == "interiors"] { "slug": slug.current }`
+    `*[_type == "article" && (category == "interiors" || "interiors" in categories)] { "slug": slug.current }`
   )
   return slugs.map((s) => ({ slug: s.slug }))
 }
@@ -62,6 +63,7 @@ export default async function InteriorsArticlePage({ params }: ArticlePageProps)
     : null
 
   const relatedArticles = relatedArticlesFromSanity(article.relatedArticles)
+  const typography = resolveArticleTypography(article.typography)
   const publishedDate = article.publishedAt
     ? new Date(article.publishedAt).toLocaleDateString('en-GB', {
         day: '2-digit',
@@ -80,7 +82,10 @@ export default async function InteriorsArticlePage({ params }: ArticlePageProps)
               {article.subcategory}
             </p>
           )}
-          <h1 className="mx-auto max-w-3xl whitespace-pre-line font-serif text-4xl leading-tight tracking-tight text-black md:text-5xl lg:text-6xl">
+          <h1
+            className={`mx-auto max-w-3xl whitespace-pre-line leading-tight tracking-tight ${typography.fontFamilyClass} ${typography.titleSizeClass}`}
+            style={{ color: typography.textColor ?? '#000000' }}
+          >
             {article.title}
           </h1>
           <div className="mt-4 flex flex-col items-center gap-1 text-sm text-black/80">
@@ -138,7 +143,12 @@ export default async function InteriorsArticlePage({ params }: ArticlePageProps)
 
         {/* Article body — text → 3 images row → text → full-width hero → repeat */}
         <div className="pt-2 pb-4">
-          <ArticleBody value={article.body} />
+          <ArticleBody
+            value={article.body}
+            fontFamilyClass={typography.fontFamilyClass}
+            bodySizeClass={typography.bodySizeClass}
+            textColor={typography.textColor}
+          />
         </div>
 
         {/* Ad banner mid */}
@@ -207,6 +217,7 @@ type ArticleData = {
   slug: { current: string }
   category: string
   publishedAt?: string | null
+  typography?: ArticleTypography | null
   subcategory?: string | null
   linkedIssue?: string | null
   coverImage?: { asset?: { _ref: string }; alt?: string; caption?: unknown }

@@ -43,7 +43,7 @@ export default async function InteriorsPage() {
   ])
 
   const typedArticles = articles as ArticleCardData[]
-  const orderedArticles = (categoryPage?.interiorsArticles ?? []).filter((article) => article?.category === 'interiors')
+  const orderedArticles = (categoryPage?.interiorsArticles ?? []).filter((article) => article?.category === 'interiors' || article?.categories?.includes('interiors'))
   const displayArticles = orderedArticles.length > 0 ? orderedArticles : typedArticles
 
   return (
@@ -93,6 +93,7 @@ type ArticleCardData = {
   title: string
   slug: string
   category: string
+  categories?: string[] | null
   subcategory?: string | null
   coverImage: { asset?: { _ref: string }; alt?: string }
   author?: { name: string; slug: string } | null

@@ -41,7 +41,7 @@ export default async function ArtsPage() {
   ])
 
   const typedArticles = articles as ArticleCardData[]
-  const orderedArticles = (categoryPage?.artsArticles ?? []).filter((article) => article?.category === 'arts')
+  const orderedArticles = (categoryPage?.artsArticles ?? []).filter((article) => article?.category === 'arts' || article?.categories?.includes('arts'))
   const displayArticles = orderedArticles.length > 0 ? orderedArticles : typedArticles
 
   return (
@@ -91,6 +91,7 @@ type ArticleCardData = {
   title: string
   slug: string
   category: string
+  categories?: string[] | null
   subcategory?: string | null
   coverImage: { asset?: { _ref: string }; alt?: string }
   author?: { name: string; slug: string } | null
