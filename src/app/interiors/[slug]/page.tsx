@@ -27,7 +27,7 @@ export const revalidate = 86400
 
 export async function generateStaticParams() {
   const slugs = await client.fetch<{ slug: string }[]>(
-    `*[_type == "article" && (category == "interiors" || "interiors" in categories)] { "slug": slug.current }`
+    `*[_type == "article" && category == "interiors"] { "slug": slug.current }`
   )
   return slugs.map((s) => ({ slug: s.slug }))
 }

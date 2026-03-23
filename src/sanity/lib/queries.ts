@@ -9,8 +9,7 @@ export const HOME_PAGE_QUERY = `
           _id,
           title,
           "slug": slug.current,
-          "category": coalesce(category, categories[0]),
-          categories,
+          category,
           coverImage,
           "author": author->{ name, "slug": slug.current }
         }
@@ -61,8 +60,7 @@ export const FEATURED_ARTICLES_HOME_QUERY = `
     _id,
     title,
     "slug": slug.current,
-    "category": coalesce(category, categories[0]),
-    categories,
+    category,
     coverImage,
     "author": author->{ name, "slug": slug.current }
   }
@@ -70,12 +68,11 @@ export const FEATURED_ARTICLES_HOME_QUERY = `
 
 // Articles by category (for category landing pages)
 export const ARTICLES_BY_CATEGORY_QUERY = `
-  *[_type == "article" && (category == $category || $category in categories)] | order(publishedAt desc) {
+  *[_type == "article" && category == $category] | order(publishedAt desc) {
     _id,
     title,
     "slug": slug.current,
-    "category": coalesce(category, categories[0]),
-    categories,
+    category,
     subcategory,
     coverImage,
     publishedAt,
@@ -85,13 +82,12 @@ export const ARTICLES_BY_CATEGORY_QUERY = `
 
 // Single article by slug and category
 export const ARTICLE_BY_SLUG_QUERY = `
-  *[_type == "article" && slug.current == $slug && (category == $category || $category in categories)][0] {
+  *[_type == "article" && slug.current == $slug && category == $category][0] {
     ...,
-    "category": coalesce(category, categories[0]),
     "author": author->{ name, "slug": slug.current, bio, portrait },
     "photographer": photographer->{ name, "slug": slug.current },
     "affiliateProducts": affiliateProducts[]->{ _id, title, brand, price, image, affiliateUrl },
-    "relatedArticles": relatedArticles[]->{ _id, title, "slug": slug.current, "category": coalesce(category, categories[0]), categories, subcategory, coverImage, "author": author->{ name, "slug": slug.current } },
+    "relatedArticles": relatedArticles[]->{ _id, title, "slug": slug.current, category, subcategory, coverImage, "author": author->{ name, "slug": slug.current } },
     "body": body[] {
       ...,
       _type == "pteImageBlock" => {
@@ -118,7 +114,7 @@ export const ARTICLE_BY_SLUG_QUERY = `
 
 // Article slugs for generateStaticParams
 export const ARTICLE_SLUGS_BY_CATEGORY_QUERY = `
-  *[_type == "article" && (category == $category || $category in categories)] { "slug": slug.current }
+  *[_type == "article" && category == $category] { "slug": slug.current }
 `
 
 // All affiliate products (for neptune market)
@@ -172,8 +168,7 @@ export const ARTICLES_SEARCH_QUERY = `
     _id,
     title,
     "slug": slug.current,
-    "category": coalesce(category, categories[0]),
-    categories,
+    category,
     coverImage,
     "author": author->{ name }
   }
@@ -256,8 +251,7 @@ export const ARTICLES_BY_CONTRIBUTOR_QUERY = `
     _id,
     title,
     "slug": slug.current,
-    "category": coalesce(category, categories[0]),
-    categories,
+    category,
     subcategory,
     coverImage,
     publishedAt,
@@ -270,8 +264,7 @@ export const ARTICLES_BY_PHOTOGRAPHER_QUERY = `
     _id,
     title,
     "slug": slug.current,
-    "category": coalesce(category, categories[0]),
-    categories,
+    category,
     subcategory,
     coverImage,
     publishedAt,
@@ -282,6 +275,42 @@ export const ARTICLES_BY_PHOTOGRAPHER_QUERY = `
 // Category page images (Interiors, Arts, Gardens, Fashion)
 export const CATEGORY_PAGE_QUERY = `
   *[_type == "categoryPage" && _id == "categoryPage"][0] {
+    "interiorsArticles": interiorsArticles[]->{
+      _id,
+      title,
+      "slug": slug.current,
+      category,
+      subcategory,
+      coverImage,
+      "author": author->{ name, "slug": slug.current }
+    },
+    "artsArticles": artsArticles[]->{
+      _id,
+      title,
+      "slug": slug.current,
+      category,
+      subcategory,
+      coverImage,
+      "author": author->{ name, "slug": slug.current }
+    },
+    "gardensArticles": gardensArticles[]->{
+      _id,
+      title,
+      "slug": slug.current,
+      category,
+      subcategory,
+      coverImage,
+      "author": author->{ name, "slug": slug.current }
+    },
+    "fashionArticles": fashionArticles[]->{
+      _id,
+      title,
+      "slug": slug.current,
+      category,
+      subcategory,
+      coverImage,
+      "author": author->{ name, "slug": slug.current }
+    },
     interiorsImage{asset, alt, caption, hotspot},
     artsImage{asset, alt, caption, hotspot},
     gardensImage{asset, alt, caption, hotspot},

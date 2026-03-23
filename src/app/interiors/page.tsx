@@ -32,21 +32,19 @@ export default async function InteriorsPage() {
       title?: string | null
     } | null>(AD_BANNER_BY_PLACEMENT_QUERY, { placement: 'category-top' }),
     sanityFetch<{
+      interiorsArticles?: ArticleCardData[] | null
+      artsArticles?: ArticleCardData[] | null
+      gardensArticles?: ArticleCardData[] | null
+      fashionArticles?: ArticleCardData[] | null
       interiorsImage?: { asset?: { _ref: string }; alt?: string; caption?: unknown } | null
       artsImage?: { asset?: { _ref: string }; alt?: string; caption?: unknown } | null
       gardensImage?: { asset?: { _ref: string }; alt?: string; caption?: unknown } | null
     } | null>(CATEGORY_PAGE_QUERY),
   ])
 
-  const typedArticles = articles as Array<{
-    _id: string
-    title: string
-    slug: string
-    category: string
-    subcategory?: string | null
-    coverImage: { asset?: { _ref: string }; alt?: string }
-    author?: { name: string; slug: string } | null
-  }>
+  const typedArticles = articles as ArticleCardData[]
+  const orderedArticles = (categoryPage?.interiorsArticles ?? []).filter((article) => article?.category === 'interiors')
+  const displayArticles = orderedArticles.length > 0 ? orderedArticles : typedArticles
 
   return (
     <main>
@@ -76,7 +74,7 @@ export default async function InteriorsPage() {
         </header>
 
         {/* Article grid */}
-        <ArticleGrid articles={typedArticles} size="compact" featuredLayout unoptimizedImages />
+        <ArticleGrid articles={displayArticles} size="compact" featuredLayout unoptimizedImages />
 
         {/* Newsstand CTA */}
         <div className="my-10 md:my-14">
@@ -88,4 +86,14 @@ export default async function InteriorsPage() {
       <CategoryPageImage image={categoryPage?.interiorsImage} />
     </main>
   )
+}
+
+type ArticleCardData = {
+  _id: string
+  title: string
+  slug: string
+  category: string
+  subcategory?: string | null
+  coverImage: { asset?: { _ref: string }; alt?: string }
+  author?: { name: string; slug: string } | null
 }

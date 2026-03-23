@@ -1,5 +1,5 @@
 import { DocumentTextIcon } from '@sanity/icons'
-import { defineField, defineType } from 'sanity'
+import { defineArrayMember, defineField, defineType } from 'sanity'
 import { captionRichTextType } from './lib/captionRichText'
 
 export const categoryPage = defineType({
@@ -8,6 +8,54 @@ export const categoryPage = defineType({
   type: 'document',
   icon: DocumentTextIcon,
   fields: [
+    defineField({
+      name: 'interiorsArticles',
+      title: 'Interiors — articles (drag to reorder)',
+      type: 'array',
+      of: [
+        defineArrayMember({
+          type: 'reference',
+          to: [{ type: 'article' }],
+        }),
+      ],
+      validation: (rule) => rule.unique(),
+    }),
+    defineField({
+      name: 'artsArticles',
+      title: 'Arts — articles (drag to reorder)',
+      type: 'array',
+      of: [
+        defineArrayMember({
+          type: 'reference',
+          to: [{ type: 'article' }],
+        }),
+      ],
+      validation: (rule) => rule.unique(),
+    }),
+    defineField({
+      name: 'gardensArticles',
+      title: 'Gardens — articles (drag to reorder)',
+      type: 'array',
+      of: [
+        defineArrayMember({
+          type: 'reference',
+          to: [{ type: 'article' }],
+        }),
+      ],
+      validation: (rule) => rule.unique(),
+    }),
+    defineField({
+      name: 'fashionArticles',
+      title: 'Fashion — articles (drag to reorder)',
+      type: 'array',
+      of: [
+        defineArrayMember({
+          type: 'reference',
+          to: [{ type: 'article' }],
+        }),
+      ],
+      validation: (rule) => rule.unique(),
+    }),
     defineField({
       name: 'interiorsImage',
       title: 'Interiors — bottom image',

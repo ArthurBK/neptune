@@ -30,21 +30,19 @@ export default async function GardensPage() {
       title?: string | null
     } | null>(AD_BANNER_BY_PLACEMENT_QUERY, { placement: 'category-top' }),
     sanityFetch<{
+      interiorsArticles?: ArticleCardData[] | null
+      artsArticles?: ArticleCardData[] | null
+      gardensArticles?: ArticleCardData[] | null
+      fashionArticles?: ArticleCardData[] | null
       interiorsImage?: { asset?: { _ref: string }; alt?: string; caption?: unknown } | null
       artsImage?: { asset?: { _ref: string }; alt?: string; caption?: unknown } | null
       gardensImage?: { asset?: { _ref: string }; alt?: string; caption?: unknown } | null
     } | null>(CATEGORY_PAGE_QUERY),
   ])
 
-  const typedArticles = articles as Array<{
-    _id: string
-    title: string
-    slug: string
-    category: string
-    subcategory?: string | null
-    coverImage: { asset?: { _ref: string }; alt?: string }
-    author?: { name: string; slug: string } | null
-  }>
+  const typedArticles = articles as ArticleCardData[]
+  const orderedArticles = (categoryPage?.gardensArticles ?? []).filter((article) => article?.category === 'gardens')
+  const displayArticles = orderedArticles.length > 0 ? orderedArticles : typedArticles
 
   return (
     <main>
@@ -74,7 +72,7 @@ export default async function GardensPage() {
 
         {/* Article list: one row per story (image left, text right) */}
         <section className="space-y-6 md:space-y-8 max-w-5xl mx-auto">
-          {typedArticles.map((article) => (
+          {displayArticles.map((article) => (
             <div key={article._id} className="max-w-4xl mx-auto">
               <ArticleCard
                 title={article.title}
@@ -102,4 +100,14 @@ export default async function GardensPage() {
       <CategoryPageImage image={categoryPage?.gardensImage} />
     </main>
   )
+}
+
+type ArticleCardData = {
+  _id: string
+  title: string
+  slug: string
+  category: string
+  subcategory?: string | null
+  coverImage: { asset?: { _ref: string }; alt?: string }
+  author?: { name: string; slug: string } | null
 }

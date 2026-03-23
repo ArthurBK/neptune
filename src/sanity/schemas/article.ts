@@ -191,21 +191,11 @@ export const article = defineType({
       validation: (rule) => rule.required(),
     }),
     defineField({
-      name: 'categories',
-      title: 'Categories',
-      type: 'array',
-      of: [defineArrayMember({ type: 'string' })],
-      options: { list: ARTICLE_CATEGORIES },
-      validation: (rule) => rule.required().min(1),
-      description: 'Select one or more categories this article belongs to.',
-    }),
-    defineField({
       name: 'category',
-      title: 'Legacy Category',
+      title: 'Category',
       type: 'string',
       options: { list: ARTICLE_CATEGORIES },
-      hidden: true,
-      readOnly: true,
+      validation: (rule) => rule.required(),
     }),
     defineField({
       name: 'subcategory',
@@ -318,14 +308,7 @@ export const article = defineType({
     }),
   ],
   preview: {
-    select: { title: 'title', categories: 'categories', legacyCategory: 'category', media: 'coverImage' },
-    prepare: ({ title, categories, legacyCategory, media }) => {
-      const categoryList = Array.isArray(categories)
-        ? categories.filter((value): value is string => typeof value === 'string' && value.length > 0)
-        : []
-      const subtitle = categoryList.length > 0 ? categoryList.join(', ') : (legacyCategory ?? '')
-      return { title, subtitle, media }
-    },
+    select: { title: 'title', subtitle: 'category', media: 'coverImage' },
   },
 })
 

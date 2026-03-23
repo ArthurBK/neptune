@@ -32,6 +32,10 @@ export default async function FashionPage() {
       title?: string | null
     } | null>(AD_BANNER_BY_PLACEMENT_QUERY, { placement: 'category-top' }),
     sanityFetch<{
+      interiorsArticles?: ArticleCardData[] | null
+      artsArticles?: ArticleCardData[] | null
+      gardensArticles?: ArticleCardData[] | null
+      fashionArticles?: ArticleCardData[] | null
       interiorsImage?: { asset?: { _ref: string }; alt?: string; caption?: unknown } | null
       artsImage?: { asset?: { _ref: string }; alt?: string; caption?: unknown } | null
       gardensImage?: { asset?: { _ref: string }; alt?: string; caption?: unknown } | null
@@ -39,15 +43,9 @@ export default async function FashionPage() {
     } | null>(CATEGORY_PAGE_QUERY),
   ])
 
-  const typedArticles = articles as Array<{
-    _id: string
-    title: string
-    slug: string
-    category: string
-    subcategory?: string | null
-    coverImage: { asset?: { _ref: string }; alt?: string }
-    author?: { name: string; slug: string } | null
-  }>
+  const typedArticles = articles as ArticleCardData[]
+  const orderedArticles = (categoryPage?.fashionArticles ?? []).filter((article) => article?.category === 'fashion')
+  const displayArticles = orderedArticles.length > 0 ? orderedArticles : typedArticles
 
   return (
     <main>
@@ -77,7 +75,7 @@ export default async function FashionPage() {
         </header>
 
         {/* Article grid */}
-        <ArticleGrid articles={typedArticles} size="compact" featuredLayout unoptimizedImages />
+        <ArticleGrid articles={displayArticles} size="compact" featuredLayout unoptimizedImages />
 
         {/* Newsstand CTA */}
         <div className="my-10 md:my-14">
@@ -89,4 +87,14 @@ export default async function FashionPage() {
       <CategoryPageImage image={categoryPage?.fashionImage} />
     </main>
   )
+}
+
+type ArticleCardData = {
+  _id: string
+  title: string
+  slug: string
+  category: string
+  subcategory?: string | null
+  coverImage: { asset?: { _ref: string }; alt?: string }
+  author?: { name: string; slug: string } | null
 }
