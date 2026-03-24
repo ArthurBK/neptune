@@ -105,6 +105,19 @@ export const categoryPage = defineType({
       description: 'Only fashion articles should be added here.',
     }),
     defineField({
+      name: 'travelArticles',
+      title: 'Travel — articles (drag to reorder)',
+      type: 'array',
+      of: [
+        defineArrayMember({
+          type: 'reference',
+          to: [{ type: 'article' }],
+        }),
+      ],
+      validation: categoryArticlesValidation('travel'),
+      description: 'Only travel articles should be added here.',
+    }),
+    defineField({
       name: 'interiorsImage',
       title: 'Interiors — bottom image',
       type: 'image',
@@ -143,6 +156,17 @@ export const categoryPage = defineType({
       type: 'image',
       options: { hotspot: true },
       description: 'Full-screen image shown at the bottom of the Fashion page',
+      fields: [
+        { name: 'alt', title: 'Alt text', type: 'string' },
+        defineField({ name: 'caption', title: 'Caption', ...captionRichTextType }),
+      ],
+    }),
+    defineField({
+      name: 'travelImage',
+      title: 'Travel — bottom image',
+      type: 'image',
+      options: { hotspot: true },
+      description: 'Full-screen image shown at the bottom of the Travel page',
       fields: [
         { name: 'alt', title: 'Alt text', type: 'string' },
         defineField({ name: 'caption', title: 'Caption', ...captionRichTextType }),

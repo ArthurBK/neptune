@@ -162,6 +162,7 @@ const ARTICLE_CATEGORIES = [
   { title: 'Gardens', value: 'gardens' },
   { title: 'Arts', value: 'arts' },
   { title: 'Fashion', value: 'fashion' },
+  { title: 'Travel', value: 'travel' },
 ]
 
 const ARTICLE_FONT_FAMILIES = [

@@ -64,7 +64,11 @@ export function MarketPageContent({ products }: MarketPageContentProps) {
           <p className="mt-4 text-base text-black text-center max-w-2xl mx-auto">
             Discover our curated shopping edit, featuring a variety of products, including books, objects of all kinds, furniture, and fashion gems that our editors adore and have on their wish lists (and soon, you will too!).
             <br />
-            <br /><span className="text-xs italic">Our editors independently curate all products featured on Neptune.<br />We may receive compensation from retailers and/or from purchases of products through these links.</span>
+            <br />
+            <span className="text-xs italic leading-[1.1]">
+              <span className="block">Our editors independently curate all products featured on Neptune.</span>
+              <span className="block">We may receive compensation from retailers and/or from purchases of products through these links.</span>
+            </span>
           </p>
         </header>
 

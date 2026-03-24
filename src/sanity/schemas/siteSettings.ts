@@ -61,6 +61,44 @@ export const siteSettings = defineType({
       group: 'content',
     }),
     defineField({
+      name: 'aboutImageLeft',
+      title: 'About Image (Left)',
+      type: 'image',
+      options: { hotspot: true },
+      group: 'content',
+      fields: [
+        defineField({
+          name: 'alt',
+          title: 'Alt text',
+          type: 'string',
+        }),
+        defineField({
+          name: 'caption',
+          title: 'Caption',
+          ...captionRichTextType,
+        }),
+      ],
+    }),
+    defineField({
+      name: 'aboutImageRight',
+      title: 'About Image (Right)',
+      type: 'image',
+      options: { hotspot: true },
+      group: 'content',
+      fields: [
+        defineField({
+          name: 'alt',
+          title: 'Alt text',
+          type: 'string',
+        }),
+        defineField({
+          name: 'caption',
+          title: 'Caption',
+          ...captionRichTextType,
+        }),
+      ],
+    }),
+    defineField({
       name: 'contactEmail',
       title: 'Contact Email',
       type: 'string',

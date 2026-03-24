@@ -35,13 +35,15 @@ export default async function ContributorsPage() {
   ].sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: 'base' }))
 
   return (
-    <main className="pb-20 md:pb-28">
-      <div className="mx-auto max-w-[1400px] px-6 md:px-12 lg:px-16 pt-10 md:pt-14">
-        <header className="mb-14 md:mb-20 text-center">
-          <h1 className="font-serif text-4xl font-bold uppercase tracking-[0.12em] text-[color:var(--neptune-red)] md:text-5xl lg:text-6xl">
+    <main>
+      <div className="max-w-7xl mx-auto px-6 md:px-12 lg:px-16 pt-4 md:pt-8 pb-6 md:pb-10">
+        <div className="mx-auto mb-6 md:mb-8 h-px w-1/3 max-w-md bg-(--neptune-logo-red)" />
+
+        <header className="mb-6 md:mb-12 text-center font-futura">
+          <h1 className="font-serif font-bold text-3xl md:text-4xl text-[#1A1A1A] uppercase tracking-wide">
             Contributors
           </h1>
-          <p className="mx-auto mt-8 max-w-3xl font-header text-base font-normal leading-relaxed text-black md:text-lg">
+          <p className="mt-2 text-sm md:text-[15px] text-black max-w-2xl mx-auto whitespace-pre-line font-[Helvetica,Arial,sans-serif]">
             Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor
             incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud
             exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure
@@ -50,13 +52,14 @@ export default async function ContributorsPage() {
         </header>
 
         {entries.length > 0 ? (
-          <div className="grid grid-cols-1 gap-x-10 gap-y-10 sm:grid-cols-2 lg:grid-cols-4 lg:gap-x-12 lg:gap-y-14">
+          <section className="max-w-5xl mx-auto">
+            <div className="grid grid-cols-1 gap-x-10 gap-y-10 sm:grid-cols-2 lg:grid-cols-4 lg:gap-x-12 lg:gap-y-14">
             {entries.map((person) => (
               <div key={`${person.href}-${person._id}`} className="text-left">
-                <p className="font-header text-[15px] font-normal leading-[1.65] text-black md:text-base">
+                <p className="font-serif text-[15px] font-normal leading-[1.65] text-black md:text-base">
                   <Link
                     href={person.href}
-                    className="font-serif font-bold uppercase tracking-[0.06em] text-[color:var(--neptune-red)] hover:underline underline-offset-2"
+                    className="font-serif font-bold uppercase tracking-[0.06em] text-(--neptune-red) hover:underline underline-offset-2"
                   >
                     {person.name}
                   </Link>
@@ -69,14 +72,15 @@ export default async function ContributorsPage() {
                 </p>
               </div>
             ))}
-          </div>
+            </div>
+          </section>
         ) : (
           <p className="text-center text-[#6B6B6B]">No contributors yet.</p>
         )}
-      </div>
 
-      <div className="mt-20 md:mt-28">
-        <NewsstandCta />
+        <div className="my-10 md:my-14">
+          <NewsstandCta />
+        </div>
       </div>
     </main>
   )

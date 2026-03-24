@@ -16,14 +16,16 @@ const CATEGORY_DESCRIPTION: Record<string, string> = {
   interiors:
     'Explore the world of interior design through the lens of renowned designers, architects, and tastemakers. From intimate at-home conversations to grand architectural statements.',
   gardens:
-    'Discover landscapes, outdoor spaces, and the art of garden design. Stories from the world\'s most inspiring outdoor environments.',
+    "Discover landscapes, outdoor spaces, and the art of garden design.\nStories from the world's most inspiring outdoor environments.",
   arts:
     'Art, culture, and the creative forces that define our visual world.',
+  travel:
+    'Journeys, destinations, and stories from inspiring places around the world.',
 }
 
-export default async function ArtsPage() {
+export default async function TravelPage() {
   const [articles, adBanner, categoryPage] = await Promise.all([
-    sanityFetch<unknown[]>(ARTICLES_BY_CATEGORY_QUERY, { category: 'arts' }),
+    sanityFetch<unknown[]>(ARTICLES_BY_CATEGORY_QUERY, { category: 'travel' }),
     sanityFetch<{
       image: { asset?: { _ref: string } }
       linkUrl?: string | null
@@ -34,19 +36,22 @@ export default async function ArtsPage() {
       artsArticles?: ArticleCardData[] | null
       gardensArticles?: ArticleCardData[] | null
       fashionArticles?: ArticleCardData[] | null
+      travelArticles?: ArticleCardData[] | null
       interiorsImage?: { asset?: { _ref: string }; alt?: string; caption?: unknown } | null
       artsImage?: { asset?: { _ref: string }; alt?: string; caption?: unknown } | null
       gardensImage?: { asset?: { _ref: string }; alt?: string; caption?: unknown } | null
+      fashionImage?: { asset?: { _ref: string }; alt?: string; caption?: unknown } | null
+      travelImage?: { asset?: { _ref: string }; alt?: string; caption?: unknown } | null
     } | null>(CATEGORY_PAGE_QUERY),
   ])
 
   const typedArticles = articles as ArticleCardData[]
-  const orderedArticles = (categoryPage?.artsArticles ?? []).filter((article) => article?.category === 'arts' || article?.categories?.includes('arts'))
+  const orderedArticles = (categoryPage?.travelArticles ?? []).filter((article) => article?.category === 'travel' || article?.categories?.includes('travel'))
   const displayArticles = orderedArticles.length > 0 ? orderedArticles : typedArticles
 
   return (
     <main>
-      <div className="max-w-7xl mx-auto px-6 md:px-12 lg:px-16 pt-4 md:pt-8 pb-6 md:pb-10">
+      <div className="max-w-7xl mx-auto px-6 md:px-12 lg:px-16 pt-4 md:pt-8">
         {/* Ad banner */}
         {adBanner?.image && (
           <div className="mb-12 md:mb-16">
@@ -58,16 +63,15 @@ export default async function ArtsPage() {
             />
           </div>
         )}
-
         <div className="mx-auto mb-6 md:mb-8 h-px w-1/3 max-w-md bg-(--neptune-logo-red)" />
 
         {/* Category header */}
         <header className="mb-6 md:mb-12 text-center font-futura">
           <h1 className="font-serif font-bold text-3xl md:text-4xl text-[#1A1A1A] uppercase tracking-wide">
-            Arts
+            Travel
           </h1>
           <p className="mt-2 text-sm md:text-[15px] text-black max-w-2xl mx-auto whitespace-pre-line font-[Helvetica,Arial,sans-serif]">
-            {CATEGORY_DESCRIPTION.arts}
+            {CATEGORY_DESCRIPTION.travel}
           </p>
         </header>
 
@@ -98,7 +102,7 @@ export default async function ArtsPage() {
       </div>
 
       {/* Category page image — fullscreen */}
-      <CategoryPageImage image={categoryPage?.artsImage} />
+      <CategoryPageImage image={categoryPage?.travelImage} />
     </main>
   )
 }

@@ -278,7 +278,7 @@ export const ARTICLES_BY_PHOTOGRAPHER_QUERY = `
   }
 `
 
-// Category page images (Interiors, Arts, Gardens, Fashion)
+// Category page images (Interiors, Arts, Gardens, Fashion, Travel)
 export const CATEGORY_PAGE_QUERY = `
   *[_type == "categoryPage" && _id == "categoryPage"][0] {
     "interiorsArticles": interiorsArticles[]->{
@@ -321,10 +321,21 @@ export const CATEGORY_PAGE_QUERY = `
       coverImage,
       "author": author->{ name, "slug": slug.current }
     },
+    "travelArticles": travelArticles[]->{
+      _id,
+      title,
+      "slug": slug.current,
+      "category": coalesce(category, categories[0]),
+      categories,
+      subcategory,
+      coverImage,
+      "author": author->{ name, "slug": slug.current }
+    },
     interiorsImage{asset, alt, caption, hotspot},
     artsImage{asset, alt, caption, hotspot},
     gardensImage{asset, alt, caption, hotspot},
-    fashionImage{asset, alt, caption, hotspot}
+    fashionImage{asset, alt, caption, hotspot},
+    travelImage{asset, alt, caption, hotspot}
   }
 `
 
@@ -335,6 +346,9 @@ export const SITE_SETTINGS_QUERY = `
     newsletterSubtitle,
     newsletterImage,
     newsletterImageLegend,
+    aboutText,
+    aboutImageLeft{asset, alt, caption, hotspot},
+    aboutImageRight{asset, alt, caption, hotspot},
     instagramUrl
   }
 `

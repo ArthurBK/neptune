@@ -6,7 +6,7 @@ import {
 } from '@/sanity/lib/queries'
 
 import { AdBanner } from '@/components/shared/AdBanner'
-import { ArticleGrid } from '@/components/editorial/ArticleGrid'
+import { ArticleCard } from '@/components/editorial/ArticleCard'
 import { CategoryPageImage } from '@/components/shared/CategoryPageImage'
 import { NewsstandCta } from '@/components/shared/NewsstandCta'
 
@@ -73,8 +73,25 @@ export default async function InteriorsPage() {
           </p>
         </header>
 
-        {/* Article grid */}
-        <ArticleGrid articles={displayArticles} size="compact" featuredLayout unoptimizedImages />
+        {/* Article list: one row per story (image left, text right) */}
+        <section className="space-y-6 md:space-y-8 max-w-5xl mx-auto">
+          {displayArticles.map((article) => (
+            <div key={article._id} className="max-w-4xl mx-auto">
+              <ArticleCard
+                title={article.title}
+                slug={article.slug}
+                category={article.category}
+                subcategory={article.subcategory}
+                coverImage={article.coverImage}
+                author={article.author}
+                horizontal
+                unoptimized
+                imageFit="contain"
+                titleClassName="text-lg md:text-2xl leading-tight"
+              />
+            </div>
+          ))}
+        </section>
 
         {/* Newsstand CTA */}
         <div className="my-10 md:my-14">

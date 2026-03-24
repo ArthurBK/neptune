@@ -18,7 +18,8 @@ const NAV_ITEMS = [
   { label: 'GARDENS', href: '/gardens' },
   { label: 'ARTS', href: '/arts' },
   { label: 'FASHION', href: '/fashion' },
-  { label: 'neptune market', href: '/the-market' },
+  { label: 'TRAVEL', href: '/travel' },
+  { label: 'shop', href: '/the-market' },
 ] as const
 
 function NavLink({
@@ -117,9 +118,8 @@ export function Header({ transparent: _transparent }: { transparent?: boolean } 
   // Keep header transparent until client mount to prevent a white flash.
   const hasSolidBg = pathname == null ? false : !isHomePage
   const lightText = isHomePage && variant === 'dark'
-  const headerClass = `fixed left-0 right-0 top-0 z-50 w-full flex flex-col border-b shrink-0 ${
-    isHomePage ? '' : 'transition-colors'
-  }`
+  const headerClass = `fixed left-0 right-0 top-0 z-50 w-full flex flex-col border-b shrink-0 ${isHomePage ? '' : 'transition-colors'
+    }`
   const headerStyle: CSSProperties = {
     height: 'var(--header-height)',
     minHeight: 'var(--header-height)',

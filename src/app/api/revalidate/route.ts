@@ -7,7 +7,7 @@ import { revalidatePath } from 'next/cache'
 import { type NextRequest, NextResponse } from 'next/server'
 import { parseBody } from 'next-sanity/webhook'
 
-const CATEGORY_SLUGS = ['interiors', 'arts', 'gardens', 'fashion'] as const
+const CATEGORY_SLUGS = ['interiors', 'arts', 'gardens', 'fashion', 'travel'] as const
 
 type WebhookBody = {
   _type?: string
