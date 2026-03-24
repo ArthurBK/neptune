@@ -12,16 +12,8 @@ import { NewsstandCta } from '@/components/shared/NewsstandCta'
 
 export const revalidate = 3600
 
-const CATEGORY_DESCRIPTION: Record<string, string> = {
-  interiors:
-    'Explore the world of interior design through the lens of renowned designers, architects, and tastemakers. From intimate at-home conversations to grand architectural statements.',
-  gardens:
-    "Discover landscapes, outdoor spaces, and the art of garden design.\nStories from the world's most inspiring outdoor environments.",
-  arts:
-    'Art, culture, and the creative forces that define our visual world.',
-  travel:
-    'Journeys, destinations, and stories from inspiring places around the world.',
-}
+const DEFAULT_TRAVEL_DESCRIPTION =
+  'Journeys, destinations, and stories from inspiring places around the world.'
 
 export default async function TravelPage() {
   const [articles, adBanner, categoryPage] = await Promise.all([
@@ -32,6 +24,7 @@ export default async function TravelPage() {
       title?: string | null
     } | null>(AD_BANNER_BY_PLACEMENT_QUERY, { placement: 'category-top' }),
     sanityFetch<{
+      travelDescription?: string | null
       interiorsArticles?: ArticleCardData[] | null
       artsArticles?: ArticleCardData[] | null
       gardensArticles?: ArticleCardData[] | null
@@ -48,6 +41,7 @@ export default async function TravelPage() {
   const typedArticles = articles as ArticleCardData[]
   const orderedArticles = (categoryPage?.travelArticles ?? []).filter((article) => article?.category === 'travel' || article?.categories?.includes('travel'))
   const displayArticles = orderedArticles.length > 0 ? orderedArticles : typedArticles
+  const travelDescription = categoryPage?.travelDescription?.trim() || DEFAULT_TRAVEL_DESCRIPTION
 
   return (
     <main>
@@ -71,7 +65,7 @@ export default async function TravelPage() {
             Travel
           </h1>
           <p className="mt-2 text-sm md:text-[15px] text-black max-w-2xl mx-auto whitespace-pre-line font-[Helvetica,Arial,sans-serif]">
-            {CATEGORY_DESCRIPTION.travel}
+            {travelDescription}
           </p>
         </header>
 

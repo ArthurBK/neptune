@@ -12,14 +12,8 @@ import { NewsstandCta } from '@/components/shared/NewsstandCta'
 
 export const revalidate = 3600
 
-const CATEGORY_DESCRIPTION: Record<string, string> = {
-  interiors:
-    'Explore the world of interior design through the lens of renowned designers, architects, and tastemakers. From intimate at-home conversations to grand architectural statements.',
-  gardens:
-    'Discover landscapes, outdoor spaces, and the art of garden design.\nStories from the world\'s most inspiring outdoor environments.',
-  arts:
-    'Art, culture, and the creative forces that define our visual world.',
-}
+const DEFAULT_GARDENS_DESCRIPTION =
+  'Discover landscapes, outdoor spaces, and the art of garden design.\nStories from the world\'s most inspiring outdoor environments.'
 
 export default async function GardensPage() {
   const [articles, adBanner, categoryPage] = await Promise.all([
@@ -30,6 +24,7 @@ export default async function GardensPage() {
       title?: string | null
     } | null>(AD_BANNER_BY_PLACEMENT_QUERY, { placement: 'category-top' }),
     sanityFetch<{
+      gardensDescription?: string | null
       interiorsArticles?: ArticleCardData[] | null
       artsArticles?: ArticleCardData[] | null
       gardensArticles?: ArticleCardData[] | null
@@ -43,6 +38,7 @@ export default async function GardensPage() {
   const typedArticles = articles as ArticleCardData[]
   const orderedArticles = (categoryPage?.gardensArticles ?? []).filter((article) => article?.category === 'gardens' || article?.categories?.includes('gardens'))
   const displayArticles = orderedArticles.length > 0 ? orderedArticles : typedArticles
+  const gardensDescription = categoryPage?.gardensDescription?.trim() || DEFAULT_GARDENS_DESCRIPTION
 
   return (
     <main>
@@ -66,7 +62,7 @@ export default async function GardensPage() {
             Gardens
           </h1>
           <p className="mt-2 text-sm md:text-[15px] text-black max-w-2xl mx-auto whitespace-pre-line font-[Helvetica,Arial,sans-serif]">
-            {CATEGORY_DESCRIPTION.gardens}
+            {gardensDescription}
           </p>
         </header>
 

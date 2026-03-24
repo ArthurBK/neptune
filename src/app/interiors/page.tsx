@@ -12,16 +12,8 @@ import { NewsstandCta } from '@/components/shared/NewsstandCta'
 
 export const revalidate = 3600
 
-const CATEGORY_DESCRIPTION: Record<string, string> = {
-  interiors:
-    'Explore the world of interior design through the lens of renowned designers, architects, and tastemakers. From intimate at-home conversations to grand architectural statements.',
-  gardens:
-    'Discover landscapes, outdoor spaces, and the art of garden design. Stories from the world\'s most inspiring outdoor environments.',
-  fashion:
-    'Fashion as expression—profiles, runway moments, and the people who shape how we dress.',
-  arts:
-    'Art, culture, and the creative forces that define our visual world.',
-}
+const DEFAULT_INTERIORS_DESCRIPTION =
+  'Explore the world of interior design through the lens of renowned designers, architects, and tastemakers. From intimate at-home conversations to grand architectural statements.'
 
 export default async function InteriorsPage() {
   const [articles, adBanner, categoryPage] = await Promise.all([
@@ -32,6 +24,7 @@ export default async function InteriorsPage() {
       title?: string | null
     } | null>(AD_BANNER_BY_PLACEMENT_QUERY, { placement: 'category-top' }),
     sanityFetch<{
+      interiorsDescription?: string | null
       interiorsArticles?: ArticleCardData[] | null
       artsArticles?: ArticleCardData[] | null
       gardensArticles?: ArticleCardData[] | null
@@ -45,6 +38,7 @@ export default async function InteriorsPage() {
   const typedArticles = articles as ArticleCardData[]
   const orderedArticles = (categoryPage?.interiorsArticles ?? []).filter((article) => article?.category === 'interiors' || article?.categories?.includes('interiors'))
   const displayArticles = orderedArticles.length > 0 ? orderedArticles : typedArticles
+  const interiorsDescription = categoryPage?.interiorsDescription?.trim() || DEFAULT_INTERIORS_DESCRIPTION
 
   return (
     <main>
@@ -69,7 +63,7 @@ export default async function InteriorsPage() {
             Interiors
           </h1>
           <p className="mt-2 text-sm md:text-[15px] text-black max-w-2xl mx-auto whitespace-pre-line font-[Helvetica,Arial,sans-serif]">
-            {CATEGORY_DESCRIPTION.interiors}
+            {interiorsDescription}
           </p>
         </header>
 

@@ -66,6 +66,13 @@ export const categoryPage = defineType({
       description: 'Only interiors articles should be added here.',
     }),
     defineField({
+      name: 'interiorsDescription',
+      title: 'Interiors — description',
+      type: 'text',
+      rows: 3,
+      description: 'Description text shown under the Interiors page title.',
+    }),
+    defineField({
       name: 'artsArticles',
       title: 'Arts — articles (drag to reorder)',
       type: 'array',
@@ -77,6 +84,13 @@ export const categoryPage = defineType({
       ],
       validation: categoryArticlesValidation('arts'),
       description: 'Only arts articles should be added here.',
+    }),
+    defineField({
+      name: 'artsDescription',
+      title: 'Arts — description',
+      type: 'text',
+      rows: 3,
+      description: 'Description text shown under the Arts page title.',
     }),
     defineField({
       name: 'gardensArticles',
@@ -92,6 +106,13 @@ export const categoryPage = defineType({
       description: 'Only gardens articles should be added here.',
     }),
     defineField({
+      name: 'gardensDescription',
+      title: 'Gardens — description',
+      type: 'text',
+      rows: 3,
+      description: 'Description text shown under the Gardens page title.',
+    }),
+    defineField({
       name: 'fashionArticles',
       title: 'Fashion — articles (drag to reorder)',
       type: 'array',
@@ -105,6 +126,13 @@ export const categoryPage = defineType({
       description: 'Only fashion articles should be added here.',
     }),
     defineField({
+      name: 'fashionDescription',
+      title: 'Fashion — description',
+      type: 'text',
+      rows: 3,
+      description: 'Description text shown under the Fashion page title.',
+    }),
+    defineField({
       name: 'travelArticles',
       title: 'Travel — articles (drag to reorder)',
       type: 'array',
@@ -116,6 +144,13 @@ export const categoryPage = defineType({
       ],
       validation: categoryArticlesValidation('travel'),
       description: 'Only travel articles should be added here.',
+    }),
+    defineField({
+      name: 'travelDescription',
+      title: 'Travel — description',
+      type: 'text',
+      rows: 3,
+      description: 'Description text shown under the Travel page title.',
     }),
     defineField({
       name: 'interiorsImage',
