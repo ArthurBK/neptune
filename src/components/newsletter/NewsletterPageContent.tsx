@@ -30,8 +30,8 @@ export function NewsletterPageContent({
     <main className="flex flex-col">
       {/* Title and text above the image */}
       <div className="flex flex-col items-center px-6 md:px-12 pt-5 md:pt-6 pb-6 md:pb-8 text-center">
-        <h1 className="font-serif text-2xl md:text-3xl text-[#1A1A1A] uppercase tracking-wide">
-          {headline ?? 'Newsletters'}
+        <h1 className="font-serif font-bold text-2xl md:text-3xl text-[#1A1A1A] uppercase tracking-wide">
+          {headline ?? 'Newsletter'}
         </h1>
         <div className="mt-4 w-full overflow-x-auto flex justify-center">
           <p className="text-base text-[#6B6B6B] whitespace-nowrap">
@@ -41,7 +41,7 @@ export function NewsletterPageContent({
         <button
           type="button"
           onClick={openModal}
-          className="mt-8 cursor-pointer bg-transparent font-header font-bold text-base tracking-[0.2em] uppercase text-black transition-colors hover:underline"
+          className="mt-8 cursor-pointer bg-transparent font-futura text-base tracking-[0.2em] uppercase text-black transition-colors hover:underline"
         >
           Subscribe
         </button>
@@ -61,7 +61,7 @@ export function NewsletterPageContent({
             />
           </div>
           {hasCaptionContent(imageLegend) && (
-            <p className="px-6 md:px-12 pt-1.5 pb-6 text-center text-xs italic text-[#6B6B6B]">
+            <p className="px-6 md:px-12 pt-1.5 pb-6 text-center text-xs italic text-black">
               <SanityCaption value={imageLegend} />
             </p>
           )}

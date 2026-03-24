@@ -33,12 +33,12 @@ export default async function NewsstandPage() {
 
   return (
     <main>
-      <div className="max-w-screen-xl mx-auto px-6 md:px-12 lg:px-16 pt-4 md:pt-8 pb-16 md:pb-24">
-        <header className="mb-8 md:mb-10 text-center">
-          <h1 className="font-serif text-2xl md:text-3xl text-[#1A1A1A] uppercase tracking-wide">
+      <div className="max-w-7xl mx-auto px-6 md:px-12 lg:px-16 pt-4 md:pt-8 pb-16 md:pb-24">
+        <header className="mb-6 md:mb-12 text-center font-futura">
+          <h1 className="font-serif font-bold text-3xl md:text-4xl text-[#1A1A1A] uppercase tracking-wide">
             Newsstand
           </h1>
-          <p className="mt-2 text-sm text-[#6B6B6B] max-w-xl mx-auto">
+          <p className="mt-2 text-sm md:text-[15px] text-black max-w-2xl mx-auto whitespace-pre-line font-[Helvetica,Arial,sans-serif]">
             Discover all available issues. Each magazine is available in
             multiple cover options.
           </p>

@@ -63,7 +63,7 @@ export default async function AboutPage() {
                     unoptimized
                   />
                 </div>
-                <figcaption className="mt-2 text-xs italic text-[#5F5F5F] leading-snug">
+                <figcaption className="mt-2 text-xs italic text-black text-center leading-snug">
                   <SanityCaption value={settings?.aboutImageLeft?.caption} />
                 </figcaption>
               </figure>
@@ -81,7 +81,7 @@ export default async function AboutPage() {
                     unoptimized
                   />
                 </div>
-                <figcaption className="mt-2 text-xs italic text-[#5F5F5F] leading-snug">
+                <figcaption className="mt-2 text-xs italic text-black text-center leading-snug">
                   <SanityCaption value={settings?.aboutImageRight?.caption} />
                 </figcaption>
               </figure>

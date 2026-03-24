@@ -7,7 +7,7 @@ import { CountrySelector } from '@/components/commerce/CountrySelector'
 const FOOTER_LINKS = [
   { label: 'ABOUT', href: '/about' },
   { label: 'CONTACT', href: '/contact' },
-  { label: 'ADVERTISING', href: '/contact#advertising' },
+  // { label: 'ADVERTISING', href: '/contact#advertising' },
 ] as const
 
 export function Footer({ instagramUrl }: { instagramUrl?: string | null }) {

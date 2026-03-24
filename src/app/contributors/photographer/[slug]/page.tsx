@@ -12,7 +12,7 @@ import {
 } from '@/sanity/lib/queries'
 
 import { AdBanner } from '@/components/shared/AdBanner'
-import { ArticleGrid } from '@/components/editorial/ArticleGrid'
+import { ArticleCard } from '@/components/editorial/ArticleCard'
 
 export const revalidate = 86400
 
@@ -67,7 +67,7 @@ export default async function PhotographerProfilePage({ params }: PageProps) {
 
   return (
     <main>
-      <div className="mx-auto max-w-screen-xl px-6 py-16 md:px-12 md:py-24 lg:px-16">
+      <div className="mx-auto max-w-screen-xl px-6 pt-8 pb-16 md:px-12 md:pt-12 md:pb-24 lg:px-16">
         <header className="mb-16 flex flex-col items-start gap-12 md:flex-row md:items-center md:gap-16">
           {portraitUrl && (
             <div className="aspect-[3/4] w-full max-w-md shrink-0 overflow-hidden bg-[#E5E5E5] md:w-[45%]">
@@ -83,14 +83,13 @@ export default async function PhotographerProfilePage({ params }: PageProps) {
             </div>
           )}
           <div className="min-w-0 flex-1">
-            <p className="mb-2 text-sm uppercase tracking-[0.2em] text-[#6B6B6B]">Photographer</p>
-            <h1 className="font-serif text-5xl leading-tight text-[#1A1A1A] md:text-6xl">
+            <h1 className="text-center font-serif text-3xl font-bold tracking-wide text-[#1A1A1A] md:text-4xl">
               {photographer.name}
             </h1>
             {photographer.location && (
               <p className="mt-2 text-base text-[#6B6B6B]">{photographer.location}</p>
             )}
-            <p className="mt-6 whitespace-pre-line leading-relaxed text-[#1A1A1A]">
+            <p className="mx-auto mt-6 max-w-2xl whitespace-pre-line text-center text-sm leading-relaxed text-[#1A1A1A] font-[Helvetica,Arial,sans-serif] md:text-[15px]">
               {photographer.bio}
             </p>
           </div>
@@ -106,23 +105,35 @@ export default async function PhotographerProfilePage({ params }: PageProps) {
           </div>
         )}
 
-        <section>
-          <h2 className="mb-8 font-serif text-3xl text-[#1A1A1A] md:text-4xl">
-            Photography by {photographer.name}
-          </h2>
+        <section className="mx-auto max-w-5xl space-y-6 md:space-y-8">
           {articles.length > 0 ? (
-            <ArticleGrid articles={articles} />
+            articles.map((article) => (
+              <div key={article._id} className="mx-auto max-w-4xl">
+                <ArticleCard
+                  title={article.title}
+                  slug={article.slug}
+                  category={article.category}
+                  subcategory={article.subcategory}
+                  coverImage={article.coverImage}
+                  author={article.author}
+                  horizontal
+                  unoptimized
+                  imageFit="contain"
+                  titleClassName="text-lg md:text-2xl leading-tight"
+                />
+              </div>
+            ))
           ) : (
             <p className="py-12 text-[#6B6B6B]">No articles yet.</p>
           )}
         </section>
 
-        <div className="mt-16 border-t border-[#E5E5E5] pt-16 text-center">
+        <div className="mt-8 pt-8 text-center">
           <Link
             href="/contributors"
-            className="text-sm uppercase tracking-[0.2em] text-[#6B6B6B] transition-colors hover:text-black"
+            className="font-futura text-sm uppercase tracking-[0.2em] text-[#6B6B6B] transition-colors hover:text-black"
           >
-            ← All contributors
+            All contributors
           </Link>
         </div>
       </div>

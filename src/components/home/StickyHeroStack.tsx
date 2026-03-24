@@ -352,7 +352,7 @@ function NewsstandHeroContent({
                     src={activeProduct.imageUrl}
                     alt={activeProduct.imageAlt ?? activeProduct.title}
                     fill
-                    className="object-contain object-center md:object-right origin-center md:origin-right scale-[0.9] md:scale-[0.6] transition-opacity duration-300"
+                    className="object-contain object-center md:object-right origin-center md:origin-right scale-[1.05] md:scale-[0.78] transition-opacity duration-300"
                     sizes="(max-width: 768px) 100vw, 50vw"
                     priority={priority && activeIndex === 0}
                   />
@@ -369,7 +369,7 @@ function NewsstandHeroContent({
 
       {/* Right: text content */}
       <div className="flex-1 min-w-0 flex flex-col justify-center px-0 md:px-10 lg:px-16 py-6 md:py-8">
-        <h2 className="font-header font-extrabold text-xl md:text-2xl lg:text-3xl text-[#1A1A1A] tracking-wide mb-4 md:mb-6">
+        <h2 className="font-serif font-extrabold text-xl md:text-2xl lg:text-3xl text-[#1A1A1A] tracking-wide mb-4 md:mb-6">
           {headline}
         </h2>
         {description ? (
@@ -406,7 +406,7 @@ function NewsletterSectionContent({
   const title = headline ?? 'Newsletter'
   const introText =
     subtitle ??
-    'For exclusive access to great interiors and great conversations, sign up for the Neptune Papers’ newsletter.'
+    'For exclusive access to great interiors and great conversations,\nsign up for the Neptune Papers’ newsletter.'
 
   return (
     <div className="flex flex-col h-full w-full min-w-0 bg-white">
@@ -430,16 +430,16 @@ function NewsletterSectionContent({
         </div>
         <div className="flex-1 md:basis-1/2 min-w-0 mt-0 md:mt-(--header-height) h-auto md:h-[calc(var(--section-height,100vh)-var(--header-height))] flex items-center justify-center px-6 md:px-10 lg:px-16 text-center">
           <div className="w-full max-w-2xl">
-            <h2 className="font-serif text-2xl md:text-3xl text-black uppercase tracking-wide">
+            <h2 className="font-serif font-bold text-3xl md:text-3xl text-black uppercase tracking-wide">
               {title}
             </h2>
-            <p className="mt-3 text-base text-black leading-relaxed">
+            <p className="mt-3 text-sm text-black leading-relaxed font-[Helvetica,Arial,sans-serif] font-normal whitespace-pre-line">
               {introText}
             </p>
             <button
               type="button"
               onClick={openModal}
-              className="mt-5 font-header font-bold text-base tracking-[0.2em] uppercase text-black transition-colors hover:underline w-fit mx-auto"
+              className="mt-5 font-futura text-base tracking-[0.2em] uppercase text-black transition-colors hover:underline w-fit mx-auto"
             >
               Subscribe now
             </button>
@@ -524,10 +524,10 @@ function ArticleSplitContent({
                   style={
                     isIosMobile
                       ? {
-                          width: '94%',
-                          height: '94%',
-                          objectFit: 'contain',
-                        }
+                        width: '94%',
+                        height: '94%',
+                        objectFit: 'contain',
+                      }
                       : undefined
                   }
                   loading={priority ? 'eager' : 'lazy'}

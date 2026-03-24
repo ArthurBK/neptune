@@ -54,24 +54,24 @@ export default async function ContributorsPage() {
         {entries.length > 0 ? (
           <section className="max-w-5xl mx-auto">
             <div className="grid grid-cols-1 gap-x-10 gap-y-10 sm:grid-cols-2 lg:grid-cols-4 lg:gap-x-12 lg:gap-y-14">
-            {entries.map((person) => (
-              <div key={`${person.href}-${person._id}`} className="text-left">
-                <p className="font-serif text-[15px] font-normal leading-[1.65] text-black md:text-base">
-                  <Link
-                    href={person.href}
-                    className="font-serif font-bold uppercase tracking-[0.06em] text-(--neptune-red) hover:underline underline-offset-2"
-                  >
-                    {person.name}
-                  </Link>
-                  {person.bio ? (
-                    <>
-                      {' '}
-                      {person.bio.trim()}
-                    </>
-                  ) : null}
-                </p>
-              </div>
-            ))}
+              {entries.map((person) => (
+                <div key={`${person.href}-${person._id}`} className="text-left">
+                  <p className="font-serif text-[15px] font-normal leading-[1.65] text-black md:text-base">
+                    <Link
+                      href={person.href}
+                      className="font-serif text-xl font-bold tracking-[0.06em] text-black hover:underline underline-offset-2"
+                    >
+                      {person.name}
+                    </Link>
+                    {person.bio ? (
+                      <>
+                        {' '}
+                        {person.bio.trim()}
+                      </>
+                    ) : null}
+                  </p>
+                </div>
+              ))}
             </div>
           </section>
         ) : (

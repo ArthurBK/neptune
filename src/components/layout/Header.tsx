@@ -44,9 +44,7 @@ function NavLink({
       ? pathname === '/'
       : pathname === baseHref || pathname.startsWith(`${baseHref}/`)
 
-  const textClass = transparent
-    ? 'text-white hover:text-white/90'
-    : 'text-black hover:text-[#63382E]'
+  const textClass = transparent ? 'text-white' : 'text-black'
 
   return (
     <Link
@@ -234,7 +232,7 @@ export function Header({ transparent: _transparent }: { transparent?: boolean } 
         </div>
 
         {/* Desktop nav — nav items centered, search & cart pinned right */}
-        <nav className="hidden md:flex items-center justify-center gap-14 mt-4 pb-3 w-full relative">
+        <nav className="hidden md:flex items-center justify-center gap-14 mt-1 pb-3 w-full relative">
           {NAV_ITEMS.map((item) => (
             <NavLink key={item.href} href={item.href} label={item.label} transparent={lightText} />
           ))}

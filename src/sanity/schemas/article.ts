@@ -214,10 +214,10 @@ export const article = defineType({
       name: 'categories',
       title: 'Categories',
       type: 'array',
-      description: 'Select one or more categories where this article should appear.',
       of: [defineArrayMember({ type: 'string' })],
       options: { list: ARTICLE_CATEGORIES },
-      validation: (rule) => rule.required().min(1).unique(),
+      hidden: true,
+      readOnly: true,
     }),
     defineField({
       name: 'category',

@@ -13,7 +13,6 @@ import {
 
 import { AdBanner } from '@/components/shared/AdBanner'
 import { ArticleCard } from '@/components/editorial/ArticleCard'
-import { ArticleGrid } from '@/components/editorial/ArticleGrid'
 
 export const revalidate = 86400
 
@@ -68,7 +67,7 @@ export default async function ContributorPage({ params }: ContributorPageProps) 
 
   return (
     <main>
-      <div className="max-w-screen-xl mx-auto px-6 md:px-12 lg:px-16 py-16 md:py-24">
+      <div className="max-w-screen-xl mx-auto px-6 md:px-12 lg:px-16 pt-8 md:pt-12 pb-16 md:pb-24">
         {/* Contributor header */}
         <header className="flex flex-col md:flex-row gap-12 md:gap-16 items-start md:items-center mb-16">
           {portraitUrl && (
@@ -90,14 +89,14 @@ export default async function ContributorPage({ params }: ContributorPageProps) 
                 {contributor.role}
               </p>
             )}
-            <h1 className="font-serif text-5xl md:text-6xl text-[#1A1A1A] leading-tight">
+            <h1 className="font-serif font-bold text-3xl md:text-4xl text-[#1A1A1A] tracking-wide text-center">
               {contributor.name}
             </h1>
             {contributor.location && (
               <p className="mt-2 text-base text-[#6B6B6B]">{contributor.location}</p>
             )}
             <div className="mt-6 prose prose-lg max-w-none">
-              <p className="text-[#1A1A1A] leading-relaxed whitespace-pre-line">
+              <p className="text-sm md:text-[15px] text-[#1A1A1A] leading-relaxed whitespace-pre-line font-[Helvetica,Arial,sans-serif] text-center max-w-2xl mx-auto">
                 {contributor.bio}
               </p>
             </div>
@@ -116,12 +115,24 @@ export default async function ContributorPage({ params }: ContributorPageProps) 
         )}
 
         {/* Articles by this contributor */}
-        <section>
-          <h2 className="font-serif text-3xl md:text-4xl text-[#1A1A1A] mb-8">
-            Articles by {contributor.name}
-          </h2>
+        <section className="space-y-6 md:space-y-8 max-w-5xl mx-auto">
           {articles.length > 0 ? (
-            <ArticleGrid articles={articles} />
+            articles.map((article) => (
+              <div key={article._id} className="max-w-4xl mx-auto">
+                <ArticleCard
+                  title={article.title}
+                  slug={article.slug}
+                  category={article.category}
+                  subcategory={article.subcategory}
+                  coverImage={article.coverImage}
+                  author={article.author}
+                  horizontal
+                  unoptimized
+                  imageFit="contain"
+                  titleClassName="text-lg md:text-2xl leading-tight"
+                />
+              </div>
+            ))
           ) : (
             <p className="text-[#6B6B6B] py-12">
               No articles yet.
@@ -130,12 +141,12 @@ export default async function ContributorPage({ params }: ContributorPageProps) 
         </section>
 
         {/* Back to contributors */}
-        <div className="mt-16 pt-16 border-t border-[#E5E5E5] text-center">
+        <div className="mt-8 pt-8 text-center">
           <Link
             href="/contributors"
-            className="text-sm tracking-[0.2em] uppercase text-[#6B6B6B] hover:text-black transition-colors"
+            className="font-futura text-sm tracking-[0.2em] uppercase text-[#6B6B6B] hover:text-black transition-colors"
           >
-            ← All contributors
+            All contributors
           </Link>
         </div>
       </div>
