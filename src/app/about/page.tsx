@@ -35,8 +35,6 @@ export default async function AboutPage() {
   return (
     <main>
       <div className="max-w-7xl mx-auto px-6 md:px-12 lg:px-16 pt-4 md:pt-8 pb-10 md:pb-14">
-        <div className="mx-auto mb-6 md:mb-8 h-px w-1/3 max-w-md bg-(--neptune-logo-red)" />
-
         <header className="mb-6 md:mb-10 text-center font-futura">
           <h1 className="font-serif font-bold text-3xl md:text-4xl text-[#1A1A1A] uppercase tracking-wide">
             About

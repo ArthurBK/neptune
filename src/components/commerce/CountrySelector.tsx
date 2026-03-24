@@ -81,12 +81,35 @@ export function CountrySelector() {
     dispatchCountryChanged(countryCode)
   }
 
+  const selectedCountry =
+    COUNTRY_LIST.find((country) => country.countryCode === selected) ??
+    COUNTRY_LIST.find((country) => country.countryCode === DEFAULT_COUNTRY) ??
+    COUNTRY_LIST[0]
+
   return (
-    <div className={`relative inline-flex items-center gap-1 transition-opacity duration-150 ${ready ? 'opacity-100' : 'opacity-0'}`}>
+    <div className={`relative mx-auto inline-flex w-fit items-center justify-center transition-opacity duration-150 ${ready ? 'opacity-100' : 'opacity-0'}`}>
+      <div className="pointer-events-none inline-flex items-center justify-center gap-1">
+        <span className="font-futura text-center font-medium text-[13px] tracking-[0.1em] uppercase text-black whitespace-nowrap">
+          {selectedCountry.countryName} — {selectedCountry.currencyCode} {selectedCountry.currencySymbol}
+        </span>
+        <svg
+          className="w-2.5 h-2.5 text-black shrink-0"
+          viewBox="0 0 10 6"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          aria-hidden="true"
+        >
+          <title>Expand</title>
+          <path d="M1 1l4 4 4-4" />
+        </svg>
+      </div>
       <select
         value={selected}
         onChange={handleChange}
-        className="font-futura text-center font-medium text-[13px] tracking-[0.1em] uppercase text-black bg-transparent border-none cursor-pointer focus:outline-none appearance-none pr-3"
+        className="absolute inset-0 w-full h-full cursor-pointer opacity-0 appearance-none"
         aria-label="Select country / currency"
       >
         {COUNTRY_LIST.map((c) => (
@@ -95,20 +118,6 @@ export function CountrySelector() {
           </option>
         ))}
       </select>
-      {/* Chevron icon */}
-      <svg
-        className="pointer-events-none w-2.5 h-2.5 text-black flex-shrink-0"
-        viewBox="0 0 10 6"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        aria-hidden="true"
-      >
-        <title>Expand</title>
-        <path d="M1 1l4 4 4-4" />
-      </svg>
     </div>
   )
 }

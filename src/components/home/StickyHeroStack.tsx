@@ -259,7 +259,7 @@ function SplitImageContent({
             alt={alt}
             fill
             className="object-cover"
-            sizes="50vw"
+            sizes="(max-width: 768px) 100vw, 50vw"
             priority={isPriority}
           />
         ) : null}
@@ -281,12 +281,17 @@ function SplitImageContent({
   }
 
   return (
-    <div className="w-full h-full min-w-0 flex flex-col md:flex-row overflow-hidden">
-      <div className="flex-1 min-w-0 h-1/2 md:h-full">
+    <div className="w-full h-full min-w-0 overflow-hidden">
+      <div className="block md:hidden h-full">
         {renderHalf(leftImageUrl, leftAlt, leftHref, priority)}
       </div>
-      <div className="flex-1 min-w-0 h-1/2 md:h-full">
-        {renderHalf(rightImageUrl, rightAlt, rightHref, false)}
+      <div className="hidden md:flex h-full min-w-0 flex-row">
+        <div className="flex-1 min-w-0 h-full">
+          {renderHalf(leftImageUrl, leftAlt, leftHref, priority)}
+        </div>
+        <div className="flex-1 min-w-0 h-full">
+          {renderHalf(rightImageUrl, rightAlt, rightHref, false)}
+        </div>
       </div>
     </div>
   )
@@ -406,23 +411,24 @@ function NewsletterSectionContent({
   return (
     <div className="flex flex-col h-full w-full min-w-0 bg-white">
       <div className="flex flex-1 min-h-0 w-full flex-col md:flex-row">
-        <div className="flex-1 md:basis-1/2 min-w-0 min-h-[45vh] md:min-h-0 relative">
+        <div className="h-0 md:h-auto flex-0 md:flex-1 md:basis-1/2 min-w-0 min-h-0 relative overflow-hidden">
           <div className="relative w-full h-full">
             {leftImageUrl ? (
               <Image
                 src={leftImageUrl}
                 alt=""
                 fill
-                className="object-cover object-center"
+                className="hidden md:block object-cover object-center"
                 sizes="(max-width: 768px) 100vw, 50vw"
                 priority={priority}
               />
-            ) : (
+            ) : null}
+            {!leftImageUrl && !rightImageUrl ? (
               <div className="absolute inset-0 bg-transparent" />
-            )}
+            ) : null}
           </div>
         </div>
-        <div className="flex-1 md:basis-1/2 min-w-0 mt-[var(--header-height)] h-[calc(var(--section-height,100vh)-var(--header-height))] flex items-center justify-center px-6 md:px-10 lg:px-16 text-center">
+        <div className="flex-1 md:basis-1/2 min-w-0 mt-0 md:mt-(--header-height) h-auto md:h-[calc(var(--section-height,100vh)-var(--header-height))] flex items-center justify-center px-6 md:px-10 lg:px-16 text-center">
           <div className="w-full max-w-2xl">
             <h2 className="font-serif text-2xl md:text-3xl text-black uppercase tracking-wide">
               {title}
@@ -437,6 +443,19 @@ function NewsletterSectionContent({
             >
               Subscribe now
             </button>
+            {rightImageUrl ? (
+              <div className="block md:hidden mt-5 mx-auto w-full max-w-[220px]">
+                <Image
+                  src={rightImageUrl}
+                  alt=""
+                  width={220}
+                  height={180}
+                  className="h-auto w-full object-contain object-center"
+                  sizes="220px"
+                  priority={priority}
+                />
+              </div>
+            ) : null}
             {rightImageUrl ? (
               <div className="hidden md:block mt-6 mx-auto w-full max-w-lg">
                 <div className="relative w-full h-[320px] md:h-[360px] overflow-hidden">
@@ -480,18 +499,46 @@ function ArticleSplitContent({
   href: string
   priority?: boolean
 }) {
+  const isIosMobile = (() => {
+    if (typeof window === 'undefined' || typeof navigator === 'undefined') return false
+    const ua = navigator.userAgent
+    const isiOS =
+      /iP(hone|od|ad)/.test(ua) ||
+      (ua.includes('Macintosh') && navigator.maxTouchPoints > 1)
+    const isMobileViewport = window.matchMedia('(max-width: 767px)').matches
+    return isiOS && isMobileViewport
+  })()
+
   return (
-    <div className="flex flex-col h-full w-full min-w-0 bg-white">
-      <div className="flex flex-col md:flex-row flex-1 min-h-0 w-full">
+    <div className="flex flex-col h-auto md:h-full w-full min-w-0 bg-white">
+      <div className="flex flex-col md:flex-row md:flex-1 min-h-0 w-full">
         {/* Left: image */}
-        <div className="flex-1 min-w-0 min-h-[30vh] md:min-h-0 relative  aspect-[16/9]">
+        <div className="flex-[1.45] max-md:supports-[-webkit-touch-callout:none]:flex-[1.28] md:flex-1 min-w-0 min-h-[45vh] max-md:supports-[-webkit-touch-callout:none]:min-h-[39vh] md:min-h-0 relative aspect-[4/3] md:aspect-[16/9]">
           {imageUrl ? (
-            <Link href={href} className="block absolute inset-0">
+            <Link href={href} className="block h-full w-full md:absolute md:inset-0">
+              <div className="flex h-full w-full items-center justify-center md:hidden">
+                <img
+                  src={imageUrl}
+                  alt={alt}
+                  className="block h-full w-full object-cover object-center"
+                  style={
+                    isIosMobile
+                      ? {
+                          width: '94%',
+                          height: '94%',
+                          objectFit: 'contain',
+                        }
+                      : undefined
+                  }
+                  loading={priority ? 'eager' : 'lazy'}
+                  decoding="async"
+                />
+              </div>
               <Image
                 src={imageUrl}
                 alt={alt}
                 fill
-                className="object-contain object-center md:object-right"
+                className="hidden object-contain object-right md:block"
                 sizes="50vw"
                 priority={priority}
               />
@@ -501,7 +548,7 @@ function ArticleSplitContent({
           )}
         </div>
         {/* Right: text */}
-        <div className="flex-1 min-w-0 flex flex-col justify-center px-6 md:px-10 lg:px-16 py-8 md:py-12">
+        <div className="flex-[0.65] md:flex-1 min-w-0 flex flex-col justify-start md:justify-center px-4 md:px-10 lg:px-16 pt-2 pb-1 md:py-12">
           {categoryHref && (
             <Link
               href={categoryHref}
@@ -511,12 +558,12 @@ function ArticleSplitContent({
             </Link>
           )}
           <Link href={href} className="group">
-            <h2 className="max-w-full whitespace-pre-line break-words font-serif text-3xl font-bold tracking-wide text-black group-hover:opacity-80 group-hover:underline underline-offset-4 transition-opacity sm:text-4xl md:text-4xl">
+            <h2 className="max-w-full whitespace-pre-line break-words font-serif text-2xl font-bold leading-[1.05] md:leading-normal tracking-wide text-black group-hover:opacity-80 group-hover:underline underline-offset-4 transition-opacity sm:text-3xl md:text-4xl [-webkit-text-size-adjust:100%] [text-size-adjust:100%]">
               {title}
             </h2>
           </Link>
           {subtitle && (
-            <p className="mt-3 text-base md:text-lg text-black">
+            <p className="mt-3 text-sm md:text-lg text-black">
               by{' '}
               {subtitleHref ? (
                 <Link
@@ -539,8 +586,8 @@ function ArticleSplitContent({
         </div>
       </div>
       {/* Below: Discover All Issues CTA (same as other pages: logo + text, centered, top/bottom border) */}
-      <div className="shrink-0 mt-auto">
-        <NewsstandCta />
+      <div className="shrink-0 mt-2 md:mt-auto">
+        <NewsstandCta compactMobile />
       </div>
     </div>
   )

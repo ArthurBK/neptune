@@ -39,9 +39,9 @@ export function ArticleAffiliateProductsSection({
             Neptune Market
           </Link>
         </div>
-        <div className="flex flex-wrap justify-center gap-8 sm:gap-10 md:gap-12 lg:gap-16">
+        <div className="grid grid-cols-2 gap-4 md:flex md:flex-wrap md:justify-center md:gap-8">
           {valid.map((p) => (
-            <div key={p._id} className="flex-none w-[220px]">
+            <div key={p._id} className="w-full md:w-[220px] md:flex-none">
               <AffiliateProductCard
                 title={p.title ?? ''}
                 brand={p.brand ?? ''}
