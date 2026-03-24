@@ -7,6 +7,8 @@ import { CountrySelector } from '@/components/commerce/CountrySelector'
 const FOOTER_LINKS = [
   { label: 'ABOUT', href: '/about' },
   { label: 'CONTACT', href: '/contact' },
+  { label: 'POLICY', href: '/policy' },
+  { label: 'COOKIES', href: '/cookies' },
   // { label: 'ADVERTISING', href: '/contact#advertising' },
 ] as const
 
