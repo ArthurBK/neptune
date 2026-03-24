@@ -1,3 +1,4 @@
+import { articleLinkCategory, orderedCategoryPageArticles } from '@/lib/categoryLanding'
 import { sanityFetch } from '@/sanity/lib/client'
 import {
   AD_BANNER_BY_PLACEMENT_QUERY,
@@ -37,7 +38,7 @@ export default async function FashionPage() {
   ])
 
   const typedArticles = articles as ArticleCardData[]
-  const orderedArticles = (categoryPage?.fashionArticles ?? []).filter((article) => article?.category === 'fashion' || article?.categories?.includes('fashion'))
+  const orderedArticles = orderedCategoryPageArticles(categoryPage?.fashionArticles)
   const displayArticles = orderedArticles.length > 0 ? orderedArticles : typedArticles
   const fashionDescription = categoryPage?.fashionDescription?.trim() || DEFAULT_FASHION_DESCRIPTION
 
@@ -75,7 +76,7 @@ export default async function FashionPage() {
               <ArticleCard
                 title={article.title}
                 slug={article.slug}
-                category={article.category}
+                category={articleLinkCategory(article, 'fashion')}
                 subcategory={article.subcategory}
                 coverImage={article.coverImage}
                 author={article.author}

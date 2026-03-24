@@ -20,16 +20,14 @@ export function LayoutShell({
   const isHome = pathname === '/'
 
   if (isStudio) {
-    return <main className="flex-1 min-w-0">{children}</main>
+    return <div className="flex-1 min-h-0 min-w-0">{children}</div>
   }
 
   return (
     <HeaderVariantProvider>
       <NewsletterModalProvider>
         <Header />
-        <main className="flex-1 min-w-0 pt-(--header-height)">
-          {children}
-        </main>
+        <div className="flex-1 min-h-0 min-w-0 pt-(--header-height)">{children}</div>
         {!isHome && <Footer instagramUrl={instagramUrl} />}
       </NewsletterModalProvider>
     </HeaderVariantProvider>

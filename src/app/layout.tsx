@@ -58,7 +58,7 @@ export default async function RootLayout({
 
   return (
     <html lang="en" className={`${cormorantGaramond.variable} ${inter.variable}`} suppressHydrationWarning>
-      <body className="min-h-screen flex flex-col bg-white text-[#1A1A1A] antialiased font-sans font-light" suppressHydrationWarning>
+      <body className="min-h-dvh flex flex-col bg-white text-[#1A1A1A] antialiased font-sans font-light" suppressHydrationWarning>
         <LayoutShell instagramUrl={instagramUrl}>{children}</LayoutShell>
       </body>
     </html>

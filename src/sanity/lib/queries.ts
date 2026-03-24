@@ -83,9 +83,22 @@ export const ARTICLES_BY_CATEGORY_QUERY = `
   }
 `
 
+// Manual category-page lists: article id must match for “in this section” even when categories[] lags
+const ARTICLE_IN_CATEGORY_PAGE_ORDER_LIST = `(
+  ($category == "travel" && _id in *[_type == "categoryPage" && _id == "categoryPage"][0].travelArticles[]._ref) ||
+  ($category == "interiors" && _id in *[_type == "categoryPage" && _id == "categoryPage"][0].interiorsArticles[]._ref) ||
+  ($category == "arts" && _id in *[_type == "categoryPage" && _id == "categoryPage"][0].artsArticles[]._ref) ||
+  ($category == "gardens" && _id in *[_type == "categoryPage" && _id == "categoryPage"][0].gardensArticles[]._ref) ||
+  ($category == "fashion" && _id in *[_type == "categoryPage" && _id == "categoryPage"][0].fashionArticles[]._ref)
+)`
+
 // Single article by slug and category
 export const ARTICLE_BY_SLUG_QUERY = `
-  *[_type == "article" && slug.current == $slug && (category == $category || $category in categories)][0] {
+  *[_type == "article" && slug.current == $slug && (
+    category == $category ||
+    $category in categories ||
+    ${ARTICLE_IN_CATEGORY_PAGE_ORDER_LIST}
+  )][0] {
     ...,
     "author": author->{ name, "slug": slug.current, bio, portrait },
     "photographer": photographer->{ name, "slug": slug.current },
@@ -117,7 +130,11 @@ export const ARTICLE_BY_SLUG_QUERY = `
 
 // Article slugs for generateStaticParams
 export const ARTICLE_SLUGS_BY_CATEGORY_QUERY = `
-  *[_type == "article" && (category == $category || $category in categories)] { "slug": slug.current }
+  *[_type == "article" && (
+    category == $category ||
+    $category in categories ||
+    ${ARTICLE_IN_CATEGORY_PAGE_ORDER_LIST}
+  )] { "slug": slug.current }
 `
 
 // All affiliate products (for neptune market)

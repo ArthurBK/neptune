@@ -10,7 +10,7 @@
 
 @media (min-width: 768px) {
   :root {
-    --header-height: 6rem; /* 96px desktop */
+    --header-height: 4.25rem; /* 68px desktop — single-row header */
   }
 }
 

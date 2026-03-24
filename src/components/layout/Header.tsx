@@ -12,15 +12,27 @@ import { useHeaderVariant } from '@/contexts/HeaderVariantContext'
 import { CartPreview } from '@/components/commerce/CartPreview'
 import { SearchModal } from './SearchModal'
 
-const NAV_ITEMS = [
+const NAV_LEFT = [
   { label: 'NEWSSTAND', href: '/newsstand' },
   { label: 'INTERIORS', href: '/interiors' },
   { label: 'GARDENS', href: '/gardens' },
+] as const
+
+const NAV_RIGHT = [
   { label: 'ARTS', href: '/arts' },
   { label: 'FASHION', href: '/fashion' },
   { label: 'TRAVEL', href: '/travel' },
-  { label: 'shop', href: '/the-market' },
+  { label: 'SHOP', href: '/the-market' },
 ] as const
+
+const NAV_ITEMS = [...NAV_LEFT, ...NAV_RIGHT] as const
+
+/** True for `/`, ``, trailing-slash only, and other empty-looking paths — avoids a white header flash on home when usePathname is briefly empty. */
+function isHomePath(path: string): boolean {
+  const trimmed = path.trim()
+  if (!trimmed) return true
+  return trimmed.replace(/\/+$/, '') === ''
+}
 
 function NavLink({
   href,
@@ -112,8 +124,8 @@ export function Header({ transparent: _transparent }: { transparent?: boolean } 
   }, [fetchCartCount])
 
   const pathname = usePathname()
-  const isHomePage = pathname === '/'
-  // Keep header transparent until client mount to prevent a white flash.
+  // `usePathname()` peut être `''` ou désynchronisé un instant sur mobile → fond blanc à tort sans ça.
+  const isHomePage = pathname != null && isHomePath(pathname)
   const hasSolidBg = pathname == null ? false : !isHomePage
   const lightText = isHomePage && variant === 'dark'
   const headerClass = `fixed left-0 right-0 top-0 z-50 w-full flex flex-col border-b shrink-0 ${isHomePage ? '' : 'transition-colors'
@@ -134,16 +146,16 @@ export function Header({ transparent: _transparent }: { transparent?: boolean } 
 
   return (
     <header className={headerClass} style={headerStyle}>
-      <div className="relative flex flex-col flex-1 max-w-screen-xl mx-auto px-4 sm:px-6 md:px-8 lg:px-10 py-1.5 md:py-2 w-full min-w-0 overflow-visible shrink-0">
-        {/* Top row: Burger + Newsletter left, Logo center, Cart/Search right */}
-        <div className="relative flex items-center justify-between">
-          <div className="flex-1 flex justify-start items-center gap-2 -ml-4 md:-ml-8">
+      <div className="relative flex flex-1 w-full min-w-0 pl-3 pr-4 sm:pl-4 sm:pr-6 md:pl-5 md:pr-8 lg:pl-6 lg:pr-10 py-1.5 md:py-2.5 overflow-visible shrink-0 items-center">
+        {/* Left: burger + newsletter | Center: nav + logo (desktop) | Right: cart + search */}
+        <div className="relative flex items-center w-full min-w-0 min-h-[1.5rem] md:min-h-0">
+          <div className="flex shrink-0 items-center gap-0 z-10">
             <button
               type="button"
               aria-label={isBurgerOpen ? 'Close menu' : 'Open menu'}
               aria-expanded={isBurgerOpen}
               onClick={() => setIsBurgerOpen((prev) => !prev)}
-              className={`w-10 h-10 flex flex-col justify-center items-center gap-1.5 ${iconClass}`}
+              className={`shrink-0 w-10 h-10 flex flex-col justify-center items-center gap-1.5 ${iconClass}`}
             >
               <span
                 className={`block w-5 h-px bg-current transition-transform duration-200 ${isBurgerOpen ? 'rotate-45 translate-y-2' : ''
@@ -162,81 +174,55 @@ export function Header({ transparent: _transparent }: { transparent?: boolean } 
               href="/newsletters"
               label="NEWSLETTER"
               transparent={lightText}
-              className="hidden md:inline-block"
+              className="hidden md:inline-block shrink-0 md:-ml-1"
             />
           </div>
-          <Link href="/" className="absolute left-1/2 -translate-x-1/2 shrink-0">
+
+          <div className="hidden md:flex flex-1 min-w-0 items-center justify-center gap-4 md:gap-5 lg:gap-7 xl:gap-9 md:mt-1">
+            <nav className="flex items-center justify-end min-w-0" aria-label="Primary navigation">
+              <ul className="flex list-none items-center justify-end gap-4 md:gap-5 lg:gap-7 xl:gap-9 flex-nowrap m-0 p-0">
+                {NAV_LEFT.map((item) => (
+                  <li key={item.href} className="shrink-0 whitespace-nowrap">
+                    <NavLink href={item.href} label={item.label} transparent={lightText} />
+                  </li>
+                ))}
+              </ul>
+            </nav>
+            <Link href="/" className="shrink-0">
+              <Image
+                src="/neptune_logo_dark.svg"
+                alt="Neptune"
+                width={120}
+                height={32}
+                className={`h-6 w-auto md:h-8 md:max-h-8 ${lightText ? 'invert' : ''}`}
+                priority
+              />
+            </Link>
+            <ul className="flex list-none items-center justify-start gap-4 md:gap-5 lg:gap-7 xl:gap-9 flex-nowrap min-w-0 m-0 p-0">
+              {NAV_RIGHT.map((item) => (
+                <li key={item.href} className="shrink-0 whitespace-nowrap">
+                  <NavLink href={item.href} label={item.label} transparent={lightText} />
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div className="flex-1 min-w-0 md:hidden" aria-hidden />
+
+          <Link
+            href="/"
+            className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 shrink-0 md:hidden"
+          >
             <Image
               src="/neptune_logo_dark.svg"
               alt="Neptune"
-              width={90}
-              height={24}
-              className={`h-5 w-auto md:h-6 ${lightText ? 'invert' : ''}`}
-              priority
+              width={120}
+              height={32}
+              className={`h-6 w-auto ${lightText ? 'invert' : ''}`}
             />
           </Link>
-          <div className="flex flex-1 justify-end items-center gap-0 md:justify-end shrink-0 min-w-0 overflow-visible -mr-2 sm:-mr-4 md:-mr-6">
-            <button
-              type="button"
-              aria-label="Cart"
-              onClick={() => setIsCartOpen(true)}
-              className={`md:hidden relative w-10 h-10 flex items-center justify-center overflow-visible shrink-0 ${iconClass}`}
-            >
-              <svg
-                className="shrink-0 overflow-visible"
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                aria-hidden
-              >
-                <title>Cart</title>
-                <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
-                <line x1="3" y1="6" x2="21" y2="6" />
-                <path d="M16 10a4 4 0 0 1-8 0" />
-              </svg>
-              {cartCount != null && cartCount > 0 && (
-                <span className="absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-black px-1 text-[10px] font-medium text-white">
-                  {cartCount > 99 ? '99+' : cartCount}
-                </span>
-              )}
-            </button>
-            <button
-              type="button"
-              aria-label="Search"
-              onClick={() => setIsSearchOpen(true)}
-              className={`md:hidden w-10 h-10 flex items-center justify-center overflow-visible shrink-0 -ml-2 ${iconClass}`}
-            >
-              <svg
-                className="shrink-0 overflow-visible"
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                aria-hidden
-              >
-                <title>Search</title>
-                <circle cx="11" cy="11" r="8" />
-                <path d="m21 21-4.35-4.35" />
-              </svg>
-            </button>
-          </div>
-        </div>
 
-        {/* Desktop nav — nav items centered, search & cart pinned right */}
-        <nav className="hidden md:flex items-center justify-center gap-14 mt-1 pb-3 w-full relative">
-          {NAV_ITEMS.map((item) => (
-            <NavLink key={item.href} href={item.href} label={item.label} transparent={lightText} />
-          ))}
-          <div className="absolute right-0 flex items-center gap-0 overflow-visible -mr-2 sm:-mr-4 md:-mr-6">
+          <div className="flex shrink-0 items-center justify-end z-10 -mr-2 sm:-mr-4 md:-mr-6">
             <button
               type="button"
               aria-label="Cart"
@@ -270,7 +256,7 @@ export function Header({ transparent: _transparent }: { transparent?: boolean } 
               type="button"
               aria-label="Search"
               onClick={() => setIsSearchOpen(true)}
-              className={`w-10 h-10 flex items-center justify-center overflow-visible shrink-0 -ml-2 ${iconClass}`}
+              className={`relative w-10 h-10 flex items-center justify-center overflow-visible shrink-0 -ml-2 ${iconClass}`}
             >
               <svg
                 className="shrink-0 overflow-visible"
@@ -290,7 +276,7 @@ export function Header({ transparent: _transparent }: { transparent?: boolean } 
               </svg>
             </button>
           </div>
-        </nav>
+        </div>
       </div>
 
       {/* Burger menu drawer — lives inside the header in the DOM but

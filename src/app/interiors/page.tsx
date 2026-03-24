@@ -1,3 +1,4 @@
+import { articleLinkCategory, orderedCategoryPageArticles } from '@/lib/categoryLanding'
 import { sanityFetch } from '@/sanity/lib/client'
 import {
   AD_BANNER_BY_PLACEMENT_QUERY,
@@ -36,7 +37,7 @@ export default async function InteriorsPage() {
   ])
 
   const typedArticles = articles as ArticleCardData[]
-  const orderedArticles = (categoryPage?.interiorsArticles ?? []).filter((article) => article?.category === 'interiors' || article?.categories?.includes('interiors'))
+  const orderedArticles = orderedCategoryPageArticles(categoryPage?.interiorsArticles)
   const displayArticles = orderedArticles.length > 0 ? orderedArticles : typedArticles
   const interiorsDescription = categoryPage?.interiorsDescription?.trim() || DEFAULT_INTERIORS_DESCRIPTION
 
@@ -74,7 +75,7 @@ export default async function InteriorsPage() {
               <ArticleCard
                 title={article.title}
                 slug={article.slug}
-                category={article.category}
+                category={articleLinkCategory(article, 'interiors')}
                 subcategory={article.subcategory}
                 coverImage={article.coverImage}
                 author={article.author}

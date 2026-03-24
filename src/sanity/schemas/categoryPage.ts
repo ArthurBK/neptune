@@ -1,49 +1,13 @@
+import type { ArrayOptions } from '@sanity/types'
 import { DocumentTextIcon } from '@sanity/icons'
 import { defineArrayMember, defineField, defineType } from 'sanity'
+import { CategoryArticleOrderInput } from '../components/CategoryArticleOrderInput'
 import { captionRichTextType } from './lib/captionRichText'
 
-type ArticleRefItem = {
-  _ref?: string
-}
+type CategoryArticleListOptions = ArrayOptions & { categoryTag: string }
 
-type FieldValidation = NonNullable<Parameters<typeof defineField>[0]['validation']>
-
-function categoryArticlesValidation(expectedCategory: string) {
-  return ((rule: {
-    unique: () => {
-      custom: (
-        validator: (
-          items: unknown,
-          context: { getClient: (args: { apiVersion: string }) => { fetch: <T>(query: string, params?: unknown) => Promise<T> } }
-        ) => Promise<true | string> | true | string
-      ) => unknown
-    }
-  }) =>
-    rule.unique().custom(async (items, context) => {
-      if (!Array.isArray(items) || items.length === 0) return true
-
-      const refs = (items as ArticleRefItem[])
-        .map((item) => item?._ref)
-        .filter((ref): ref is string => typeof ref === 'string' && ref.length > 0)
-
-      if (refs.length === 0) return true
-
-      const client = context.getClient({ apiVersion: '2026-03-06' })
-      const rows = await client.fetch<Array<{ _id: string; category?: string | null; categories?: string[] | null }>>(
-        `*[_type == "article" && _id in $ids]{ _id, category, categories }`,
-        { ids: refs }
-      )
-
-      const wrong = rows.filter((row) => {
-        const inPrimary = row.category === expectedCategory
-        const inAdditional = Array.isArray(row.categories) && row.categories.includes(expectedCategory)
-        return !inPrimary && !inAdditional
-      })
-      if (wrong.length === 0) return true
-
-      const ids = wrong.map((row) => row._id).join(', ')
-      return `Contains article(s) not in "${expectedCategory}": ${ids}`
-    })) as FieldValidation
+function categoryListOptions(tag: string): CategoryArticleListOptions {
+  return { categoryTag: tag }
 }
 
 export const categoryPage = defineType({
@@ -62,8 +26,10 @@ export const categoryPage = defineType({
           to: [{ type: 'article' }],
         }),
       ],
-      validation: categoryArticlesValidation('interiors'),
-      description: 'Only interiors articles should be added here.',
+      options: categoryListOptions('interiors'),
+      components: { input: CategoryArticleOrderInput },
+      validation: (rule) => rule.unique(),
+      description: 'Adding an article here adds the Interiors category on that article. Drag to reorder.',
     }),
     defineField({
       name: 'interiorsDescription',
@@ -82,8 +48,10 @@ export const categoryPage = defineType({
           to: [{ type: 'article' }],
         }),
       ],
-      validation: categoryArticlesValidation('arts'),
-      description: 'Only arts articles should be added here.',
+      options: categoryListOptions('arts'),
+      components: { input: CategoryArticleOrderInput },
+      validation: (rule) => rule.unique(),
+      description: 'Adding an article here adds the Arts category on that article. Drag to reorder.',
     }),
     defineField({
       name: 'artsDescription',
@@ -102,8 +70,10 @@ export const categoryPage = defineType({
           to: [{ type: 'article' }],
         }),
       ],
-      validation: categoryArticlesValidation('gardens'),
-      description: 'Only gardens articles should be added here.',
+      options: categoryListOptions('gardens'),
+      components: { input: CategoryArticleOrderInput },
+      validation: (rule) => rule.unique(),
+      description: 'Adding an article here adds the Gardens category on that article. Drag to reorder.',
     }),
     defineField({
       name: 'gardensDescription',
@@ -122,8 +92,10 @@ export const categoryPage = defineType({
           to: [{ type: 'article' }],
         }),
       ],
-      validation: categoryArticlesValidation('fashion'),
-      description: 'Only fashion articles should be added here.',
+      options: categoryListOptions('fashion'),
+      components: { input: CategoryArticleOrderInput },
+      validation: (rule) => rule.unique(),
+      description: 'Adding an article here adds the Fashion category on that article. Drag to reorder.',
     }),
     defineField({
       name: 'fashionDescription',
@@ -142,8 +114,10 @@ export const categoryPage = defineType({
           to: [{ type: 'article' }],
         }),
       ],
-      validation: categoryArticlesValidation('travel'),
-      description: 'Only travel articles should be added here.',
+      options: categoryListOptions('travel'),
+      components: { input: CategoryArticleOrderInput },
+      validation: (rule) => rule.unique(),
+      description: 'Adding an article here adds the Travel category on that article. Drag to reorder.',
     }),
     defineField({
       name: 'travelDescription',
