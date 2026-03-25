@@ -36,7 +36,7 @@ export default async function GardensPage() {
     } | null>(CATEGORY_PAGE_QUERY),
   ])
 
-  const typedArticles = articles as ArticleCardData[]
+  const typedArticles = (articles ?? []) as ArticleCardData[]
   const orderedArticles = orderedCategoryPageArticles(categoryPage?.gardensArticles)
   const displayArticles = orderedArticles.length > 0 ? orderedArticles : typedArticles
   const gardensDescription = categoryPage?.gardensDescription?.trim() || DEFAULT_GARDENS_DESCRIPTION

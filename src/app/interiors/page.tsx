@@ -36,7 +36,7 @@ export default async function InteriorsPage() {
     } | null>(CATEGORY_PAGE_QUERY),
   ])
 
-  const typedArticles = articles as ArticleCardData[]
+  const typedArticles = (articles ?? []) as ArticleCardData[]
   const orderedArticles = orderedCategoryPageArticles(categoryPage?.interiorsArticles)
   const displayArticles = orderedArticles.length > 0 ? orderedArticles : typedArticles
   const interiorsDescription = categoryPage?.interiorsDescription?.trim() || DEFAULT_INTERIORS_DESCRIPTION

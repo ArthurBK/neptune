@@ -39,7 +39,7 @@ export default async function TravelPage() {
     } | null>(CATEGORY_PAGE_QUERY),
   ])
 
-  const typedArticles = articles as ArticleCardData[]
+  const typedArticles = (articles ?? []) as ArticleCardData[]
   const orderedArticles = orderedCategoryPageArticles(categoryPage?.travelArticles)
   const displayArticles = orderedArticles.length > 0 ? orderedArticles : typedArticles
   const travelDescription = categoryPage?.travelDescription?.trim() || DEFAULT_TRAVEL_DESCRIPTION

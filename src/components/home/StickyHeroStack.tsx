@@ -4,8 +4,6 @@ import type { ReactNode } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 
-import { useEffect, useRef, useState } from 'react'
-
 import { useOpenNewsletterModal } from '@/contexts/NewsletterModalContext'
 import { articleTitleSingleLine } from '@/lib/articleTitle'
 import { urlFor } from '@/sanity/lib/image'
@@ -315,60 +313,12 @@ function NewsstandHeroContent({
 }) {
   const headline = title ?? products[0]?.title ?? ''
   const cta = ctaLabel ?? 'Discover our anniversary issue'
-  const [activeIndex, setActiveIndex] = useState(0)
-  const indexRef = useRef(0)
-
-  useEffect(() => {
-    if (products.length <= 1) return
-
-    const reduceMotion =
-      typeof window !== 'undefined' &&
-      window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches
-    if (reduceMotion) return
-
-    const tick = () => {
-      const nextIndex = (indexRef.current + 1) % products.length
-      indexRef.current = nextIndex
-      setActiveIndex(nextIndex)
-    }
-
-    const id = window.setInterval(tick, 2500)
-    return () => window.clearInterval(id)
-  }, [products.length])
-
-  const activeProduct = products[Math.min(activeIndex, Math.max(0, products.length - 1))]
+  const gridProducts = products.slice(0, 6)
 
   return (
     <div className="flex flex-col md:flex-row w-full min-w-0 h-full gap-0 items-stretch overflow-hidden bg-white">
-      {/* Left: 6 product covers in 3x2 grid, padding on top */}
-      <div className="flex-1 min-w-0 min-h-0 h-full flex flex-col overflow-hidden">
-        <div className="w-full h-full">
-          {activeProduct ? (
-            <Link href={`/newsstand/${activeProduct.handle}`} className="block w-full h-full">
-              <div className="relative w-full h-full">
-                {activeProduct.imageUrl ? (
-                  <Image
-                    key={activeProduct.imageUrl}
-                    src={activeProduct.imageUrl}
-                    alt={activeProduct.imageAlt ?? activeProduct.title}
-                    fill
-                    className="object-contain object-center md:object-right origin-center md:origin-right scale-[1.05] md:scale-[0.78] transition-opacity duration-300"
-                    sizes="(max-width: 768px) 100vw, 50vw"
-                    priority={priority && activeIndex === 0}
-                  />
-                ) : (
-                  <div className="absolute inset-0 flex items-center justify-center text-[#6B6B6B] text-sm">
-                    {activeProduct.title}
-                  </div>
-                )}
-              </div>
-            </Link>
-          ) : null}
-        </div>
-      </div>
-
-      {/* Right: text content */}
-      <div className="flex-1 min-w-0 flex flex-col justify-center px-0 md:px-10 lg:px-16 py-6 md:py-8">
+      {/* Left: text content */}
+      <div className="flex-1 md:flex-[1_1_33.333%] min-w-0 flex flex-col justify-center px-6 md:px-10 lg:px-16 py-6 md:py-8">
         <h2 className="font-serif font-extrabold text-xl md:text-2xl lg:text-3xl text-[#1A1A1A] tracking-wide mb-4 md:mb-6">
           {headline}
         </h2>
@@ -383,6 +333,37 @@ function NewsstandHeroContent({
         >
           {cta}
         </Link>
+      </div>
+
+      {/* Right: static 6 covers grid (3x2) */}
+      <div className="flex-1 md:flex-[1_1_66.666%] min-w-0 min-h-0 h-full overflow-hidden p-0">
+        <div className="grid h-full w-full grid-cols-3 grid-rows-2 gap-0">
+          {gridProducts.map((p, idx) => (
+            <Link
+              key={p.handle}
+              href={`/newsstand/${p.handle}`}
+              className={`relative min-h-0 overflow-hidden bg-[#F3F3F3] ${p.handle === featuredHandle ? 'ring-1 ring-black/20' : ''}`}
+              aria-label={p.title}
+            >
+              <div className="relative h-full w-full">
+                {p.imageUrl ? (
+                  <Image
+                    src={p.imageUrl}
+                    alt={p.imageAlt ?? p.title}
+                    fill
+                    className="object-cover object-center"
+                    sizes="(max-width: 768px) 33vw, 16vw"
+                    priority={priority && idx < 3}
+                  />
+                ) : (
+                  <div className="absolute inset-0 flex items-center justify-center text-[#6B6B6B] text-sm px-3 text-center">
+                    {p.title}
+                  </div>
+                )}
+              </div>
+            </Link>
+          ))}
+        </div>
       </div>
     </div>
   )
@@ -947,6 +928,7 @@ function renderSectionContent(
       zIndex,
       bgWhite: true,
       bgTransparent: false,
+      noPadding: true,
     }
   }
   if (item.type === 'newsletter') {

@@ -62,7 +62,7 @@ function NavLink({
     <Link
       href={href}
       onClick={onClick}
-      className={`font-futura font-medium text-[13px] tracking-[0.1em] [word-spacing:0.15em] uppercase transition-colors ${bold ? 'font-bold' : ''} ${textClass} ${className ?? ''}`}
+      className={`inline-flex items-baseline h-5 md:h-6 leading-none font-futura font-medium text-[13px] tracking-[0.1em] [word-spacing:0.15em] uppercase transition-colors ${bold ? 'font-bold' : ''} ${textClass} ${className ?? ''}`}
     >
       {label}
     </Link>
@@ -174,13 +174,13 @@ export function Header({ transparent: _transparent }: { transparent?: boolean } 
               href="/newsletters"
               label="NEWSLETTER"
               transparent={lightText}
-              className="hidden md:inline-block shrink-0 md:-ml-1"
+              className="hidden md:inline-flex shrink-0 md:-ml-1 md:h-10 md:items-center"
             />
           </div>
 
-          <div className="hidden md:flex flex-1 min-w-0 items-center justify-center gap-4 md:gap-5 lg:gap-7 xl:gap-9 md:mt-1">
-            <nav className="flex items-center justify-end min-w-0" aria-label="Primary navigation">
-              <ul className="flex list-none items-center justify-end gap-4 md:gap-5 lg:gap-7 xl:gap-9 flex-nowrap m-0 p-0">
+          <div className="hidden md:flex flex-1 min-w-0 items-baseline justify-center gap-4 md:gap-5 lg:gap-7 xl:gap-9 md:mt-0">
+            <nav className="flex items-baseline justify-end min-w-0" aria-label="Primary navigation">
+              <ul className="flex list-none items-baseline justify-end gap-4 md:gap-5 lg:gap-7 xl:gap-9 flex-nowrap m-0 p-0">
                 {NAV_LEFT.map((item) => (
                   <li key={item.href} className="shrink-0 whitespace-nowrap">
                     <NavLink href={item.href} label={item.label} transparent={lightText} />
@@ -188,17 +188,17 @@ export function Header({ transparent: _transparent }: { transparent?: boolean } 
                 ))}
               </ul>
             </nav>
-            <Link href="/" className="shrink-0">
+            <Link href="/" className="shrink-0 flex items-baseline">
               <Image
                 src="/neptune_logo_dark.svg"
                 alt="Neptune"
-                width={120}
-                height={32}
-                className={`h-6 w-auto md:h-8 md:max-h-8 ${lightText ? 'invert' : ''}`}
+                width={110}
+                height={30}
+                className={`inline-block align-baseline h-4 w-auto md:h-5 md:max-h-5 ${lightText ? 'invert' : ''}`}
                 priority
               />
             </Link>
-            <ul className="flex list-none items-center justify-start gap-4 md:gap-5 lg:gap-7 xl:gap-9 flex-nowrap min-w-0 m-0 p-0">
+            <ul className="flex list-none items-baseline justify-start gap-4 md:gap-5 lg:gap-7 xl:gap-9 flex-nowrap min-w-0 m-0 p-0">
               {NAV_RIGHT.map((item) => (
                 <li key={item.href} className="shrink-0 whitespace-nowrap">
                   <NavLink href={item.href} label={item.label} transparent={lightText} />
@@ -216,9 +216,9 @@ export function Header({ transparent: _transparent }: { transparent?: boolean } 
             <Image
               src="/neptune_logo_dark.svg"
               alt="Neptune"
-              width={120}
-              height={32}
-              className={`h-6 w-auto ${lightText ? 'invert' : ''}`}
+              width={110}
+              height={30}
+              className={`block h-4 w-auto ${lightText ? 'invert' : ''}`}
             />
           </Link>
 

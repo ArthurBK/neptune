@@ -37,7 +37,7 @@ export default async function FashionPage() {
     } | null>(CATEGORY_PAGE_QUERY),
   ])
 
-  const typedArticles = articles as ArticleCardData[]
+  const typedArticles = (articles ?? []) as ArticleCardData[]
   const orderedArticles = orderedCategoryPageArticles(categoryPage?.fashionArticles)
   const displayArticles = orderedArticles.length > 0 ? orderedArticles : typedArticles
   const fashionDescription = categoryPage?.fashionDescription?.trim() || DEFAULT_FASHION_DESCRIPTION

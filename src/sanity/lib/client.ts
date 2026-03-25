@@ -18,5 +18,16 @@ export async function sanityFetch<T>(
   query: string,
   params?: Record<string, unknown>,
 ): Promise<T> {
-  return client.fetch<T>(query, params ?? {})
+  try {
+    return await client.fetch<T>(query, params ?? {})
+  } catch (err) {
+    // In development we prefer a usable site over a hard crash when Sanity is
+    // temporarily unreachable (bad DNS/VPN/offline, etc).
+    if (process.env.NODE_ENV !== 'production') {
+      console.warn('[sanityFetch] fetch failed; returning null in development', err)
+      return null as T
+    }
+
+    throw err
+  }
 }

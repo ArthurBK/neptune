@@ -36,7 +36,7 @@ export default async function ArtsPage() {
     } | null>(CATEGORY_PAGE_QUERY),
   ])
 
-  const typedArticles = articles as ArticleCardData[]
+  const typedArticles = (articles ?? []) as ArticleCardData[]
   const orderedArticles = orderedCategoryPageArticles(categoryPage?.artsArticles)
   const displayArticles = orderedArticles.length > 0 ? orderedArticles : typedArticles
   const artsDescription = categoryPage?.artsDescription?.trim() || DEFAULT_ARTS_DESCRIPTION
