@@ -187,13 +187,13 @@ export function CartPreview({ isOpen, onClose }: CartPreviewProps) {
         onKeyDown={(e) => e.stopPropagation()}
       >
         <div className="flex h-full flex-col">
-          <div className="flex items-center justify-between border-b border-[#E5E5E5] px-6 py-4">
-            <h2 className="font-serif text-xl uppercase tracking-wide">Cart</h2>
+          <div className="relative flex items-center justify-center border-b border-[#E5E5E5] px-6 py-4">
+            <h2 className="font-futura text-xl uppercase tracking-wide">Cart</h2>
             <button
               type="button"
               onClick={onClose}
               aria-label="Close cart"
-              className="p-2 text-[#6B6B6B] hover:text-black transition-colors"
+              className="absolute right-4 p-2 text-[#6B6B6B] hover:text-black transition-colors"
             >
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden>
                 <title>Close</title>
@@ -274,7 +274,7 @@ export function CartPreview({ isOpen, onClose }: CartPreviewProps) {
               <Link
                 href={cart.checkoutUrl}
                 onClick={onClose}
-                className="block w-full bg-black py-3 text-center text-sm font-medium uppercase tracking-[0.2em] text-white transition-opacity hover:opacity-80"
+                className="font-header block w-full bg-black py-3 text-center text-sm font-medium uppercase tracking-[0.2em] text-white transition-opacity hover:opacity-80"
               >
                 Checkout
               </Link>

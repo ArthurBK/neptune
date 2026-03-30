@@ -59,7 +59,7 @@ export function HorizontalImageCarousel({
         {images.map((img, i) => (
           <div
             key={img.url}
-            className="flex shrink-0 w-full snap-center snap-always items-center justify-center"
+            className="flex shrink-0 w-full snap-center snap-always items-center justify-center h-[55vh] sm:h-[70vh]"
           >
             <Image
               src={img.url}
@@ -67,7 +67,7 @@ export function HorizontalImageCarousel({
               width={img.width ?? 800}
               height={img.height ?? 1067}
               sizes="100vw"
-              className="max-h-[55vh] w-auto max-w-full object-contain sm:max-h-[70vh]"
+              className="h-full w-auto max-w-full object-contain"
               priority={i === 0}
             />
           </div>
@@ -82,10 +82,10 @@ export function HorizontalImageCarousel({
               key={images[i].url}
               type="button"
               onClick={() => goTo(i)}
-              className={`rounded-full transition-all duration-300 ${
+              className={`h-1.5 w-1.5 rounded-full transition-all duration-300 ${
                 i === current
-                  ? 'h-1.5 w-6 bg-[#1A1A1A]'
-                  : 'h-1.5 w-1.5 bg-[#1A1A1A]/30 hover:bg-[#1A1A1A]/60'
+                  ? 'bg-[#1A1A1A]'
+                  : 'bg-[#1A1A1A]/30 hover:bg-[#1A1A1A]/60'
               }`}
               aria-label={`Go to image ${i + 1}`}
               aria-current={i === current}

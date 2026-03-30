@@ -71,10 +71,10 @@ export default async function FashionArticlePage({ params }: ArticlePageProps) {
   const typography = resolveArticleTypography(article.typography)
   const publishedDate = article.publishedAt
     ? new Date(article.publishedAt).toLocaleDateString('en-GB', {
-        day: '2-digit',
-        month: 'long',
-        year: 'numeric',
-      })
+      day: '2-digit',
+      month: 'long',
+      year: 'numeric',
+    })
     : null
 
   return (
@@ -182,7 +182,7 @@ export default async function FashionArticlePage({ params }: ArticlePageProps) {
 
         {/* Related articles — from Sanity */}
         {relatedArticles.length > 0 && (
-          <div className="mt-6 pt-12">
+          <div className="mt-2 md:mt-6 pt-6 md:pt-12">
             <div className="max-w-[1400px] mx-auto px-6 md:px-12">
               <h2 className="font-serif text-3xl md:text-4xl text-[#1A1A1A] mb-10 text-center uppercase tracking-[0.02em]">
                 YOU MAY ALSO LIKE

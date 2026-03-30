@@ -102,7 +102,7 @@ export function ProductForm({ variants, productTitle, productHandle }: ProductFo
         </div>
       )}
 
-      <p className={`font-futura text-2xl text-[#1A1A1A] transition-opacity duration-150 ${priceReady ? 'opacity-100' : 'opacity-0'}`}>
+      <p className={`font-futura text-base text-[#1A1A1A] transition-opacity duration-150 ${priceReady ? 'opacity-100' : 'opacity-0'}`}>
         {formatPriceNoDecimals(displayPrice.amount, displayPrice.currencyCode)}
       </p>
 

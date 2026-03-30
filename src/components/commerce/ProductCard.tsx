@@ -22,7 +22,7 @@ export function ProductCard({
   const isSmall = size === 'small' || compact
 
   return (
-    <article className={`group ${compact ? 'max-w-[200px]' : ''}`}>
+    <article className={`group ${compact ? 'max-w-[240px] sm:max-w-[200px]' : ''}`}>
       <Link href={`/newsstand/${handle}`} className="block overflow-hidden">
         <div className="aspect-3/4 overflow-hidden">
           {featuredImage?.url ? (
@@ -65,7 +65,7 @@ export function ProductCard({
           {formatPriceNoDecimals(price.amount, price.currencyCode)}
         </p>
         {!compact && firstVariant?.availableForSale && (
-          <div className="mt-3 opacity-0 group-hover:opacity-100 transition-opacity flex justify-center">
+          <div className="mt-3 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity flex justify-center">
             <AddToCartButton
               variant={firstVariant}
               productTitle={title}

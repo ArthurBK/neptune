@@ -384,37 +384,39 @@ function NewsstandHeroContent({
   const gridProducts = products.slice(0, 6)
 
   return (
-    <div className="flex flex-col w-full min-w-0 max-w-full h-full items-center overflow-x-hidden overflow-hidden bg-white py-[var(--header-height)]">
-      {/* Top: text content */}
-      <div className="w-full max-w-4xl min-w-0 px-6 md:px-10 lg:px-16 text-center">
-        <h2 className="font-serif font-normal text-xl md:text-2xl lg:text-2xl text-[#1A1A1A] tracking-wide mt-3 md:mt-4">
+    <div className="flex w-full min-w-0 max-w-full h-full overflow-hidden bg-white
+      flex-col items-center py-[var(--header-height)]
+      md:flex-row md:items-stretch md:py-0">
+
+      {/* ── Desktop col 1: text + CTA ───────────────────────────────── */}
+      <div className="hidden md:flex md:flex-1 md:flex-col md:items-center md:justify-center md:min-w-0 md:px-8 lg:px-12 md:text-center">
+        <h2 className="font-serif font-normal text-xl lg:text-2xl text-[#1A1A1A] tracking-wide mb-4">
           {headline}
         </h2>
         {description ? (
           <p
-            className="text-xs md:text-sm text-black leading-relaxed"
+            className="text-sm text-black leading-relaxed mb-6"
             style={{ fontFamily: 'var(--font-gill-sans)' }}
           >
             {description}
           </p>
         ) : null}
+        <Link
+          href="/newsstand"
+          className="inline-block bg-black text-white font-header font-medium text-sm tracking-[0.18em] uppercase px-5 py-2.5 transition-colors hover:bg-[#1f1f1f]"
+        >
+          {cta}
+        </Link>
       </div>
 
-      {/* Covers: mobile = single rotating cover; md+ = 3×2 grid */}
-      <div className="flex min-h-0 min-w-0 w-full max-w-full flex-1 items-center justify-center overflow-hidden px-3 sm:px-4 md:px-0">
-        <div className="w-full py-2 md:hidden">
-          {gridProducts.length > 0 ? (
-            <NewsstandMobileRotator
-              key={gridProducts.map((p) => p.handle).join('|')}
-              products={gridProducts}
-              priority={priority}
-            />
-          ) : null}
-        </div>
-        <div className="hidden w-full max-w-none min-w-0 aspect-square grid-cols-3 grid-rows-2 gap-0.5 md:grid md:h-full md:w-auto">
+      {/* ── Desktop col 2: 3×2 grid (centered) ──────────────────────── */}
+      <div className="hidden md:flex md:items-center md:justify-center md:h-full md:flex-1 md:min-w-0 md:overflow-hidden md:pt-[var(--header-height)]">
+        <div className="aspect-square grid-cols-3 grid-rows-2 gap-0.5 grid h-full w-auto min-w-0">
           {gridProducts.map((p, idx) => {
             const col = idx % 3
+            const row = idx < 3 ? 'top' : 'bottom'
             const x = col === 0 ? 'right' : col === 2 ? 'left' : 'center'
+            const y = row === 'top' ? 'bottom' : 'top'
             return (
               <Link
                 key={`${p.handle}-${idx}`}
@@ -428,7 +430,7 @@ function NewsstandHeroContent({
                     alt={p.imageAlt ?? p.title}
                     fill
                     className="object-contain"
-                    style={{ objectPosition: `${x} center` }}
+                    style={{ objectPosition: `${x} ${y}` }}
                     sizes="22vw"
                     priority={priority && idx < 3}
                   />
@@ -442,13 +444,44 @@ function NewsstandHeroContent({
           })}
         </div>
       </div>
-      <div className="w-full px-6 md:px-10 lg:px-16 pt-3 md:pt-4 text-center">
-        <Link
-          href={"/newsstand"}
-          className="inline-block bg-black text-white font-header font-medium text-sm md:text-base tracking-[0.18em] uppercase px-5 py-2.5 transition-colors hover:bg-[#1f1f1f]"
-        >
-          {cta}
-        </Link>
+
+      {/* ── Desktop col 3: empty trailing (mirrors col 1 for centering) ── */}
+      <div className="hidden md:block md:w-16 lg:w-24 md:shrink-0" aria-hidden />
+
+      {/* ── Mobile: text + rotator + CTA (stacked) ─────────────────── */}
+      <div className="flex flex-col items-center w-full md:hidden">
+        <div className="w-full max-w-4xl px-6 text-center">
+          <h2 className="font-serif font-normal text-xl text-[#1A1A1A] tracking-wide mb-2">
+            {headline}
+          </h2>
+          {description ? (
+            <p
+              className="text-xs text-black leading-relaxed"
+              style={{ fontFamily: 'var(--font-gill-sans)' }}
+            >
+              {description}
+            </p>
+          ) : null}
+        </div>
+
+        <div className="w-full flex-1 flex items-center justify-center py-4 px-3">
+          {gridProducts.length > 0 ? (
+            <NewsstandMobileRotator
+              key={gridProducts.map((p) => p.handle).join('|')}
+              products={gridProducts}
+              priority={priority}
+            />
+          ) : null}
+        </div>
+
+        <div className="w-full px-6 pb-2 text-center">
+          <Link
+            href="/newsstand"
+            className="inline-block bg-black text-white font-header font-medium text-sm tracking-[0.18em] uppercase px-5 py-2.5 transition-colors hover:bg-[#1f1f1f]"
+          >
+            {cta}
+          </Link>
+        </div>
       </div>
     </div>
   )

@@ -114,8 +114,8 @@ export default async function NewsstandProductPage({ params }: ProductPageProps)
       <div className="max-w-screen-xl mx-auto px-6 md:px-12 lg:px-16 ">
 
         {/* You May Also Like */}
-        <div className="pt-16 border-t border-[#E5E5E5] text-center">
-          <h2 className="font-serif text-4xl text-[#1A1A1A] mb-8">
+        <div className="pt-2 md:pt-16 text-center">
+          <h2 className="font-serif text-2xl md:text-4xl text-[#1A1A1A] mb-8">
             YOU MAY ALSO LIKE
           </h2>
           {relatedProducts.length > 0 ? (

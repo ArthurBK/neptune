@@ -31,7 +31,7 @@ export async function LinkedIssuePreview({ handle }: { handle: string }) {
     product?.featuredImage?.altText ?? product?.title ?? 'Linked issue'
 
   return (
-    <div className="mt-12">
+    <div className="mt-0 md:mt-12">
       <div className="mx-auto max-w-[1400px] px-6 md:px-12 lg:px-16 text-center">
         <Link
           href={`/newsstand/${handle}`}
