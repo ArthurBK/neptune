@@ -25,6 +25,7 @@ type HomePageSection = {
     title: string
     slug: string
     category: string
+    subcategory?: string | null
     coverImage: { asset?: { _ref: string }; alt?: string }
     author?: { name: string; slug: string } | null
   }
@@ -110,6 +111,7 @@ export default async function Home() {
             title: block.article.title,
             slug: block.article.slug,
             category: block.article.category,
+            subcategory: block.article.subcategory ?? null,
             coverImage: block.article.coverImage,
             author: block.article.author,
           },
@@ -220,6 +222,7 @@ export default async function Home() {
         title: string
         slug: string
         category: string
+        subcategory?: string | null
         coverImage: { asset?: { _ref: string }; alt?: string }
         author?: { name: string; slug: string } | null
       }>

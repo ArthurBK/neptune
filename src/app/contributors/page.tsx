@@ -40,10 +40,13 @@ export default async function ContributorsPage() {
         <div className="mx-auto mb-6 md:mb-8 h-px w-1/3 max-w-md bg-(--neptune-logo-red)" />
 
         <header className="mb-6 md:mb-12 text-center font-futura">
-          <h1 className="font-serif font-bold text-3xl md:text-4xl text-[#1A1A1A] uppercase tracking-wide">
+          <h1 className="font-futura font-normal text-xl md:text-2xl text-[#1A1A1A] uppercase tracking-wide">
             Contributors
           </h1>
-          <p className="mt-2 text-sm md:text-[15px] text-black max-w-2xl mx-auto whitespace-pre-line font-[Helvetica,Arial,sans-serif]">
+          <p
+            className="mt-2 text-sm md:text-[16px] text-black max-w-2xl mx-auto whitespace-pre-line"
+            style={{ fontFamily: "var(--font-gill-sans)", fontWeight: 300 }}
+          >
             Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor
             incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud
             exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure

@@ -58,10 +58,13 @@ export function MarketPageContent({ products }: MarketPageContentProps) {
     <main>
       <div className="max-w-7xl mx-auto px-6 md:px-12 lg:px-16 pt-4 md:pt-8 pb-16 md:pb-24">
         <header className="mb-6 md:mb-12 text-center font-futura">
-          <h1 className="font-serif font-bold text-3xl md:text-4xl uppercase tracking-wide text-[#1A1A1A]">
+          <h1 className="font-futura font-normal text-xl md:text-2xl uppercase tracking-wide text-[#1A1A1A]">
             Neptune Market
           </h1>
-          <p className="mt-2 text-sm md:text-[15px] text-black max-w-2xl mx-auto whitespace-pre-line font-[Helvetica,Arial,sans-serif]">
+          <p
+            className="mt-2 text-sm md:text-[16px] text-black max-w-2xl mx-auto whitespace-pre-line"
+            style={{ fontFamily: 'var(--font-gill-sans)', fontWeight: 300 }}
+          >
             Discover our curated shopping edit, featuring a variety of products, including books, objects of all kinds, furniture, and fashion gems that our editors adore and have on their wish lists (and soon, you will too!).
             <br />
             <br />

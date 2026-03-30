@@ -146,7 +146,7 @@ export function Header({ transparent: _transparent }: { transparent?: boolean } 
 
   return (
     <header className={headerClass} style={headerStyle}>
-      <div className="relative flex flex-1 w-full min-w-0 pl-3 pr-4 sm:pl-4 sm:pr-6 md:pl-5 md:pr-8 lg:pl-6 lg:pr-10 py-1.5 md:py-2.5 overflow-visible shrink-0 items-center">
+      <div className="relative flex flex-1 w-full min-w-0 px-4 sm:px-6 md:px-8 lg:px-10 py-1.5 md:py-2.5 overflow-visible shrink-0 items-center">
         {/* Left: burger + newsletter | Center: nav + logo (desktop) | Right: cart + search */}
         <div className="relative flex items-center w-full min-w-0 min-h-[1.5rem] md:min-h-0">
           <div className="flex shrink-0 items-center gap-0 z-10">
@@ -170,15 +170,17 @@ export function Header({ transparent: _transparent }: { transparent?: boolean } 
                   }`}
               />
             </button>
-            <NavLink
-              href="/newsletters"
-              label="NEWSLETTER"
-              transparent={lightText}
-              className="hidden md:inline-flex shrink-0 md:-ml-1 md:h-10 md:items-center"
-            />
+            <div className="hidden md:block">
+              <NavLink
+                href="/newsletters"
+                label="NEWSLETTER"
+                transparent={lightText}
+                className="shrink-0 md:-ml-1 md:h-10 md:items-center"
+              />
+            </div>
           </div>
 
-          <div className="hidden md:flex flex-1 min-w-0 items-baseline justify-center gap-4 md:gap-5 lg:gap-7 xl:gap-9 md:mt-0">
+          <div className="hidden md:flex absolute left-1/2 -translate-x-1/2 min-w-0 items-baseline justify-center gap-4 md:gap-5 lg:gap-7 xl:gap-9 md:mt-0">
             <nav className="flex items-baseline justify-end min-w-0" aria-label="Primary navigation">
               <ul className="flex list-none items-baseline justify-end gap-4 md:gap-5 lg:gap-7 xl:gap-9 flex-nowrap m-0 p-0">
                 {NAV_LEFT.map((item) => (
@@ -222,7 +224,7 @@ export function Header({ transparent: _transparent }: { transparent?: boolean } 
             />
           </Link>
 
-          <div className="flex shrink-0 items-center justify-end z-10 -mr-2 sm:-mr-4 md:-mr-6">
+          <div className="absolute right-0 top-1/2 -translate-y-1/2 flex shrink-0 items-center justify-end z-10">
             <button
               type="button"
               aria-label="Cart"
@@ -293,6 +295,11 @@ export function Header({ transparent: _transparent }: { transparent?: boolean } 
         style={{ WebkitOverflowScrolling: 'touch' } as CSSProperties}
       >
         <nav className="flex min-h-full flex-col gap-3 px-6 pt-8 pb-12">
+          <NavLink
+            href="/newsletters"
+            label="NEWSLETTER"
+            onClick={() => setIsBurgerOpen(false)}
+          />
           {NAV_ITEMS.map((item) => (
             <NavLink
               key={item.href}

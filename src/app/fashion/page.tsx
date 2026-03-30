@@ -61,10 +61,13 @@ export default async function FashionPage() {
 
         {/* Category header */}
         <header className="mb-6 md:mb-12 text-center font-futura">
-          <h1 className="font-serif font-bold text-3xl md:text-4xl text-[#1A1A1A] uppercase tracking-wide">
+          <h1 className="font-futura font-normal text-xl md:text-2xl text-[#1A1A1A] uppercase tracking-wide">
             Fashion
           </h1>
-          <p className="mt-2 text-sm md:text-[15px] text-black max-w-2xl mx-auto whitespace-pre-line font-[Helvetica,Arial,sans-serif]">
+          <p
+            className="mt-2 text-sm md:text-[16px] text-black max-w-2xl mx-auto whitespace-pre-line"
+            style={{ fontFamily: "var(--font-gill-sans)", fontWeight: 300 }}
+          >
             {fashionDescription}
           </p>
         </header>

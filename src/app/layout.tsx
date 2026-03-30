@@ -41,6 +41,23 @@ const cormorantGaramond = localFont({
   display: 'swap',
 })
 
+const gillSans = localFont({
+  src: [
+    {
+      path: '../../public/fonts/gill-sans-2/Gill Sans Light.otf',
+      weight: '300',
+      style: 'normal',
+    },
+    {
+      path: '../../public/fonts/gill-sans-2/Gill Sans.otf',
+      weight: '400',
+      style: 'normal',
+    },
+  ],
+  variable: '--font-gill-sans',
+  display: 'swap',
+})
+
 export const metadata: Metadata = {
   title: 'Neptune',
   description: 'Luxury editorial magazine',
@@ -57,7 +74,7 @@ export default async function RootLayout({
   const instagramUrl = settings?.instagramUrl ?? null
 
   return (
-    <html lang="en" className={`${cormorantGaramond.variable} ${inter.variable}`} suppressHydrationWarning>
+    <html lang="en" className={`${cormorantGaramond.variable} ${inter.variable} ${gillSans.variable}`} suppressHydrationWarning>
       <body className="min-h-dvh flex flex-col bg-white text-[#1A1A1A] antialiased font-sans font-light" suppressHydrationWarning>
         <LayoutShell instagramUrl={instagramUrl}>{children}</LayoutShell>
       </body>

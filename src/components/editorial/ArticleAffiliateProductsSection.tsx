@@ -34,7 +34,7 @@ export function ArticleAffiliateProductsSection({
           </h2>
           <Link
             href="/the-market"
-            className="mt-3 inline-block text-xs uppercase tracking-[0.2em] text-[#6B6B6B] transition-colors hover:text-black hover:underline"
+            className="font-futura mt-3 inline-block text-xs uppercase tracking-[0.1em] text-black transition-colors hover:text-black hover:underline"
           >
             Neptune Market
           </Link>

@@ -30,18 +30,23 @@ export function NewsletterPageContent({
     <main className="flex flex-col">
       {/* Title and text above the image */}
       <div className="flex flex-col items-center px-6 md:px-12 pt-5 md:pt-6 pb-6 md:pb-8 text-center">
-        <h1 className="font-serif font-bold text-2xl md:text-3xl text-[#1A1A1A] uppercase tracking-wide">
+        <h1
+          className="font-futura font-normal text-xl md:text-2xl text-[#1A1A1A] uppercase tracking-wide"
+        >
           {headline ?? 'Newsletter'}
         </h1>
         <div className="mt-4 w-full overflow-x-auto flex justify-center">
-          <p className="text-base text-[#6B6B6B] whitespace-nowrap">
+          <p
+            className="text-base md:text-[16px] text-black whitespace-nowrap"
+            style={{ fontFamily: 'var(--font-gill-sans)' }}
+          >
             {introText}
           </p>
         </div>
         <button
           type="button"
           onClick={openModal}
-          className="mt-8 cursor-pointer bg-transparent font-futura text-base tracking-[0.2em] uppercase text-black transition-colors hover:underline"
+          className="mt-8 w-fit mx-auto cursor-pointer bg-black text-white font-futura text-sm md:text-base tracking-[0.18em] uppercase px-5 py-2.5 transition-colors hover:bg-[#1f1f1f]"
         >
           Subscribe
         </button>

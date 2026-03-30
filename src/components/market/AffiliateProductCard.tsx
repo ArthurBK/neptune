@@ -72,10 +72,13 @@ export function AffiliateProductCard({
         )}
       </div>
       <div className="mt-2 text-center">
-        <h3 className="font-serif text-m text-black group-hover:underline line-clamp-2 leading-tight">
+        <h3
+          className="px-2 md:px-3 text-sm md:text-[17px] text-black group-hover:underline line-clamp-2 leading-tight"
+          style={{ fontFamily: 'var(--font-gill-sans)' }}
+        >
           {title}
         </h3>
-        <p className="font-header font-semibold text-[13px] text-black leading-tight">{brand}</p>
+        <p className="tracking-[0.1em] font-header font-semibold text-[13px] text-black leading-tight">{brand}</p>
         <p className="mt-2 font-futura text-xs text-black leading-tight">
           {formatAffiliatePrice(price)}
         </p>

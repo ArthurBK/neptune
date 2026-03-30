@@ -10,6 +10,7 @@ export const HOME_PAGE_QUERY = `
           title,
           "slug": slug.current,
           "category": coalesce(category, categories[0]),
+          subcategory,
           categories,
           coverImage,
           "author": author->{ name, "slug": slug.current }
@@ -62,6 +63,7 @@ export const FEATURED_ARTICLES_HOME_QUERY = `
     title,
     "slug": slug.current,
     "category": coalesce(category, categories[0]),
+    subcategory,
     categories,
     coverImage,
     "author": author->{ name, "slug": slug.current }

@@ -1,6 +1,6 @@
 'use client'
 
-import type { ReactNode } from 'react'
+import { useEffect, useRef, useState, type ReactNode } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 
@@ -14,6 +14,7 @@ export interface CarouselArticle {
   title: string
   slug: string
   category: string
+  subcategory?: string | null
   coverImage: { asset?: { _ref: string }; alt?: string }
   author?: { name: string; slug: string } | null
 }
@@ -295,10 +296,77 @@ function SplitImageContent({
   )
 }
 
+/** Mobile newsstand hero: one cover at a time, cycling like a GIF */
+function NewsstandMobileRotator({
+  products,
+  priority,
+}: {
+  products: FeaturedProduct[]
+  priority: boolean
+}) {
+  const [activeIndex, setActiveIndex] = useState(0)
+  const indexRef = useRef(0)
+
+  useEffect(() => {
+    // Warm image cache to reduce visible flashing while rotating.
+    for (const p of products) {
+      if (!p.imageUrl) continue
+      const img = new window.Image()
+      img.src = p.imageUrl
+    }
+  }, [products])
+
+  useEffect(() => {
+    if (products.length <= 1) return
+
+    const reduceMotion =
+      typeof window !== 'undefined' &&
+      window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches
+    if (reduceMotion) return
+
+    const tick = () => {
+      const next = (indexRef.current + 1) % products.length
+      indexRef.current = next
+      setActiveIndex(next)
+    }
+
+    const id = window.setInterval(tick, 1800)
+    return () => window.clearInterval(id)
+  }, [products.length])
+
+  const p = products[Math.min(activeIndex, Math.max(0, products.length - 1))]
+  if (!p) return null
+
+  return (
+    <div className="relative mx-auto w-full max-w-[280px] aspect-[2/3]">
+      <Link
+        href={`/newsstand/${p.handle}`}
+        className="relative block h-full w-full overflow-hidden"
+        aria-label={p.title}
+      >
+        {p.imageUrl ? (
+          <Image
+            src={p.imageUrl}
+            alt={p.imageAlt ?? p.title}
+            fill
+            className="object-contain object-center transition-opacity duration-300"
+            sizes="280px"
+            priority={priority && activeIndex === 0}
+          />
+        ) : (
+          <div className="absolute inset-0 flex items-center justify-center bg-[#F3F3F3] px-3 text-center text-sm text-[#6B6B6B]">
+            {p.title}
+          </div>
+        )}
+      </Link>
+    </div>
+  )
+}
+
 /** Newsstand hero: 6 product covers (left) + text (right) */
 function NewsstandHeroContent({
   products,
-  featuredHandle,
+  featuredHandle: _featuredHandle,
   title,
   description,
   ctaLabel,
@@ -316,54 +384,71 @@ function NewsstandHeroContent({
   const gridProducts = products.slice(0, 6)
 
   return (
-    <div className="flex flex-col md:flex-row w-full min-w-0 h-full gap-0 items-stretch overflow-hidden bg-white">
-      {/* Left: text content */}
-      <div className="flex-1 md:flex-[1_1_33.333%] min-w-0 flex flex-col justify-center px-6 md:px-10 lg:px-16 py-6 md:py-8">
-        <h2 className="font-serif font-extrabold text-xl md:text-2xl lg:text-3xl text-[#1A1A1A] tracking-wide mb-4 md:mb-6">
+    <div className="flex flex-col w-full min-w-0 max-w-full h-full items-center overflow-x-hidden overflow-hidden bg-white py-[var(--header-height)]">
+      {/* Top: text content */}
+      <div className="w-full max-w-4xl min-w-0 px-6 md:px-10 lg:px-16 text-center">
+        <h2 className="font-serif font-normal text-xl md:text-2xl lg:text-2xl text-[#1A1A1A] tracking-wide mt-3 md:mt-4">
           {headline}
         </h2>
         {description ? (
-          <p className="text-base md:text-lg text-black mb-6 md:mb-8 leading-relaxed">
+          <p
+            className="text-xs md:text-sm text-black leading-relaxed"
+            style={{ fontFamily: 'var(--font-gill-sans)' }}
+          >
             {description}
           </p>
         ) : null}
-        <Link
-          href={"/newsstand"}
-          className="font-header font-medium text-sm md:text-base tracking-[0.2em] uppercase text-[#1A1A1A] hover:underline underline-offset-4 w-fit"
-        >
-          {cta}
-        </Link>
       </div>
 
-      {/* Right: static 6 covers grid (3x2) */}
-      <div className="flex-1 md:flex-[1_1_66.666%] min-w-0 min-h-0 h-full overflow-hidden p-0">
-        <div className="grid h-full w-full grid-cols-3 grid-rows-2 gap-0">
-          {gridProducts.map((p, idx) => (
-            <Link
-              key={p.handle}
-              href={`/newsstand/${p.handle}`}
-              className={`relative min-h-0 overflow-hidden bg-[#F3F3F3] ${p.handle === featuredHandle ? 'ring-1 ring-black/20' : ''}`}
-              aria-label={p.title}
-            >
-              <div className="relative h-full w-full">
+      {/* Covers: mobile = single rotating cover; md+ = 3×2 grid */}
+      <div className="flex min-h-0 min-w-0 w-full max-w-full flex-1 items-center justify-center overflow-hidden px-3 sm:px-4 md:px-0">
+        <div className="w-full py-2 md:hidden">
+          {gridProducts.length > 0 ? (
+            <NewsstandMobileRotator
+              key={gridProducts.map((p) => p.handle).join('|')}
+              products={gridProducts}
+              priority={priority}
+            />
+          ) : null}
+        </div>
+        <div className="hidden w-full max-w-none min-w-0 aspect-square grid-cols-3 grid-rows-2 gap-0.5 md:grid md:h-full md:w-auto">
+          {gridProducts.map((p, idx) => {
+            const col = idx % 3
+            const x = col === 0 ? 'right' : col === 2 ? 'left' : 'center'
+            return (
+              <Link
+                key={`${p.handle}-${idx}`}
+                href={`/newsstand/${p.handle}`}
+                className="relative min-h-0 min-w-0 overflow-hidden"
+                aria-label={p.title}
+              >
                 {p.imageUrl ? (
                   <Image
                     src={p.imageUrl}
                     alt={p.imageAlt ?? p.title}
                     fill
-                    className="object-cover object-center"
-                    sizes="(max-width: 768px) 33vw, 16vw"
+                    className="object-contain"
+                    style={{ objectPosition: `${x} center` }}
+                    sizes="22vw"
                     priority={priority && idx < 3}
                   />
                 ) : (
-                  <div className="absolute inset-0 flex items-center justify-center text-[#6B6B6B] text-sm px-3 text-center">
+                  <div className="absolute inset-0 flex items-center justify-center bg-[#F3F3F3] px-3 text-center text-sm text-[#6B6B6B]">
                     {p.title}
                   </div>
                 )}
-              </div>
-            </Link>
-          ))}
+              </Link>
+            )
+          })}
         </div>
+      </div>
+      <div className="w-full px-6 md:px-10 lg:px-16 pt-3 md:pt-4 text-center">
+        <Link
+          href={"/newsstand"}
+          className="inline-block bg-black text-white font-header font-medium text-sm md:text-base tracking-[0.18em] uppercase px-5 py-2.5 transition-colors hover:bg-[#1f1f1f]"
+        >
+          {cta}
+        </Link>
       </div>
     </div>
   )
@@ -411,28 +496,30 @@ function NewsletterSectionContent({
         </div>
         <div className="flex-1 md:basis-1/2 min-w-0 mt-0 md:mt-(--header-height) h-auto md:h-[calc(var(--section-height,100vh)-var(--header-height))] flex items-center justify-center px-6 md:px-10 lg:px-16 text-center">
           <div className="w-full max-w-2xl">
-            <h2 className="font-serif font-bold text-3xl md:text-3xl text-black uppercase tracking-wide">
+            <h2 className="font-futura font-normal text-xl md:text-2xl text-black uppercase tracking-wide">
               {title}
             </h2>
-            <p className="mt-3 text-sm text-black leading-relaxed font-[Helvetica,Arial,sans-serif] font-normal whitespace-pre-line">
+            <p className="mt-3 text-sm text-black leading-relaxed font-[Helvetica,Arial,sans-serif] font-normal whitespace-pre-line"
+              style={{ fontFamily: 'var(--font-gill-sans)', fontWeight: 300 }}
+            >
               {introText}
             </p>
             <button
               type="button"
               onClick={openModal}
-              className="mt-5 font-futura text-base tracking-[0.2em] uppercase text-black transition-colors hover:underline w-fit mx-auto"
+              className="cursor-pointer mt-5 w-fit mx-auto bg-black text-white font-futura text-sm md:text-base tracking-[0.18em] uppercase px-5 py-2.5 transition-colors hover:bg-[#1f1f1f]"
             >
               Subscribe now
             </button>
             {rightImageUrl ? (
-              <div className="block md:hidden mt-5 mx-auto w-full max-w-[220px]">
+              <div className="block md:hidden mt-5 w-screen -mx-6">
                 <Image
                   src={rightImageUrl}
                   alt=""
-                  width={220}
-                  height={180}
+                  width={1200}
+                  height={900}
                   className="h-auto w-full object-contain object-center"
-                  sizes="220px"
+                  sizes="100vw"
                   priority={priority}
                 />
               </div>
@@ -468,6 +555,7 @@ function ArticleSplitContent({
   subtitle,
   subtitleHref,
   categoryHref,
+  categoryLabel,
   href,
   priority = false,
 }: {
@@ -477,40 +565,22 @@ function ArticleSplitContent({
   subtitle?: React.ReactNode
   subtitleHref?: string
   categoryHref?: string
+  categoryLabel?: string | null
   href: string
   priority?: boolean
 }) {
-  const isIosMobile = (() => {
-    if (typeof window === 'undefined' || typeof navigator === 'undefined') return false
-    const ua = navigator.userAgent
-    const isiOS =
-      /iP(hone|od|ad)/.test(ua) ||
-      (ua.includes('Macintosh') && navigator.maxTouchPoints > 1)
-    const isMobileViewport = window.matchMedia('(max-width: 767px)').matches
-    return isiOS && isMobileViewport
-  })()
-
   return (
-    <div className="flex flex-col h-auto md:h-full w-full min-w-0 bg-white">
+    <div className="flex flex-col h-auto md:h-full w-full min-w-0 items-center md:items-stretch bg-white">
       <div className="flex flex-col md:flex-row md:flex-1 min-h-0 w-full">
         {/* Left: image */}
-        <div className="flex-[1.45] max-md:supports-[-webkit-touch-callout:none]:flex-[1.28] md:flex-1 min-w-0 min-h-[45vh] max-md:supports-[-webkit-touch-callout:none]:min-h-[39vh] md:min-h-0 relative aspect-[4/3] md:aspect-[16/9]">
+        <div className="flex-[1.45] md:flex-1 min-w-0 min-h-[56vh] md:min-h-0 relative md:aspect-[16/9]">
           {imageUrl ? (
             <Link href={href} className="block h-full w-full md:absolute md:inset-0">
               <div className="flex h-full w-full items-center justify-center md:hidden">
                 <img
                   src={imageUrl}
                   alt={alt}
-                  className="block h-full w-full object-cover object-center"
-                  style={
-                    isIosMobile
-                      ? {
-                        width: '94%',
-                        height: '94%',
-                        objectFit: 'contain',
-                      }
-                      : undefined
-                  }
+                  className="block h-full w-full object-contain object-center"
                   loading={priority ? 'eager' : 'lazy'}
                   decoding="async"
                 />
@@ -529,22 +599,22 @@ function ArticleSplitContent({
           )}
         </div>
         {/* Right: text */}
-        <div className="flex-[0.65] md:flex-1 min-w-0 flex flex-col justify-start md:justify-center px-4 md:px-10 lg:px-16 pt-2 pb-1 md:py-12">
+        <div className="flex-[0.65] md:flex-1 min-w-0 flex flex-col items-center md:items-start text-center md:text-left justify-start md:justify-center px-4 md:px-10 lg:px-16 pt-2 pb-1 md:py-12">
           {categoryHref && (
             <Link
               href={categoryHref}
-              className="font-header font-extrabold text-[12px] tracking-[0.25em] uppercase text-[color:var(--neptune-logo-red)] hover:underline underline-offset-2 transition-colors mb-3"
+              className="font-header font-extrabold text-[12px] tracking-[0.25em] uppercase text-[color:var(--neptune-logo-red)] hover:underline underline-offset-2 transition-colors mb-0"
             >
-              Cover Story
+              {categoryLabel ?? 'Cover Story'}
             </Link>
           )}
           <Link href={href} className="group">
-            <h2 className="max-w-full whitespace-pre-line break-words font-serif text-2xl font-bold leading-[1.05] md:leading-normal tracking-wide text-black group-hover:opacity-80 group-hover:underline underline-offset-4 transition-opacity sm:text-3xl md:text-4xl [-webkit-text-size-adjust:100%] [text-size-adjust:100%]">
+            <h2 className="max-w-full whitespace-pre-line break-words font-serif text-2xl font-bold leading-[0.98] md:leading-[1.22] tracking-wide text-black group-hover:opacity-80 group-hover:underline underline-offset-4 transition-opacity sm:text-3xl md:text-4xl [-webkit-text-size-adjust:100%] [text-size-adjust:100%]">
               {title}
             </h2>
           </Link>
           {subtitle && (
-            <p className="mt-3 text-sm md:text-lg text-black">
+            <p className="mt-0 text-sm md:text-lg text-black">
               by{' '}
               {subtitleHref ? (
                 <Link
@@ -657,6 +727,7 @@ function HeroContent({
   subtitle,
   subtitleHref,
   categoryHref,
+  categoryLabel,
   cta,
   href,
   priority = false,
@@ -669,6 +740,7 @@ function HeroContent({
   subtitle?: React.ReactNode
   subtitleHref?: string
   categoryHref?: string
+  categoryLabel?: string | null
   cta: string
   href: string
   priority?: boolean
@@ -688,7 +760,7 @@ function HeroContent({
               href={categoryHref}
               className="pointer-events-auto text-xs tracking-[0.25em] uppercase text-white/80 hover:text-white hover:underline underline-offset-2 transition-colors mb-3"
             >
-              Cover Story
+              {categoryLabel ?? 'Cover Story'}
             </Link>
           )}
           <Link
@@ -718,7 +790,7 @@ function HeroContent({
             href={categoryHref}
             className="text-xs tracking-[0.25em] uppercase text-white/80 hover:text-white hover:underline underline-offset-2 transition-colors mb-3"
           >
-            Cover Story
+            {categoryLabel ?? 'Cover Story'}
           </Link>
         )}
         <h2 className="font-serif text-4xl sm:text-5xl md:text-6xl lg:text-8xl text-white tracking-wide max-w-full break-words [text-shadow:0_2px_20px_rgba(0,0,0,0.8),0_0_40px_rgba(0,0,0,0.6)]">
@@ -824,7 +896,7 @@ function renderSectionContent(
     return {
       content: (
         <div
-          className={`w-full h-full min-w-0 flex flex-col ${imageUrl ? 'pt-[var(--header-height)]' : ''}`}
+          className={`w-full h-full min-w-0 flex flex-col justify-center md:justify-start ${imageUrl ? 'pt-[var(--header-height)]' : ''}`}
         >
           <ArticleSplitContent
             imageUrl={imageUrl}
@@ -835,6 +907,7 @@ function renderSectionContent(
               article.author?.slug ? `/contributors/${article.author.slug}` : undefined
             }
             categoryHref={`/${article.category}`}
+            categoryLabel={article.subcategory}
             href={`/${article.category}/${article.slug}`}
             priority={priority}
           />

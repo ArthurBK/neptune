@@ -35,11 +35,11 @@ export default async function AboutPage() {
   return (
     <main>
       <div className="max-w-7xl mx-auto px-6 md:px-12 lg:px-16 pt-4 md:pt-8 pb-10 md:pb-14">
-        <header className="mb-6 md:mb-10 text-center font-futura">
-          <h1 className="font-serif font-bold text-3xl md:text-4xl text-[#1A1A1A] uppercase tracking-wide">
+        {/* <header className="mb-6 md:mb-10 text-center font-futura">
+          <h1 className="font-futura font-normal text-xl md:text-2xl text-[#1A1A1A] uppercase tracking-wide">
             About
           </h1>
-        </header>
+        </header> */}
 
         {settings?.aboutText?.length ? (
           <section className="max-w-3xl mx-auto mb-10 md:mb-14">
