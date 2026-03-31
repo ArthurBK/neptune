@@ -14,6 +14,7 @@ import {
 import { HomeScrollContainer } from '@/components/home/HomeScrollContainer'
 import type { HomeSection } from '@/components/home/StickyHeroStack'
 import { Footer } from '@/components/layout/Footer'
+import { SuppressLayoutFooter } from '@/components/layout/SuppressLayoutFooter'
 
 export const revalidate = 3600
 
@@ -275,6 +276,7 @@ export default async function Home() {
 
   return (
     <div className="min-h-screen">
+      <SuppressLayoutFooter />
       <HomeScrollContainer sections={sections}>
         <section className="h-[var(--section-height,100vh)] min-h-[var(--section-height,100vh)] w-full shrink-0 flex flex-col items-center justify-center bg-white">
           <Footer instagramUrl={settings?.instagramUrl ?? null} />

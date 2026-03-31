@@ -15,6 +15,7 @@ type ListPerson = {
   name: string
   slug: string
   bio: string
+  articleCount: number
 }
 
 export default async function ContributorsPage() {
@@ -60,12 +61,18 @@ export default async function ContributorsPage() {
               {entries.map((person) => (
                 <div key={`${person.href}-${person._id}`} className="text-left">
                   <p className="font-serif text-[15px] font-normal leading-[1.65] text-black md:text-base">
-                    <Link
-                      href={person.href}
-                      className="font-serif text-xl font-bold tracking-[0.06em] text-black hover:underline underline-offset-2"
-                    >
-                      {person.name}
-                    </Link>
+                    {person.articleCount > 0 ? (
+                      <Link
+                        href={person.href}
+                        className="font-serif text-xl font-bold tracking-[0.06em] text-black hover:underline underline-offset-2"
+                      >
+                        {person.name}
+                      </Link>
+                    ) : (
+                      <span className="font-serif text-xl font-bold tracking-[0.06em] text-black">
+                        {person.name}
+                      </span>
+                    )}
                     {person.bio ? (
                       <>
                         {' '}

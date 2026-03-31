@@ -384,9 +384,7 @@ function NewsstandHeroContent({
   const gridProducts = products.slice(0, 6)
 
   return (
-    <div className="flex w-full min-w-0 max-w-full h-full overflow-hidden bg-white
-      flex-col items-center py-[var(--header-height)]
-      md:flex-row md:items-stretch md:py-0">
+    <div className="flex w-full min-w-0 max-w-full h-full overflow-hidden bg-white flex-col items-center py-[var(--header-height)] md:flex-row md:items-stretch md:py-0">
 
       {/* ── Desktop col 1: text + CTA ───────────────────────────────── */}
       <div className="hidden md:flex md:flex-1 md:flex-col md:items-center md:justify-center md:min-w-0 md:px-8 lg:px-12 md:text-center">

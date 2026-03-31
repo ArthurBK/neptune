@@ -240,7 +240,8 @@ export const CONTRIBUTORS_LIST_PAGE_QUERY = `
     _id,
     name,
     "slug": slug.current,
-    bio
+    bio,
+    "articleCount": count(*[_type == "article" && references(^._id)])
   }
 `
 
@@ -249,7 +250,8 @@ export const PHOTOGRAPHERS_LIST_PAGE_QUERY = `
     _id,
     name,
     "slug": slug.current,
-    bio
+    bio,
+    "articleCount": count(*[_type == "article" && references(^._id)])
   }
 `
 

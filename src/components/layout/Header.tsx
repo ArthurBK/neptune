@@ -123,8 +123,12 @@ export function Header({ transparent: _transparent }: { transparent?: boolean } 
     }
   }, [fetchCartCount])
 
-  const pathname = usePathname()
-  // `usePathname()` peut être `''` ou désynchronisé un instant sur mobile → fond blanc à tort sans ça.
+  const pathnameFromRouter = usePathname()
+  // On the client, window.location.pathname is immediately available and always accurate,
+  // preventing the white flash caused by usePathname() briefly holding a stale/wrong value
+  // during hydration or concurrent-mode transitions.
+  const pathname =
+    typeof window !== 'undefined' ? window.location.pathname : pathnameFromRouter
   const isHomePage = pathname != null && isHomePath(pathname)
   const hasSolidBg = pathname == null ? false : !isHomePage
   const lightText = isHomePage && variant === 'dark'
@@ -145,7 +149,7 @@ export function Header({ transparent: _transparent }: { transparent?: boolean } 
     : 'text-black hover:text-[#63382E] transition-colors'
 
   return (
-    <header className={headerClass} style={headerStyle}>
+    <header className={headerClass} style={headerStyle} suppressHydrationWarning>
       <div className="relative flex flex-1 w-full min-w-0 px-4 sm:px-6 md:px-8 lg:px-10 py-1.5 md:py-2.5 overflow-visible shrink-0 items-center">
         {/* Left: burger + newsletter | Center: nav + logo (desktop) | Right: cart + search */}
         <div className="relative flex items-center w-full min-w-0 min-h-[1.5rem] md:min-h-0">
