@@ -123,8 +123,12 @@ export function Header({ transparent: _transparent }: { transparent?: boolean } 
     }
   }, [fetchCartCount])
 
-  const pathname = usePathname()
-  const isHomePage = pathname != null && isHomePath(pathname)
+  const pathnameFromRouter = usePathname()
+  // usePathname() is the primary source for reactive navigation updates.
+  // window.location.pathname is used only as a fallback when usePathname()
+  // is briefly empty during hydration, preventing a white flash on the homepage.
+  const pathname = pathnameFromRouter || (typeof window !== 'undefined' ? window.location.pathname : '/')
+  const isHomePage = isHomePath(pathname)
   const hasSolidBg = !isHomePage
   const lightText = isHomePage && variant === 'dark'
   const headerClass = `fixed left-0 right-0 top-0 z-50 w-full flex flex-col border-b shrink-0 ${isHomePage ? '' : 'transition-colors'
@@ -169,7 +173,7 @@ export function Header({ transparent: _transparent }: { transparent?: boolean } 
                   }`}
               />
             </button>
-            <div className="hidden md:block">
+            <div className="hidden lg:block">
               <NavLink
                 href="/newsletters"
                 label="NEWSLETTER"
@@ -179,7 +183,7 @@ export function Header({ transparent: _transparent }: { transparent?: boolean } 
             </div>
           </div>
 
-          <div className="hidden md:flex absolute left-1/2 -translate-x-1/2 min-w-0 items-baseline justify-center gap-4 md:gap-5 lg:gap-7 xl:gap-9 md:mt-0">
+          <div className="hidden lg:flex absolute left-1/2 -translate-x-1/2 min-w-0 items-baseline justify-center gap-4 md:gap-5 lg:gap-7 xl:gap-9 md:mt-0">
             <nav className="flex items-baseline justify-end min-w-0" aria-label="Primary navigation">
               <ul className="flex list-none items-baseline justify-end gap-4 md:gap-5 lg:gap-7 xl:gap-9 flex-nowrap m-0 p-0">
                 {NAV_LEFT.map((item) => (
@@ -208,11 +212,11 @@ export function Header({ transparent: _transparent }: { transparent?: boolean } 
             </ul>
           </div>
 
-          <div className="flex-1 min-w-0 md:hidden" aria-hidden />
+          <div className="flex-1 min-w-0 lg:hidden" aria-hidden />
 
           <Link
             href="/"
-            className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 shrink-0 md:hidden"
+            className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 shrink-0 lg:hidden"
           >
             <Image
               src="/neptune_logo_dark.svg"
