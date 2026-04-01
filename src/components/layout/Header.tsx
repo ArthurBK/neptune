@@ -123,14 +123,9 @@ export function Header({ transparent: _transparent }: { transparent?: boolean } 
     }
   }, [fetchCartCount])
 
-  const pathnameFromRouter = usePathname()
-  // On the client, window.location.pathname is immediately available and always accurate,
-  // preventing the white flash caused by usePathname() briefly holding a stale/wrong value
-  // during hydration or concurrent-mode transitions.
-  const pathname =
-    typeof window !== 'undefined' ? window.location.pathname : pathnameFromRouter
+  const pathname = usePathname()
   const isHomePage = pathname != null && isHomePath(pathname)
-  const hasSolidBg = pathname == null ? false : !isHomePage
+  const hasSolidBg = !isHomePage
   const lightText = isHomePage && variant === 'dark'
   const headerClass = `fixed left-0 right-0 top-0 z-50 w-full flex flex-col border-b shrink-0 ${isHomePage ? '' : 'transition-colors'
     }`

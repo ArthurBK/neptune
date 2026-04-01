@@ -448,7 +448,7 @@ function NewsstandHeroContent({
 
       {/* ── Mobile: text + rotator + CTA (stacked) ─────────────────── */}
       <div className="flex flex-col items-center w-full md:hidden">
-        <div className="w-full max-w-4xl px-6 text-center">
+        <div className="w-full max-w-4xl px-6 pt-4 text-center">
           <h2 className="font-serif font-normal text-xl text-[#1A1A1A] tracking-wide mb-2">
             {headline}
           </h2>

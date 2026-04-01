@@ -3,7 +3,7 @@
 :root {
   --background: #ffffff;
   --foreground: #1a1a1a;
-  --header-height: 2rem; /* 52px mobile */
+  --header-height: 2.75rem; /* 52px mobile */
   --neptune-red: #8B2942;
   --neptune-logo-red: #DC2626;
 }
@@ -54,4 +54,23 @@ body {
   width: min(33.333%, 28rem);
   margin-inline: auto;
   border-top: 1px solid #e5e5e5;
+}
+
+@media (max-width: 767px) {
+  .CookieConsent {
+    flex-direction: column !important;
+    align-items: center !important;
+    text-align: center !important;
+    padding: 1.25rem !important;
+  }
+
+  .CookieConsent > div:first-child {
+    margin: 0 0 1rem 0 !important;
+    text-align: center !important;
+  }
+
+  #rcc-confirm-button,
+  #rcc-decline-button {
+    margin: 0.25rem !important;
+  }
 }

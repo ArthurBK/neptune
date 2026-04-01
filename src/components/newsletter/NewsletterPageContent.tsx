@@ -35,14 +35,12 @@ export function NewsletterPageContent({
         >
           {headline ?? 'Newsletter'}
         </h1>
-        <div className="mt-4 w-full overflow-x-auto flex justify-center">
-          <p
-            className="text-base md:text-[16px] text-black whitespace-nowrap"
-            style={{ fontFamily: 'var(--font-gill-sans)' }}
-          >
-            {introText}
-          </p>
-        </div>
+        <p
+          className="mt-4 text-base md:text-[16px] text-black max-w-prose"
+          style={{ fontFamily: 'var(--font-gill-sans)' }}
+        >
+          {introText}
+        </p>
         <button
           type="button"
           onClick={openModal}
