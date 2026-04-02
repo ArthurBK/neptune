@@ -384,10 +384,10 @@ function NewsstandHeroContent({
   const gridProducts = products.slice(0, 6)
 
   return (
-    <div className="flex w-full min-w-0 max-w-full h-full overflow-hidden bg-white flex-col items-center py-[var(--header-height)] md:flex-row md:items-stretch md:py-0">
+    <div className="flex w-full min-w-0 max-w-full h-full min-h-0 overflow-hidden bg-white flex-col items-center py-[var(--header-height)] max-md:landscape:py-0 max-md:landscape:pt-[var(--header-height)] max-md:landscape:pb-2 md:flex-row md:items-stretch md:py-0">
 
       {/* ── Desktop col 1: text + CTA ───────────────────────────────── */}
-      <div className="hidden md:flex md:flex-1 md:flex-col md:items-center md:justify-center md:min-w-0 md:px-8 lg:px-12 md:text-center">
+      <div className="hidden md:flex md:flex-1 md:flex-col md:items-center md:justify-center md:min-w-0 md:px-8 lg:px-12 md:text-center md:landscape:pt-[var(--header-height)]">
         <h2 className="font-serif font-normal text-xl lg:text-2xl text-[#1A1A1A] tracking-wide mb-4">
           {headline}
         </h2>
@@ -446,9 +446,9 @@ function NewsstandHeroContent({
       {/* ── Desktop col 3: empty trailing (mirrors col 1 for centering) ── */}
       <div className="hidden md:block md:w-16 lg:w-24 md:shrink-0" aria-hidden />
 
-      {/* ── Mobile: text + rotator + CTA (stacked) ─────────────────── */}
-      <div className="flex flex-col items-center w-full md:hidden">
-        <div className="w-full max-w-4xl px-6 pt-4 text-center">
+      {/* ── Mobile: portrait = column; landscape = copy+CTA left, rotator right (tops aligned) ── */}
+      <div className="grid w-full min-h-0 flex-1 md:hidden grid-cols-1 grid-rows-[auto_1fr_auto] max-md:landscape:grid-cols-[minmax(0,1fr)_auto] max-md:landscape:grid-rows-[auto_auto] gap-3 max-md:landscape:gap-4 max-md:landscape:items-start max-md:landscape:justify-center max-md:landscape:px-6">
+        <div className="w-full max-w-4xl justify-self-center px-6 pt-4 text-center max-md:landscape:max-w-none max-md:landscape:w-full max-md:landscape:justify-self-stretch max-md:landscape:px-0 max-md:landscape:pt-4 max-md:landscape:text-left max-md:landscape:col-start-1 max-md:landscape:row-start-1">
           <h2 className="font-serif font-normal text-xl text-[#1A1A1A] tracking-wide mb-2">
             {headline}
           </h2>
@@ -462,7 +462,7 @@ function NewsstandHeroContent({
           ) : null}
         </div>
 
-        <div className="w-full flex-1 flex items-center justify-center py-4 px-3">
+        <div className="w-full min-h-0 flex items-center justify-center py-4 px-3 max-md:landscape:col-start-2 max-md:landscape:row-span-2 max-md:landscape:row-start-1 max-md:landscape:flex max-md:landscape:items-start max-md:landscape:justify-center max-md:landscape:self-start max-md:landscape:px-0 max-md:landscape:py-0 max-md:landscape:pt-4">
           {gridProducts.length > 0 ? (
             <NewsstandMobileRotator
               key={gridProducts.map((p) => p.handle).join('|')}
@@ -472,7 +472,7 @@ function NewsstandHeroContent({
           ) : null}
         </div>
 
-        <div className="w-full px-6 pb-2 text-center">
+        <div className="w-full justify-self-center px-6 pb-2 text-center max-md:landscape:justify-self-stretch max-md:landscape:px-0 max-md:landscape:pb-0 max-md:landscape:text-left max-md:landscape:col-start-1 max-md:landscape:row-start-2">
           <Link
             href="/newsstand"
             className="inline-block bg-black text-white font-header font-medium text-sm tracking-[0.18em] uppercase px-5 py-2.5 transition-colors hover:bg-[#1f1f1f]"
@@ -506,31 +506,30 @@ function NewsletterSectionContent({
     'For exclusive access to great interiors and great conversations,\nsign up for the Neptune Papers’ newsletter.'
 
   return (
-    <div className="flex flex-col h-full w-full min-w-0 bg-white">
+    <div className="flex flex-col h-full min-h-0 w-full min-w-0 bg-white">
       <div className="flex flex-1 min-h-0 w-full flex-col md:flex-row">
-        <div className="h-0 md:h-auto flex-0 md:flex-1 md:basis-1/2 min-w-0 min-h-0 relative overflow-hidden">
-          <div className="relative w-full h-full">
-            {leftImageUrl ? (
-              <Image
-                src={leftImageUrl}
-                alt=""
-                fill
-                className="hidden md:block object-cover object-center"
-                sizes="(max-width: 768px) 100vw, 50vw"
-                priority={priority}
-              />
-            ) : null}
-            {!leftImageUrl && !rightImageUrl ? (
-              <div className="absolute inset-0 bg-transparent" />
-            ) : null}
-          </div>
+        {/* Left image – desktop only */}
+        <div className="hidden md:block md:flex-1 md:basis-1/2 min-w-0 min-h-0 relative overflow-hidden">
+          {leftImageUrl ? (
+            <Image
+              src={leftImageUrl}
+              alt=""
+              fill
+              className="object-cover object-center"
+              sizes="50vw"
+              priority={priority}
+            />
+          ) : null}
         </div>
-        <div className="flex-1 md:basis-1/2 min-w-0 mt-0 md:mt-(--header-height) h-auto md:h-[calc(var(--section-height,100vh)-var(--header-height))] flex items-center justify-center px-6 md:px-10 lg:px-16 text-center">
-          <div className="w-full max-w-2xl">
+
+        {/* Text + CTA – scrollable on mobile */}
+        <div className="flex-1 min-w-0 min-h-0 overflow-y-auto overscroll-contain md:overflow-visible md:flex-none md:basis-1/2 md:flex md:items-center md:justify-center md:px-10 lg:md:px-16">
+          <div className="w-full max-w-2xl mx-auto px-6 pt-[var(--header-height)] pb-8 text-center md:px-0 md:pt-0 md:pb-0">
             <h2 className="font-futura font-normal text-xl md:text-2xl text-black uppercase tracking-wide">
               {title}
             </h2>
-            <p className="mt-3 text-sm text-black leading-relaxed font-[Helvetica,Arial,sans-serif] font-normal whitespace-pre-line"
+            <p
+              className="mt-3 text-sm text-black leading-relaxed font-normal whitespace-pre-line"
               style={{ fontFamily: 'var(--font-gill-sans)', fontWeight: 300 }}
             >
               {introText}
@@ -542,8 +541,9 @@ function NewsletterSectionContent({
             >
               Subscribe now
             </button>
+            {/* Right image – mobile only (below button) */}
             {rightImageUrl ? (
-              <div className="block md:hidden mt-5 w-screen -mx-6">
+              <div className="md:hidden max-lg:landscape:hidden mt-5 w-screen -mx-6">
                 <Image
                   src={rightImageUrl}
                   alt=""
@@ -555,24 +555,22 @@ function NewsletterSectionContent({
                 />
               </div>
             ) : null}
+            {/* Right image – desktop only (inline) */}
             {rightImageUrl ? (
-              <div className="hidden md:block mt-6 mx-auto w-full max-w-lg">
+              <div className="hidden md:block max-lg:landscape:hidden mt-6 mx-auto w-full max-w-lg">
                 <div className="relative w-full h-[320px] md:h-[360px] overflow-hidden">
                   <Image
                     src={rightImageUrl}
                     alt=""
                     fill
                     className="object-contain object-center"
-                    sizes="(max-width: 768px) 90vw, 420px"
+                    sizes="420px"
                   />
                 </div>
               </div>
             ) : null}
           </div>
         </div>
-      </div>
-      <div className="shrink-0 mt-auto">
-        {/* <NewsstandCta /> */}
       </div>
     </div>
   )
@@ -640,7 +638,7 @@ function ArticleSplitContent({
             </Link>
           )}
           <Link href={href} className="group">
-            <h2 className="max-w-full whitespace-pre-line break-words font-serif text-2xl font-bold leading-[0.98] md:leading-[1.22] tracking-wide text-black group-hover:opacity-80 group-hover:underline underline-offset-4 transition-opacity sm:text-3xl md:text-4xl [-webkit-text-size-adjust:100%] [text-size-adjust:100%]">
+            <h2 className="max-w-full whitespace-pre-line break-words font-serif text-2xl font-bold leading-[0.98] md:leading-[1.22] tracking-wide text-black group-hover:opacity-80 group-hover:underline underline-offset-4 transition-opacity sm:text-3xl md:text-4xl max-lg:landscape:text-xl max-lg:landscape:leading-tight [-webkit-text-size-adjust:100%] [text-size-adjust:100%]">
               {title}
             </h2>
           </Link>
@@ -1039,7 +1037,7 @@ function renderSectionContent(
     const { leftImageUrl, rightImageUrl, headline, subtitle } = item.data
     return {
       content: (
-        <div className="h-full w-full flex items-center">
+        <div className="h-full w-full min-h-0 flex items-stretch">
           <NewsletterSectionContent
             leftImageUrl={leftImageUrl}
             rightImageUrl={rightImageUrl}
