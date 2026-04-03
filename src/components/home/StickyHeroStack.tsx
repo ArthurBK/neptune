@@ -338,7 +338,7 @@ function NewsstandMobileRotator({
   if (!p) return null
 
   return (
-    <div className="relative mx-auto w-full max-w-[280px] aspect-[2/3]">
+    <div className="relative mx-auto w-full max-w-[340px] aspect-[2/3]">
       <Link
         href={`/newsstand/${p.handle}`}
         className="relative block h-full w-full overflow-hidden"
@@ -447,7 +447,7 @@ function NewsstandHeroContent({
       <div className="hidden md:block md:w-16 lg:w-24 md:shrink-0" aria-hidden />
 
       {/* ── Mobile: portrait = column; landscape = copy+CTA left, rotator right (tops aligned) ── */}
-      <div className="grid w-full min-h-0 flex-1 md:hidden grid-cols-1 grid-rows-[auto_1fr_auto] max-md:landscape:grid-cols-[minmax(0,1fr)_auto] max-md:landscape:grid-rows-[auto_auto] gap-3 max-md:landscape:gap-4 max-md:landscape:items-start max-md:landscape:justify-center max-md:landscape:px-6">
+      <div className="grid w-full min-h-0 flex-1 md:hidden grid-cols-1 grid-rows-[auto_auto_auto] content-center max-md:landscape:grid-cols-[minmax(0,1fr)_auto] max-md:landscape:grid-rows-[auto_auto] gap-3 max-md:landscape:gap-4 max-md:landscape:items-start max-md:landscape:justify-center max-md:landscape:px-6">
         <div className="w-full max-w-4xl justify-self-center px-6 pt-4 text-center max-md:landscape:max-w-none max-md:landscape:w-full max-md:landscape:justify-self-stretch max-md:landscape:px-0 max-md:landscape:pt-4 max-md:landscape:text-left max-md:landscape:col-start-1 max-md:landscape:row-start-1">
           <h2 className="font-serif font-normal text-xl text-[#1A1A1A] tracking-wide mb-2">
             {headline}
@@ -462,7 +462,7 @@ function NewsstandHeroContent({
           ) : null}
         </div>
 
-        <div className="w-full min-h-0 flex items-center justify-center py-4 px-3 max-md:landscape:col-start-2 max-md:landscape:row-span-2 max-md:landscape:row-start-1 max-md:landscape:flex max-md:landscape:items-start max-md:landscape:justify-center max-md:landscape:self-start max-md:landscape:px-0 max-md:landscape:py-0 max-md:landscape:pt-4">
+        <div className="w-full min-h-0 flex items-center justify-center py-0 px-3 max-md:landscape:col-start-2 max-md:landscape:row-span-2 max-md:landscape:row-start-1 max-md:landscape:flex max-md:landscape:items-start max-md:landscape:justify-center max-md:landscape:self-start max-md:landscape:px-0 max-md:landscape:py-0 max-md:landscape:pt-0">
           {gridProducts.length > 0 ? (
             <NewsstandMobileRotator
               key={gridProducts.map((p) => p.handle).join('|')}
@@ -524,7 +524,7 @@ function NewsletterSectionContent({
 
         {/* Text + CTA – scrollable on mobile */}
         <div className="flex-1 min-w-0 min-h-0 overflow-y-auto overscroll-contain md:overflow-visible md:flex-none md:basis-1/2 md:flex md:items-center md:justify-center md:px-10 lg:md:px-16">
-          <div className="w-full max-w-2xl mx-auto px-6 pt-[var(--header-height)] pb-8 text-center md:px-0 md:pt-0 md:pb-0">
+          <div className="w-full max-w-2xl mx-auto px-6 pt-[var(--header-height)] pb-8 text-center flex flex-col justify-center h-full md:h-auto md:flex-none md:px-0 md:pt-0 md:pb-0">
             <h2 className="font-futura font-normal text-xl md:text-2xl text-black uppercase tracking-wide">
               {title}
             </h2>
