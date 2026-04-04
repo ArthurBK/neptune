@@ -123,15 +123,10 @@ export function Header({ transparent: _transparent }: { transparent?: boolean } 
     }
   }, [fetchCartCount])
 
-  const pathnameFromRouter = usePathname() ?? ''
-  // On the client, the real URL wins: usePathname() can lag window.location by a
-  // frame during transitions (e.g. still "/newsstand" while the bar already shows "/"),
-  // which incorrectly applied a solid white header over the home hero.
-  // On the server there is no window — use the router path (with "/" if empty).
-  const pathname =
-    typeof window !== 'undefined'
-      ? window.location.pathname
-      : pathnameFromRouter || '/'
+  // usePathname() drives re-renders on every navigation and is the single source of truth.
+  // isHomePath treats null/''/trailing-slash-only as home, covering any brief empty value
+  // during hydration without needing a window.location fallback.
+  const pathname = usePathname() ?? '/'
   const isHomePage = isHomePath(pathname)
   const hasSolidBg = !isHomePage
   const lightText = isHomePage && variant === 'dark'
