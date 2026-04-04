@@ -38,13 +38,14 @@ export function LayoutShell({
 }) {
   const pathname = usePathname()
   const isStudio = pathname?.startsWith('/studio')
+  const isHome = !pathname || pathname === '/' || pathname.replace(/\/+$/, '') === ''
 
   if (isStudio) {
     return <div className="flex-1 min-h-0 min-w-0">{children}</div>
   }
 
   return (
-    <HeaderVariantProvider>
+    <HeaderVariantProvider initialVariant={isHome ? 'dark' : 'light'}>
       <FooterVisibilityProvider>
         <NewsletterModalProvider>
           <LayoutShellInner instagramUrl={instagramUrl}>{children}</LayoutShellInner>

@@ -62,7 +62,7 @@ function NavLink({
     <Link
       href={href}
       onClick={onClick}
-      className={`inline-flex items-baseline h-5 md:h-6 leading-none font-futura font-medium text-[13px] tracking-[0.1em] [word-spacing:0.15em] uppercase transition-colors ${bold ? 'font-bold' : ''} ${textClass} ${className ?? ''}`}
+      className={`inline-flex items-baseline h-5 md:h-6 leading-none font-futura font-medium text-[13px] tracking-[0.1em] [word-spacing:0.15em] uppercase transition-colors duration-300 ${bold ? 'font-bold' : ''} ${textClass} ${className ?? ''}`}
     >
       {label}
     </Link>
@@ -143,8 +143,8 @@ export function Header({ transparent: _transparent }: { transparent?: boolean } 
     borderColor: 'transparent',
   }
   const iconClass = lightText
-    ? 'text-white hover:text-white/90 transition-colors'
-    : 'text-black hover:text-[#63382E] transition-colors'
+    ? 'text-white hover:text-white/90 transition-colors duration-300'
+    : 'text-black hover:text-[#63382E] transition-colors duration-300'
 
   return (
     <header className={headerClass} style={headerStyle} suppressHydrationWarning>
@@ -198,7 +198,7 @@ export function Header({ transparent: _transparent }: { transparent?: boolean } 
                 alt="Neptune"
                 width={110}
                 height={30}
-                className={`inline-block align-baseline h-4 w-auto md:h-5 md:max-h-5 ${lightText ? 'invert' : ''}`}
+                className={`inline-block align-baseline h-4 w-auto md:h-5 md:max-h-5 transition-[filter] duration-300 ${lightText ? 'invert' : ''}`}
                 priority
               />
             </Link>
@@ -222,7 +222,7 @@ export function Header({ transparent: _transparent }: { transparent?: boolean } 
               alt="Neptune"
               width={110}
               height={30}
-              className={`block h-4 w-auto ${lightText ? 'invert' : ''}`}
+              className={`block h-4 w-auto transition-[filter] duration-300 ${lightText ? 'invert' : ''}`}
             />
           </Link>
 

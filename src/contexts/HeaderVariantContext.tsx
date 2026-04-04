@@ -14,8 +14,14 @@ const HeaderVariantContext = createContext<HeaderVariantContextValue>({
   setVariant: () => {},
 })
 
-export function HeaderVariantProvider({ children }: { children: ReactNode }) {
-  const [variant, setVariant] = useState<HeaderVariant>('light')
+export function HeaderVariantProvider({
+  children,
+  initialVariant = 'light',
+}: {
+  children: ReactNode
+  initialVariant?: HeaderVariant
+}) {
+  const [variant, setVariant] = useState<HeaderVariant>(initialVariant)
   return (
     <HeaderVariantContext.Provider value={{ variant, setVariant }}>
       {children}
