@@ -120,9 +120,9 @@ export function HomeScrollContainer({ sections, children }: HomeScrollContainerP
       const sectionHeight = el.clientHeight
       if (sectionHeight <= 0) return
       const rawIndex = Math.round(el.scrollTop / sectionHeight)
-      const index = Math.max(0, Math.min(rawIndex, sections.length - 1))
+      const index = Math.max(0, Math.min(rawIndex, totalSections - 1))
       currentIndexRef.current = index
-      const section = sections[index]
+      const section = sections[Math.min(index, sections.length - 1)]
       setHeaderVariant(isSectionDark(section) ? 'dark' : 'light')
     }
 
