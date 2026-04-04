@@ -123,11 +123,15 @@ export function Header({ transparent: _transparent }: { transparent?: boolean } 
     }
   }, [fetchCartCount])
 
-  const pathnameFromRouter = usePathname()
-  // usePathname() is the primary source for reactive navigation updates.
-  // window.location.pathname is used only as a fallback when usePathname()
-  // is briefly empty during hydration, preventing a white flash on the homepage.
-  const pathname = pathnameFromRouter || (typeof window !== 'undefined' ? window.location.pathname : '/')
+  const pathnameFromRouter = usePathname() ?? ''
+  // On the client, the real URL wins: usePathname() can lag window.location by a
+  // frame during transitions (e.g. still "/newsstand" while the bar already shows "/"),
+  // which incorrectly applied a solid white header over the home hero.
+  // On the server there is no window — use the router path (with "/" if empty).
+  const pathname =
+    typeof window !== 'undefined'
+      ? window.location.pathname
+      : pathnameFromRouter || '/'
   const isHomePage = isHomePath(pathname)
   const hasSolidBg = !isHomePage
   const lightText = isHomePage && variant === 'dark'
