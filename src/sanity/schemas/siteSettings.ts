@@ -1,6 +1,11 @@
 import { CogIcon } from '@sanity/icons'
 import { defineField, defineType } from 'sanity'
+import { plainTextToPortableText } from '../lib/portableText'
 import { captionRichTextType } from './lib/captionRichText'
+import { pageIntroRichTextType } from './lib/pageIntroRichText'
+
+const DEFAULT_NEWSLETTER_DESCRIPTION =
+  'Sign up to the Neptune newsletters for an exclusive access to great interiors and great conversations.'
 
 export const siteSettings = defineType({
   name: 'siteSettings',
@@ -37,6 +42,18 @@ export const siteSettings = defineType({
       name: 'newsletterSubtitle',
       title: 'Newsletter Subtitle',
       type: 'string',
+      group: 'newsletter',
+    }),
+    defineField({
+      name: 'newsletterDescriptionRichText',
+      title: 'Newsletter Page Description',
+      ...pageIntroRichTextType,
+      description:
+        'Rich text description shown at the top of /newsletters, above the subscribe button.',
+      initialValue: plainTextToPortableText(
+        DEFAULT_NEWSLETTER_DESCRIPTION,
+        'newsletterDescription',
+      ),
       group: 'newsletter',
     }),
     defineField({

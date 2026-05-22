@@ -1,5 +1,6 @@
 import { DocumentTextIcon, ImageIcon } from '@sanity/icons'
 import { defineArrayMember, defineField, defineType } from 'sanity'
+import { pageIntroRichTextType } from './lib/pageIntroRichText'
 
 // Home section: article reference
 const homeArticleBlock = defineType({
@@ -210,16 +211,16 @@ const homeNewsstandBlock = defineType({
       name: 'productHandles',
       title: 'Products',
       type: 'array',
-      description: 'Exactly 6 Shopify product handles from Newsstand. Drag to reorder. First product is used for the CTA link.',
+      description: 'Exactly 6 Shopify product handles or product URLs from Newsstand. Drag to reorder. First product is used for the CTA link.',
       of: [
         {
           type: 'object',
           fields: [
             {
               name: 'handle',
-              title: 'Product handle',
+              title: 'Product handle or URL',
               type: 'string',
-              description: 'e.g. neptune-issue-01',
+              description: 'e.g. neptune-issue-01 or https://www.neptune-papers.com/products/neptune-issue-01',
               validation: (rule) => rule.required(),
             },
           ],
@@ -232,15 +233,29 @@ const homeNewsstandBlock = defineType({
       validation: (rule) => rule.required().length(6),
     }),
     defineField({
-      name: 'title',
+      name: 'titleRichText',
       title: 'Headline',
+      ...pageIntroRichTextType,
+      description: 'Optional rich text headline shown above the Newsstand carousel.',
+    }),
+    defineField({
+      name: 'descriptionRichText',
+      title: 'Description',
+      ...pageIntroRichTextType,
+      description: 'Optional rich text description shown below the headline.',
+    }),
+    defineField({
+      name: 'title',
+      title: 'Legacy Headline',
       type: 'string',
+      hidden: true,
       description: 'Optional — overrides product title (e.g. "NEPTUNE 10")',
     }),
     defineField({
       name: 'description',
-      title: 'Description',
+      title: 'Legacy Description',
       type: 'text',
+      hidden: true,
       description: 'Optional body text for the right column',
     }),
     defineField({
@@ -273,9 +288,16 @@ const homeNewsletterBlock = defineType({
       description: 'Title on the left (e.g. "Newsletters"). Falls back to Site Settings → Newsletter if empty.',
     }),
     defineField({
-      name: 'subtitle',
+      name: 'subtitleRichText',
       title: 'Subtitle / description',
+      ...pageIntroRichTextType,
+      description: 'Rich text shown below the headline on the left. Falls back to Site Settings → Newsletter if empty.',
+    }),
+    defineField({
+      name: 'subtitle',
+      title: 'Legacy Subtitle / description',
       type: 'text',
+      hidden: true,
       description: 'Text below the headline on the left. Falls back to Site Settings → Newsletter if empty.',
     }),
     defineField({

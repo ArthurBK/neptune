@@ -17,7 +17,8 @@ import {
   homeVideoBlock,
 } from './homePage'
 import { affiliateProduct } from './affiliateProduct'
-import { categoryPage } from './categoryPage'
+import { storiesPage } from './storiesPage'
+import { contributorsPage } from './contributorsPage'
 import { contributor } from './contributor'
 import { photographer } from './photographer'
 import { siteSettings } from './siteSettings'
@@ -26,7 +27,8 @@ import { marketPage } from './marketPage'
 export const schema: { types: SchemaTypeDefinition[] } = {
   types: [
     article,
-    categoryPage,
+    storiesPage,
+    contributorsPage,
     homePage,
     homeArticleBlock,
     homeImageBlock,

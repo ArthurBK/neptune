@@ -1,6 +1,8 @@
 'use client'
 
-import { useEffect, useRef, useState, type ReactNode } from 'react'
+import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react'
+import type { PortableTextBlock } from '@portabletext/types'
+import { PortableText, type PortableTextComponents } from 'next-sanity'
 import Image from 'next/image'
 import Link from 'next/link'
 
@@ -24,6 +26,148 @@ export interface FeaturedProduct {
   title: string
   imageUrl: string | null
   imageAlt: string | null
+}
+
+type HomeRichText = PortableTextBlock[]
+
+const inlineFontClassByValue: Record<string, string> = {
+  serif: 'font-serif',
+  futura: 'font-futura',
+  header: 'font-header',
+  sans: 'font-[Helvetica,Arial,sans-serif]',
+}
+
+function hasRichText(value: HomeRichText | null | undefined): value is HomeRichText {
+  return Array.isArray(value) && value.length > 0
+}
+
+function normalizedHexColor(value: string | null | undefined): string | undefined {
+  if (!value) return undefined
+  const trimmed = value.trim()
+  const isHex = /^#(?:[0-9a-fA-F]{3}){1,2}$/.test(trimmed)
+  return isHex ? trimmed : undefined
+}
+
+const homeRichTextMarks: NonNullable<PortableTextComponents['marks']> = {
+  strong: ({ children }) => <strong className="font-medium">{children}</strong>,
+  em: ({ children }) => <em className="italic">{children}</em>,
+  underline: ({ children }) => <u>{children}</u>,
+  textStyle: ({ value, children }) => {
+    const fontFamilyValue =
+      typeof value?.fontFamily === 'string' ? value.fontFamily : undefined
+    const fontSizeValue = typeof value?.fontSize === 'number' ? value.fontSize : undefined
+    const color = normalizedHexColor(value?.textColor)
+    const className = fontFamilyValue ? inlineFontClassByValue[fontFamilyValue] : undefined
+    const style: CSSProperties = {
+      ...(color ? { color } : {}),
+      ...(fontSizeValue ? { fontSize: `${fontSizeValue}px` } : {}),
+    }
+
+    return (
+      <span className={className} style={style}>
+        {children}
+      </span>
+    )
+  },
+}
+
+const newsstandHeadlineComponents: PortableTextComponents = {
+  block: {
+    normal: ({ children }) => (
+      <h2 className="mx-auto mb-2 max-w-2xl font-serif text-lg font-normal tracking-wide text-[#1A1A1A] md:text-xl lg:text-2xl">
+        {children}
+      </h2>
+    ),
+    h2: ({ children }) => (
+      <h2 className="mx-auto mb-2 max-w-2xl font-serif text-xl font-normal tracking-wide text-[#1A1A1A] md:text-2xl lg:text-3xl">
+        {children}
+      </h2>
+    ),
+    h3: ({ children }) => (
+      <h3 className="mx-auto mb-2 max-w-2xl font-serif text-lg font-normal tracking-wide text-[#1A1A1A] md:text-xl">
+        {children}
+      </h3>
+    ),
+    blockquote: ({ children }) => (
+      <blockquote className="mx-auto mb-2 max-w-2xl font-serif text-xl leading-tight text-[#1A1A1A] md:text-2xl">
+        {children}
+      </blockquote>
+    ),
+    pullQuote: ({ children }) => (
+      <blockquote className="mx-auto mb-2 max-w-2xl font-serif text-2xl leading-tight text-[#1A1A1A] md:text-3xl">
+        {children}
+      </blockquote>
+    ),
+  },
+  marks: homeRichTextMarks,
+}
+
+const newsstandDescriptionComponents: PortableTextComponents = {
+  block: {
+    normal: ({ children }) => (
+      <p
+        className="mx-auto max-w-xl text-xs leading-relaxed text-black md:text-sm"
+        style={{ fontFamily: 'var(--font-gill-sans)' }}
+      >
+        {children}
+      </p>
+    ),
+    h2: ({ children }) => (
+      <h2 className="mx-auto max-w-xl font-serif text-lg leading-tight text-black md:text-xl">
+        {children}
+      </h2>
+    ),
+    h3: ({ children }) => (
+      <h3 className="mx-auto max-w-xl font-serif text-base leading-tight text-black md:text-lg">
+        {children}
+      </h3>
+    ),
+    blockquote: ({ children }) => (
+      <blockquote className="mx-auto max-w-xl font-serif text-lg leading-relaxed text-black md:text-xl">
+        {children}
+      </blockquote>
+    ),
+    pullQuote: ({ children }) => (
+      <blockquote className="mx-auto max-w-2xl font-serif text-xl leading-snug text-black md:text-2xl">
+        {children}
+      </blockquote>
+    ),
+  },
+  marks: homeRichTextMarks,
+}
+
+const newsletterSubtitleComponents: PortableTextComponents = {
+  block: {
+    normal: ({ children }) => (
+      <p
+        className="mt-3 text-sm font-normal leading-relaxed text-black"
+        style={{ fontFamily: 'var(--font-gill-sans)', fontWeight: 300 }}
+      >
+        {children}
+      </p>
+    ),
+    h2: ({ children }) => (
+      <h2 className="mt-3 font-serif text-xl leading-tight text-black md:text-2xl">
+        {children}
+      </h2>
+    ),
+    h3: ({ children }) => (
+      <h3 className="mt-3 font-serif text-lg leading-tight text-black md:text-xl">
+        {children}
+      </h3>
+    ),
+    blockquote: ({ children }) => (
+      <blockquote className="mt-3 font-serif text-xl leading-relaxed text-black md:text-2xl">
+        {children}
+      </blockquote>
+    ),
+    pullQuote: ({ children }) => (
+      <blockquote className="mt-3 font-serif text-2xl leading-snug text-black md:text-3xl">
+        {children}
+      </blockquote>
+    ),
+  },
+  marks: homeRichTextMarks,
 }
 
 export type HomeSection =
@@ -61,7 +205,9 @@ export type HomeSection =
       products: FeaturedProduct[]
       featuredHandle: string
       title?: string | null
+      titleRichText?: HomeRichText | null
       description?: string | null
+      descriptionRichText?: HomeRichText | null
       ctaLabel?: string | null
     }
   }
@@ -72,6 +218,7 @@ export type HomeSection =
       rightImageUrl: string | null
       headline?: string | null
       subtitle?: string | null
+      subtitleRichText?: HomeRichText | null
     }
   }
   | { type: 'video'; data: { videoUrl: string } }
@@ -296,8 +443,8 @@ function SplitImageContent({
   )
 }
 
-/** Mobile newsstand hero: one cover at a time, cycling like a GIF */
-function NewsstandMobileRotator({
+/** Newsstand cover carousel: one centered cover inside a framed box. */
+function NewsstandCoverCarousel({
   products,
   priority,
 }: {
@@ -330,7 +477,7 @@ function NewsstandMobileRotator({
       setActiveIndex(next)
     }
 
-    const id = window.setInterval(tick, 1800)
+    const id = window.setInterval(tick, 2400)
     return () => window.clearInterval(id)
   }, [products.length])
 
@@ -338,123 +485,93 @@ function NewsstandMobileRotator({
   if (!p) return null
 
   return (
-    <div className="relative mx-auto w-full max-w-[340px] aspect-[2/3]">
-      <Link
-        href={`/newsstand/${p.handle}`}
-        className="relative block h-full w-full overflow-hidden"
-        aria-label={p.title}
-      >
-        {p.imageUrl ? (
-          <Image
-            src={p.imageUrl}
-            alt={p.imageAlt ?? p.title}
-            fill
-            className="object-contain object-center transition-opacity duration-300"
-            sizes="280px"
-            priority={priority && activeIndex === 0}
-          />
-        ) : (
-          <div className="absolute inset-0 flex items-center justify-center bg-[#F3F3F3] px-3 text-center text-sm text-[#6B6B6B]">
-            {p.title}
-          </div>
-        )}
-      </Link>
+    <div className="relative flex h-full max-h-[88vh] aspect-[6/5] w-auto max-w-full items-center justify-center overflow-hidden bg-[#E5E1D8] px-8 py-3 shadow-[0_18px_60px_rgba(0,0,0,0.12)] md:px-16 md:py-4 lg:px-28 lg:py-5">
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.55),rgba(255,255,255,0)_58%)]" />
+      <div className="relative flex h-full max-h-full min-h-0 w-full max-w-full items-center justify-center pb-5 md:pb-7">
+        <Link
+          href={`/newsstand/${p.handle}`}
+          className="relative block h-[calc(100%-1.25rem)] max-h-full aspect-[4/5] max-w-full overflow-hidden shadow-[4px_5px_5px_rgba(0,0,0,0.3),0_8px_16px_rgba(0,0,0,0.14)] md:h-[calc(100%-1.75rem)]"
+          aria-label={p.title}
+        >
+          {p.imageUrl ? (
+            <Image
+              src={p.imageUrl}
+              alt={p.imageAlt ?? p.title}
+              fill
+              className="object-cover object-center transition-opacity duration-300"
+              sizes="(max-width: 768px) 260px, 420px"
+              priority={priority && activeIndex === 0}
+            />
+          ) : (
+            <div className="absolute inset-0 flex items-center justify-center bg-[#F3F3F3] px-3 text-center text-sm text-[#6B6B6B]">
+              {p.title}
+            </div>
+          )}
+        </Link>
+      </div>
+      {products.length > 1 && (
+        <div className="absolute bottom-3 left-1/2 flex -translate-x-1/2 gap-1.5 md:bottom-4">
+          {products.map((product, index) => (
+            <button
+              key={`${product.handle}-dot`}
+              type="button"
+              className={`h-1.5 w-1.5 rounded-full transition-colors ${
+                index === activeIndex ? 'bg-black' : 'bg-black/25 hover:bg-black/50'
+              }`}
+              onClick={() => {
+                indexRef.current = index
+                setActiveIndex(index)
+              }}
+              aria-label={`Show ${product.title}`}
+            />
+          ))}
+        </div>
+      )}
     </div>
   )
 }
 
-/** Newsstand hero: 6 product covers (left) + text (right) */
+/** Newsstand hero: centered copy + framed cover carousel. */
 function NewsstandHeroContent({
   products,
-  featuredHandle: _featuredHandle,
   title,
+  titleRichText,
   description,
+  descriptionRichText,
   ctaLabel,
   priority = false,
 }: {
   products: FeaturedProduct[]
   featuredHandle: string
   title?: string | null
+  titleRichText?: HomeRichText | null
   description?: string | null
+  descriptionRichText?: HomeRichText | null
   ctaLabel?: string | null
   priority?: boolean
 }) {
   const headline = title ?? products[0]?.title ?? ''
+  const richHeadline = hasRichText(titleRichText) ? titleRichText : null
+  const richDescription = hasRichText(descriptionRichText) ? descriptionRichText : null
   const cta = ctaLabel ?? 'Discover our anniversary issue'
-  const gridProducts = products.slice(0, 6)
+  const carouselProducts = products.slice(0, 6)
 
   return (
-    <div className="flex w-full min-w-0 max-w-full h-full min-h-0 overflow-hidden bg-white flex-col items-center py-[var(--header-height)] max-md:landscape:py-0 max-md:landscape:pt-[var(--header-height)] max-md:landscape:pb-2 md:flex-row md:items-stretch md:py-0">
-
-      {/* ── Desktop col 1: text + CTA ───────────────────────────────── */}
-      <div className="hidden md:flex md:flex-1 md:flex-col md:items-center md:justify-center md:min-w-0 md:px-8 lg:px-12 md:text-center md:landscape:pt-[var(--header-height)]">
-        <h2 className="font-serif font-normal text-xl lg:text-2xl text-[#1A1A1A] tracking-wide mb-4">
-          {headline}
-        </h2>
-        {description ? (
-          <p
-            className="text-sm text-black leading-relaxed mb-6"
-            style={{ fontFamily: 'var(--font-gill-sans)' }}
-          >
-            {description}
-          </p>
-        ) : null}
-        <Link
-          href="/newsstand"
-          className="inline-block bg-black text-white font-header font-medium text-sm tracking-[0.18em] uppercase px-5 py-2.5 transition-colors hover:bg-[#1f1f1f]"
-        >
-          {cta}
-        </Link>
-      </div>
-
-      {/* ── Desktop col 2: 3×2 grid (centered) ──────────────────────── */}
-      <div className="hidden md:flex md:items-center md:justify-center md:h-full md:flex-1 md:min-w-0 md:overflow-hidden md:pt-[var(--header-height)]">
-        <div className="aspect-square grid-cols-3 grid-rows-2 gap-0.5 grid h-full w-auto min-w-0">
-          {gridProducts.map((p, idx) => {
-            const col = idx % 3
-            const row = idx < 3 ? 'top' : 'bottom'
-            const x = col === 0 ? 'right' : col === 2 ? 'left' : 'center'
-            const y = row === 'top' ? 'bottom' : 'top'
-            return (
-              <Link
-                key={`${p.handle}-${idx}`}
-                href={`/newsstand/${p.handle}`}
-                className="relative min-h-0 min-w-0 overflow-hidden"
-                aria-label={p.title}
-              >
-                {p.imageUrl ? (
-                  <Image
-                    src={p.imageUrl}
-                    alt={p.imageAlt ?? p.title}
-                    fill
-                    className="object-contain"
-                    style={{ objectPosition: `${x} ${y}` }}
-                    sizes="22vw"
-                    priority={priority && idx < 3}
-                  />
-                ) : (
-                  <div className="absolute inset-0 flex items-center justify-center bg-[#F3F3F3] px-3 text-center text-sm text-[#6B6B6B]">
-                    {p.title}
-                  </div>
-                )}
-              </Link>
-            )
-          })}
-        </div>
-      </div>
-
-      {/* ── Desktop col 3: empty trailing (mirrors col 1 for centering) ── */}
-      <div className="hidden md:block md:w-16 lg:w-24 md:shrink-0" aria-hidden />
-
-      {/* ── Mobile: portrait = column; landscape = copy+CTA left, rotator right (tops aligned) ── */}
-      <div className="grid w-full min-h-0 flex-1 md:hidden grid-cols-1 grid-rows-[auto_auto_auto] content-center max-md:landscape:grid-cols-[minmax(0,1fr)_auto] max-md:landscape:grid-rows-[auto_auto] gap-3 max-md:landscape:gap-4 max-md:landscape:items-start max-md:landscape:justify-center max-md:landscape:px-6">
-        <div className="w-full max-w-4xl justify-self-center px-6 pt-4 text-center max-md:landscape:max-w-none max-md:landscape:w-full max-md:landscape:justify-self-stretch max-md:landscape:px-0 max-md:landscape:pt-4 max-md:landscape:text-left max-md:landscape:col-start-1 max-md:landscape:row-start-1">
-          <h2 className="font-serif font-normal text-xl text-[#1A1A1A] tracking-wide mb-2">
-            {headline}
-          </h2>
-          {description ? (
+    <div className="flex h-full min-h-0 w-full min-w-0 max-w-full flex-col items-center justify-center overflow-hidden bg-white px-4 pt-[calc(var(--header-height)+20px)] pb-6 text-center md:px-10 md:pt-[calc(var(--header-height)+30px)] md:pb-10">
+      <div className="flex h-full min-h-0 w-full max-w-6xl flex-col items-center justify-center">
+        <div className="shrink-0">
+          {richHeadline ? (
+            <PortableText value={richHeadline} components={newsstandHeadlineComponents} />
+          ) : (
+            <h2 className="mx-auto mb-2 max-w-2xl font-serif text-lg font-normal tracking-wide text-[#1A1A1A] md:text-xl lg:text-2xl">
+              {headline}
+            </h2>
+          )}
+          {richDescription ? (
+            <PortableText value={richDescription} components={newsstandDescriptionComponents} />
+          ) : description ? (
             <p
-              className="text-xs text-black leading-relaxed"
+              className="mx-auto max-w-xl text-xs leading-relaxed text-black md:text-sm"
               style={{ fontFamily: 'var(--font-gill-sans)' }}
             >
               {description}
@@ -462,17 +579,17 @@ function NewsstandHeroContent({
           ) : null}
         </div>
 
-        <div className="w-full min-h-0 flex items-center justify-center py-0 px-3 max-md:landscape:col-start-2 max-md:landscape:row-span-2 max-md:landscape:row-start-1 max-md:landscape:flex max-md:landscape:items-start max-md:landscape:justify-center max-md:landscape:self-start max-md:landscape:px-0 max-md:landscape:py-0 max-md:landscape:pt-0">
-          {gridProducts.length > 0 ? (
-            <NewsstandMobileRotator
-              key={gridProducts.map((p) => p.handle).join('|')}
-              products={gridProducts}
+        <div className="mt-4 flex min-h-0 w-full flex-1 items-center justify-center md:mt-5">
+          {carouselProducts.length > 0 ? (
+            <NewsstandCoverCarousel
+              key={carouselProducts.map((p) => p.handle).join('|')}
+              products={carouselProducts}
               priority={priority}
             />
           ) : null}
         </div>
 
-        <div className="w-full justify-self-center px-6 pb-2 text-center max-md:landscape:justify-self-stretch max-md:landscape:px-0 max-md:landscape:pb-0 max-md:landscape:text-left max-md:landscape:col-start-1 max-md:landscape:row-start-2">
+        <div className="mt-4 shrink-0 md:mt-5">
           <Link
             href="/newsstand"
             className="inline-block bg-black text-white font-header font-medium text-sm tracking-[0.18em] uppercase px-5 py-2.5 transition-colors hover:bg-[#1f1f1f]"
@@ -491,16 +608,19 @@ function NewsletterSectionContent({
   rightImageUrl,
   headline,
   subtitle,
+  subtitleRichText,
   priority = false,
 }: {
   leftImageUrl: string | null
   rightImageUrl: string | null
   headline?: string | null
   subtitle?: string | null
+  subtitleRichText?: HomeRichText | null
   priority?: boolean
 }) {
   const openModal = useOpenNewsletterModal()
   const title = headline ?? 'Newsletter'
+  const richSubtitle = hasRichText(subtitleRichText) ? subtitleRichText : null
   const introText =
     subtitle ??
     'For exclusive access to great interiors and great conversations,\nsign up for the Neptune Papers’ newsletter.'
@@ -528,12 +648,16 @@ function NewsletterSectionContent({
             <h2 className="font-futura font-normal text-xl md:text-2xl text-black uppercase tracking-wide">
               {title}
             </h2>
-            <p
-              className="mt-3 text-sm text-black leading-relaxed font-normal whitespace-pre-line"
-              style={{ fontFamily: 'var(--font-gill-sans)', fontWeight: 300 }}
-            >
-              {introText}
-            </p>
+            {richSubtitle ? (
+              <PortableText value={richSubtitle} components={newsletterSubtitleComponents} />
+            ) : (
+              <p
+                className="mt-3 text-sm text-black leading-relaxed font-normal whitespace-pre-line"
+                style={{ fontFamily: 'var(--font-gill-sans)', fontWeight: 300 }}
+              >
+                {introText}
+              </p>
+            )}
             <button
               type="button"
               onClick={openModal}
@@ -935,9 +1059,9 @@ function renderSectionContent(
             subtitleHref={
               article.author?.slug ? `/contributors/${article.author.slug}` : undefined
             }
-            categoryHref={`/${article.category}`}
+            categoryHref="/stories"
             categoryLabel={article.subcategory}
-            href={`/${article.category}/${article.slug}`}
+            href={`/stories/${article.slug}`}
             priority={priority}
           />
         </div>
@@ -1011,7 +1135,15 @@ function renderSectionContent(
     }
   }
   if (item.type === 'newsstandProduct') {
-    const { products, featuredHandle, title, description, ctaLabel } = item.data
+    const {
+      products,
+      featuredHandle,
+      title,
+      titleRichText,
+      description,
+      descriptionRichText,
+      ctaLabel,
+    } = item.data
     return {
       content: (
         <div className="h-full w-full flex items-center">
@@ -1019,7 +1151,9 @@ function renderSectionContent(
             products={products}
             featuredHandle={featuredHandle}
             title={title}
+            titleRichText={titleRichText}
             description={description}
+            descriptionRichText={descriptionRichText}
             ctaLabel={ctaLabel}
             priority={priority}
           />
@@ -1034,7 +1168,7 @@ function renderSectionContent(
     }
   }
   if (item.type === 'newsletter') {
-    const { leftImageUrl, rightImageUrl, headline, subtitle } = item.data
+    const { leftImageUrl, rightImageUrl, headline, subtitle, subtitleRichText } = item.data
     return {
       content: (
         <div className="h-full w-full min-h-0 flex items-stretch">
@@ -1043,6 +1177,7 @@ function renderSectionContent(
             rightImageUrl={rightImageUrl}
             headline={headline}
             subtitle={subtitle}
+            subtitleRichText={subtitleRichText}
             priority={priority}
           />
         </div>

@@ -132,7 +132,7 @@ export function VerticalImageCarousel({
         {images.map((img, i) => (
           <div
             key={img.url}
-            className="flex items-center justify-center"
+            className="flex items-start justify-center"
             style={{ height: `${100 / total}%` }}
           >
             <Image

@@ -4,7 +4,13 @@ import type { StructureResolver } from 'sanity/structure'
 // https://www.sanity.io/docs/structure-builder-cheat-sheet
 export const structure: StructureResolver = (S) =>
   (() => {
-    const topSingletonIds = ['homePage', 'categoryPage', 'siteSettings', 'marketPage']
+    const topSingletonIds = [
+      'homePage',
+      'storiesPage',
+      'contributorsPage',
+      'siteSettings',
+      'marketPage',
+    ]
 
     const otherDocItems = S.documentTypeListItems().filter((item) => {
       const id = item.getId()
@@ -37,9 +43,13 @@ export const structure: StructureResolver = (S) =>
           .icon(HomeIcon)
           .child(S.document().schemaType('homePage').documentId('homePage')),
         S.listItem()
-          .title('Category Pages')
+          .title('Stories Page')
           .icon(DocumentTextIcon)
-          .child(S.document().schemaType('categoryPage').documentId('categoryPage')),
+          .child(S.document().schemaType('storiesPage').documentId('storiesPage')),
+        S.listItem()
+          .title('Contributors Page')
+          .icon(DocumentTextIcon)
+          .child(S.document().schemaType('contributorsPage').documentId('contributorsPage')),
         S.listItem()
           .title('Site Settings')
           .icon(CogIcon)

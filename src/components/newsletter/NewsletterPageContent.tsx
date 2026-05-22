@@ -4,43 +4,47 @@ import Image from 'next/image'
 
 import { useOpenNewsletterModal } from '@/contexts/NewsletterModalContext'
 import { SanityCaption, hasCaptionContent } from '@/components/shared/SanityCaption'
+import {
+  PageIntroText,
+  hasPortableTextContent,
+  type PageIntroPortableText,
+} from '@/components/shared/PageIntroText'
 
 const DEFAULT_IMAGE =
   'https://images.unsplash.com/photo-1507842217343-583bb7270b66?w=1920&q=80'
 
 interface NewsletterPageContentProps {
-  headline?: string | null
   subtitle?: string | null
+  descriptionRichText?: PageIntroPortableText | null
   imageUrl: string | null
   imageLegend?: unknown | null
 }
 
 export function NewsletterPageContent({
-  headline,
   subtitle,
+  descriptionRichText,
   imageUrl,
   imageLegend,
 }: NewsletterPageContentProps) {
   const openModal = useOpenNewsletterModal()
+  const richDescription = hasPortableTextContent(descriptionRichText) ? descriptionRichText : null
   const introText =
     subtitle ??
     'Sign up to the Neptune newsletters for an exclusive access to great interiors and great conversations.'
 
   return (
     <main className="flex flex-col">
-      {/* Title and text above the image */}
       <div className="flex flex-col items-center px-6 md:px-12 pt-5 md:pt-6 pb-6 md:pb-8 text-center">
-        <h1
-          className="font-futura font-normal text-xl md:text-2xl text-[#1A1A1A] uppercase tracking-wide"
-        >
-          {headline ?? 'Newsletter'}
-        </h1>
-        <p
-          className="mt-4 text-base md:text-[16px] text-black max-w-prose"
-          style={{ fontFamily: 'var(--font-gill-sans)' }}
-        >
-          {introText}
-        </p>
+        {richDescription ? (
+          <PageIntroText value={richDescription} />
+        ) : (
+          <p
+            className="max-w-prose text-base text-black md:text-[16px]"
+            style={{ fontFamily: 'var(--font-gill-sans)' }}
+          >
+            {introText}
+          </p>
+        )}
         <button
           type="button"
           onClick={openModal}

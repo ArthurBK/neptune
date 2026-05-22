@@ -1,3 +1,5 @@
+import { ContactForm } from '@/components/contact/ContactForm'
+
 export const revalidate = 3600
 
 export default async function ContactPage() {
@@ -10,24 +12,8 @@ export default async function ContactPage() {
           </h1>
         </header>
 
-        <section className="max-w-3xl mx-auto text-center space-y-2">
-          <p className="text-sm md:text-[15px] text-black whitespace-pre-line font-[Helvetica,Arial,sans-serif]">
-            For any inquiries, you may write to{' '}
-            <a href="mailto:contact@neptune-papers.com" className="underline underline-offset-2">
-              contact@neptune-papers.com
-            </a>
-            .
-          </p>
-          <p className="text-sm md:text-[15px] text-black whitespace-pre-line font-[Helvetica,Arial,sans-serif]">
-            For advertising opportunities, you may write to{' '}
-            <a
-              href="mailto:partnerships@kapture-media.com"
-              className="underline underline-offset-2"
-            >
-              partnerships@kapture-media.com
-            </a>
-            .
-          </p>
+        <section className="mx-auto max-w-3xl">
+          <ContactForm />
         </section>
       </div>
     </main>

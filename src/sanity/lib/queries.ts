@@ -40,7 +40,15 @@ export const HOME_PAGE_QUERY = `
       _type == "homeNewsstandBlock" => {
         "productHandles": productHandles[] { handle },
         title,
+        titleRichText[] {
+          ...,
+          markDefs[] { ... }
+        },
         description,
+        descriptionRichText[] {
+          ...,
+          markDefs[] { ... }
+        },
         ctaLabel
       },
       _type == "homeVideoBlock" => {
@@ -49,6 +57,10 @@ export const HOME_PAGE_QUERY = `
       _type == "homeNewsletterBlock" => {
         headline,
         subtitle,
+        subtitleRichText[] {
+          ...,
+          markDefs[] { ... }
+        },
         leftImage,
         rightImage
       }
@@ -67,6 +79,43 @@ export const FEATURED_ARTICLES_HOME_QUERY = `
     categories,
     coverImage,
     "author": author->{ name, "slug": slug.current }
+  }
+`
+
+// All stories across editorial categories
+export const ALL_STORIES_QUERY = `
+  *[_type == "article"] | order(publishedAt desc) {
+    _id,
+    title,
+    "slug": slug.current,
+    "category": coalesce(category, categories[0]),
+    categories,
+    subcategory,
+    coverImage,
+    publishedAt,
+    "author": author->{ name, "slug": slug.current }
+  }
+`
+
+export const STORIES_PAGE_QUERY = `
+  *[_type == "storiesPage" && _id == "storiesPage"][0] {
+    description,
+    introText[] {
+      ...,
+      markDefs[] { ... }
+    },
+    "articles": articles[]->{
+      _id,
+      title,
+      "slug": slug.current,
+      "category": coalesce(category, categories[0]),
+      categories,
+      subcategory,
+      coverImage,
+      publishedAt,
+      "author": author->{ name, "slug": slug.current }
+    },
+    image{asset, alt, caption, hotspot}
   }
 `
 
@@ -128,6 +177,41 @@ export const ARTICLE_BY_SLUG_QUERY = `
       }
     }
   }
+`
+
+export const ARTICLE_BY_STORY_SLUG_QUERY = `
+  *[_type == "article" && slug.current == $slug] | order(publishedAt desc)[0] {
+    ...,
+    "author": author->{ name, "slug": slug.current, bio, portrait },
+    "photographer": photographer->{ name, "slug": slug.current },
+    "affiliateProducts": affiliateProducts[]->{ _id, title, brand, price, image, affiliateUrl },
+    "relatedArticles": relatedArticles[]->{ _id, title, "slug": slug.current, "category": coalesce(category, categories[0]), categories, subcategory, coverImage, "author": author->{ name, "slug": slug.current } },
+    "body": body[] {
+      ...,
+      _type == "pteImageBlock" => {
+        "imageDimensions": image.asset->metadata.dimensions
+      },
+      _type == "pteImageGridBlock" => {
+        "images": images[]{
+          ...,
+          "imageDimensions": asset->metadata.dimensions
+        }
+      },
+      _type == "adBannerEmbedBlock" => {
+        "adBanner": adBanner->{ image, linkUrl, title }
+      },
+      markDefs[] {
+        ...,
+        _type == "affiliateProductEmbed" => {
+          "product": product->{ title, affiliateUrl }
+        }
+      }
+    }
+  }
+`
+
+export const ARTICLE_STORY_SLUGS_QUERY = `
+  *[_type == "article"] { "slug": slug.current }
 `
 
 // Article slugs for generateStaticParams
@@ -224,6 +308,10 @@ export const CONTRIBUTOR_BY_SLUG_QUERY = `
     "slug": slug.current,
     role,
     bio,
+    bioRichText[] {
+      ...,
+      markDefs[] { ... }
+    },
     portrait,
     location
   }
@@ -234,6 +322,16 @@ export const CONTRIBUTOR_SLUGS_QUERY = `
   *[_type == "contributor"] { "slug": slug.current }
 `
 
+// Contributors page intro content
+export const CONTRIBUTORS_PAGE_QUERY = `
+  *[_type == "contributorsPage" && _id == "contributorsPage"][0] {
+    description[] {
+      ...,
+      markDefs[] { ... }
+    }
+  }
+`
+
 // Contributors listing page (name + bio)
 export const CONTRIBUTORS_LIST_PAGE_QUERY = `
   *[_type == "contributor"] | order(name asc) {
@@ -241,6 +339,10 @@ export const CONTRIBUTORS_LIST_PAGE_QUERY = `
     name,
     "slug": slug.current,
     bio,
+    bioRichText[] {
+      ...,
+      markDefs[] { ... }
+    },
     "articleCount": count(*[_type == "article" && references(^._id)])
   }
 `
@@ -370,6 +472,10 @@ export const SITE_SETTINGS_QUERY = `
   *[_type == "siteSettings" && _id == "siteSettings"][0] {
     newsletterHeadline,
     newsletterSubtitle,
+    newsletterDescriptionRichText[] {
+      ...,
+      markDefs[] { ... }
+    },
     newsletterImage,
     newsletterImageLegend,
     aboutText,

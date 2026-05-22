@@ -2,15 +2,38 @@
 
 import CookieConsent, { getCookieConsentValue, resetCookieConsentValue } from 'react-cookie-consent'
 
-export function CookieBanner() {
+const cookieBannerCopy = {
+  en: {
+    accept: 'Accept',
+    decline: 'Decline',
+    message: 'We use cookies to improve your experience and analyze our traffic.',
+    learnMore: 'Learn more',
+  },
+  fr: {
+    accept: 'Accepter',
+    decline: 'Refuser',
+    message: 'Nous utilisons des cookies pour améliorer votre expérience et analyser notre trafic.',
+    learnMore: 'En savoir plus',
+  },
+} as const
+
+type CookieBannerLocale = keyof typeof cookieBannerCopy
+
+type CookieBannerProps = {
+  locale?: CookieBannerLocale
+}
+
+export function CookieBanner({ locale = 'en' }: CookieBannerProps) {
+  const copy = cookieBannerCopy[locale]
+
   return (
     <CookieConsent
       location="bottom"
       cookieName="neptune_cookie_consent"
       expires={365}
       enableDeclineButton
-      declineButtonText="Refuser"
-      buttonText="Accepter"
+      declineButtonText={copy.decline}
+      buttonText={copy.accept}
       onAccept={() => {
         // Analytics or tracking can be enabled here
       }}
@@ -58,16 +81,16 @@ export function CookieBanner() {
         margin: '0 0 0 0.5rem',
       }}
     >
-      Nous utilisons des cookies pour améliorer votre expérience et analyser notre trafic.{' '}
+      {copy.message}{' '}
       <a
-        href="/politique-de-confidentialite"
+        href="/cookies"
         style={{
           color: '#8B2942',
           textDecoration: 'underline',
           textUnderlineOffset: '2px',
         }}
       >
-        En savoir plus
+        {copy.learnMore}
       </a>
     </CookieConsent>
   )

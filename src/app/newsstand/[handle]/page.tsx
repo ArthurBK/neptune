@@ -1,16 +1,9 @@
 import { notFound } from 'next/navigation'
 
-import { shopifyFetch } from '@/lib/shopify/client'
-import {
-  ALL_PRODUCTS_QUERY,
-  NEWSSTAND_PRODUCTS_QUERY,
-  PRODUCT_BY_HANDLE_QUERY,
-} from '@/lib/shopify/queries'
-import type {
-  AllProductsResponse,
-  NewsstandProductsResponse,
-  ProductByHandleResponse,
-} from '@/lib/shopify/types'
+import { shopifyFetch } from "@/lib/shopify/client"
+import { getNewsstandProducts } from "@/lib/shopify/products"
+import { PRODUCT_BY_HANDLE_QUERY } from "@/lib/shopify/queries"
+import type { ProductByHandleResponse } from "@/lib/shopify/types"
 
 import { ProductCard } from '@/components/commerce/ProductCard'
 import { ProductForm } from '@/components/commerce/ProductForm'
@@ -22,10 +15,7 @@ export const revalidate = 3600
 
 export async function generateStaticParams() {
   try {
-    const data = await shopifyFetch<NewsstandProductsResponse>({
-      query: NEWSSTAND_PRODUCTS_QUERY,
-    })
-    const products = data.collection?.products.edges.map((e) => e.node) ?? []
+    const products = await getNewsstandProducts()
     return products.map((p) => ({ handle: p.handle }))
   } catch {
     return []
@@ -39,27 +29,17 @@ interface ProductPageProps {
 export default async function NewsstandProductPage({ params }: ProductPageProps) {
   const { handle } = await params
 
-  const [productData, collectionData, allProductsData] = await Promise.all([
+  const [productData, allProducts] = await Promise.all([
     shopifyFetch<ProductByHandleResponse>({
       query: PRODUCT_BY_HANDLE_QUERY,
       variables: { handle },
     }),
-    shopifyFetch<NewsstandProductsResponse>({
-      query: NEWSSTAND_PRODUCTS_QUERY,
-    }),
-    shopifyFetch<AllProductsResponse>({
-      query: ALL_PRODUCTS_QUERY,
-    }),
+    getNewsstandProducts(),
   ])
 
   const product = productData.product
   if (!product) notFound()
 
-  const collectionProducts =
-    collectionData.collection?.products.edges.map((e) => e.node) ?? []
-  const allProductsList = allProductsData.products?.edges.map((e) => e.node) ?? []
-  const allProducts =
-    collectionProducts.length > 0 ? collectionProducts : allProductsList
   const relatedProducts = allProducts
     .filter((p) => p.handle !== handle)
     .slice(0, 3)
@@ -88,7 +68,7 @@ export default async function NewsstandProductPage({ params }: ProductPageProps)
         </div>
 
         {/* Box 3 — product info */}
-        <div className="flex flex-col bg-white lg:justify-center">
+        <div className="flex flex-col bg-white lg:justify-start">
           <div className="px-4 pt-4 pb-6 lg:px-8 lg:pt-4 lg:pb-16">
             <h1 className="font-serif text-xl md:text-2xl text-[#1A1A1A] uppercase tracking-wide">
               {product.title}

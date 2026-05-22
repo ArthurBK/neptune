@@ -9,22 +9,23 @@ interface ProductCardProps {
   product: ShopifyProduct
   compact?: boolean
   size?: 'default' | 'small'
+  titleFontFamily?: 'serif' | 'futura' | 'inter'
 }
 
 export function ProductCard({
   product,
   compact = false,
   size = 'default',
+  titleFontFamily = 'serif',
 }: ProductCardProps) {
   const { title, handle, priceRange, featuredImage, variants } = product
   const price = priceRange.minVariantPrice
   const firstVariant = variants.edges[0]?.node
-  const isSmall = size === 'small' || compact
 
   return (
     <article className={`group ${compact ? 'max-w-[240px] sm:max-w-[200px]' : ''}`}>
       <Link href={`/newsstand/${handle}`} className="block overflow-hidden">
-        <div className="aspect-3/4 overflow-hidden">
+        <div className="aspect-3/4 overflow-hidden bg-white">
           {featuredImage?.url ? (
             <Image
               src={featuredImage.url}
@@ -38,7 +39,7 @@ export function ProductCard({
                     ? '(max-width: 640px) 50vw, (max-width: 1024px) 50vw, 25vw'
                     : '(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw'
               }
-              className="w-full h-full object-cover transition-transform duration-300 ease-out group-hover:scale-[1.02]"
+              className="w-full h-full object-contain object-bottom transition-opacity duration-300 ease-out group-hover:opacity-90"
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center text-[#1A1A1A] text-sm">
@@ -50,9 +51,16 @@ export function ProductCard({
       <div className={compact ? 'mt-2' : size === 'small' ? 'mt-3' : 'mt-4'}>
         <Link href={`/newsstand/${handle}`}>
           <h3
-            className={`font-serif text-center text-[#1A1A1A] group-hover:underline line-clamp-2 ${
-              compact ? 'text-sm' : size === 'small' ? 'text-base' : 'text-xl'
+            className={`text-center text-[#1A1A1A] group-hover:underline line-clamp-2 ${
+              compact ? 'text-sm' : size === 'small' ? 'text-[11px] md:text-xs' : 'text-sm md:text-base'
             }`}
+            style={
+              titleFontFamily === 'futura'
+                ? { fontFamily: 'Futura, "Futura PT", "Futura Std", "Trebuchet MS", Arial, sans-serif' }
+                : titleFontFamily === 'inter'
+                  ? { fontFamily: 'var(--font-inter), sans-serif' }
+                  : undefined
+            }
           >
             {title}
           </h3>

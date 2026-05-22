@@ -12,20 +12,19 @@ import { useHeaderVariant } from '@/contexts/HeaderVariantContext'
 import { CartPreview } from '@/components/commerce/CartPreview'
 import { SearchModal } from './SearchModal'
 
-const NAV_LEFT = [
+const DESKTOP_NAV_ITEMS = [
   { label: 'NEWSSTAND', href: '/newsstand' },
-  { label: 'INTERIORS', href: '/interiors' },
-  { label: 'GARDENS', href: '/gardens' },
+  { label: 'STORIES', href: '/stories' },
 ] as const
 
-const NAV_RIGHT = [
-  { label: 'ARTS', href: '/arts' },
-  { label: 'FASHION', href: '/fashion' },
-  { label: 'TRAVEL', href: '/travel' },
+const BURGER_NAV_ITEMS = [
+  { label: 'NEWSSTAND', href: '/newsstand' },
+  { label: 'STORIES', href: '/stories' },
   { label: 'SHOP', href: '/the-market' },
+  { label: 'CONTRIBUTORS', href: '/contributors' },
+  { label: 'NEWSLETTER', href: '/newsletters' },
+  { label: 'CONTACT', href: '/contact' },
 ] as const
-
-const NAV_ITEMS = [...NAV_LEFT, ...NAV_RIGHT] as const
 
 /** True for `/`, ``, trailing-slash only, and other empty-looking paths — avoids a white header flash on home when usePathname is briefly empty. */
 function isHomePath(path: string): boolean {
@@ -49,13 +48,6 @@ function NavLink({
   transparent?: boolean
   className?: string
 }) {
-  const pathname = usePathname()
-  const baseHref = href.replace(/#.*/, '')
-  const isActive =
-    href === '/'
-      ? pathname === '/'
-      : pathname === baseHref || pathname.startsWith(`${baseHref}/`)
-
   const textClass = transparent ? 'text-white' : 'text-black'
 
   return (
@@ -69,7 +61,7 @@ function NavLink({
   )
 }
 
-export function Header({ transparent: _transparent }: { transparent?: boolean } = {}) {
+export function Header() {
   const variant = useHeaderVariant()
   const [isBurgerOpen, setIsBurgerOpen] = useState(false)
   const [isSearchOpen, setIsSearchOpen] = useState(false)
@@ -105,7 +97,9 @@ export function Header({ transparent: _transparent }: { transparent?: boolean } 
   }, [isBurgerOpen])
 
   useEffect(() => {
-    fetchCartCount()
+    const initialCartCountTimer = window.setTimeout(() => {
+      fetchCartCount()
+    }, 0)
     const cartUpdatedHandler = (e: Event) => {
       const cart = (e as CustomEvent<{ cart?: { totalQuantity?: number } | null }>)?.detail?.cart
       if (cart !== undefined && typeof cart?.totalQuantity === 'number') {
@@ -118,6 +112,7 @@ export function Header({ transparent: _transparent }: { transparent?: boolean } 
     window.addEventListener('neptune-cart-updated', cartUpdatedHandler)
     window.addEventListener(CART_OPEN_EVENT, openCartHandler)
     return () => {
+      window.clearTimeout(initialCartCountTimer)
       window.removeEventListener('neptune-cart-updated', cartUpdatedHandler)
       window.removeEventListener(CART_OPEN_EVENT, openCartHandler)
     }
@@ -139,7 +134,8 @@ export function Header({ transparent: _transparent }: { transparent?: boolean } 
     top: 0,
     left: 0,
     right: 0,
-    background: hasSolidBg ? '#ffffff' : 'transparent',
+    background: hasSolidBg ? 'rgba(255, 255, 255, 0.9)' : 'transparent',
+    backdropFilter: hasSolidBg ? 'saturate(180%) blur(10px)' : 'none',
     borderColor: 'transparent',
   }
   const iconClass = lightText
@@ -149,9 +145,9 @@ export function Header({ transparent: _transparent }: { transparent?: boolean } 
   return (
     <header className={headerClass} style={headerStyle} suppressHydrationWarning>
       <div className="relative flex flex-1 w-full min-w-0 px-4 sm:px-6 md:px-8 lg:px-10 py-1.5 md:py-2.5 overflow-visible shrink-0 items-center">
-        {/* Left: burger + newsletter | Center: nav + logo (desktop) | Right: cart + search */}
+        {/* Left: burger + primary links | Center: logo (desktop) | Right: cart + search */}
         <div className="relative flex items-center w-full min-w-0 min-h-[1.5rem] md:min-h-0">
-          <div className="flex shrink-0 items-center gap-0 z-10">
+          <div className="flex shrink-0 items-center gap-3 md:gap-4 z-10">
             <button
               type="button"
               aria-label={isBurgerOpen ? 'Close menu' : 'Open menu'}
@@ -169,29 +165,23 @@ export function Header({ transparent: _transparent }: { transparent?: boolean } 
               />
               <span
                 className={`block w-5 h-px bg-current transition-transform duration-200 ${isBurgerOpen ? '-rotate-45 -translate-y-2' : ''
-                  }`}
+                }`}
               />
             </button>
-            <div className="hidden lg:block">
-              <NavLink
-                href="/newsletters"
-                label="NEWSLETTER"
-                transparent={lightText}
-                className="shrink-0 md:-ml-1 md:h-10 md:items-center"
-              />
+            <div className="hidden lg:flex items-center gap-4 md:gap-5">
+              {DESKTOP_NAV_ITEMS.map((item) => (
+                <NavLink
+                  key={item.href}
+                  href={item.href}
+                  label={item.label}
+                  transparent={lightText}
+                  className="shrink-0 md:h-10 md:items-center"
+                />
+              ))}
             </div>
           </div>
 
-          <div className="hidden lg:flex absolute left-1/2 -translate-x-1/2 min-w-0 items-baseline justify-center gap-4 md:gap-5 lg:gap-7 xl:gap-9 md:mt-0">
-            <nav className="flex items-baseline justify-end min-w-0" aria-label="Primary navigation">
-              <ul className="flex list-none items-baseline justify-end gap-4 md:gap-5 lg:gap-7 xl:gap-9 flex-nowrap m-0 p-0">
-                {NAV_LEFT.map((item) => (
-                  <li key={item.href} className="shrink-0 whitespace-nowrap">
-                    <NavLink href={item.href} label={item.label} transparent={lightText} />
-                  </li>
-                ))}
-              </ul>
-            </nav>
+          <div className="hidden lg:flex absolute left-1/2 -translate-x-1/2 min-w-0 items-baseline justify-center md:mt-0">
             <Link href="/" className="shrink-0 flex items-baseline">
               <Image
                 src="/neptune_logo_dark.svg"
@@ -202,13 +192,6 @@ export function Header({ transparent: _transparent }: { transparent?: boolean } 
                 priority
               />
             </Link>
-            <ul className="flex list-none items-baseline justify-start gap-4 md:gap-5 lg:gap-7 xl:gap-9 flex-nowrap min-w-0 m-0 p-0">
-              {NAV_RIGHT.map((item) => (
-                <li key={item.href} className="shrink-0 whitespace-nowrap">
-                  <NavLink href={item.href} label={item.label} transparent={lightText} />
-                </li>
-              ))}
-            </ul>
           </div>
 
           <div className="flex-1 min-w-0 lg:hidden" aria-hidden />
@@ -287,7 +270,7 @@ export function Header({ transparent: _transparent }: { transparent?: boolean } 
           fixed-positioned to the viewport. overflow-x-hidden has been
           removed from the header so iOS Safari cannot clip this panel. */}
       <div
-        className={`fixed inset-0 z-40 bg-black/20 transition-opacity duration-300 ${isBurgerOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}
+        className={`fixed inset-0 z-40 bg-transparent ${isBurgerOpen ? 'pointer-events-auto' : 'pointer-events-none'}`}
         onClick={() => setIsBurgerOpen(false)}
         aria-hidden
       />
@@ -297,12 +280,7 @@ export function Header({ transparent: _transparent }: { transparent?: boolean } 
         style={{ WebkitOverflowScrolling: 'touch' } as CSSProperties}
       >
         <nav className="flex min-h-full flex-col gap-3 px-6 pt-8 pb-12">
-          <NavLink
-            href="/newsletters"
-            label="NEWSLETTER"
-            onClick={() => setIsBurgerOpen(false)}
-          />
-          {NAV_ITEMS.map((item) => (
+          {BURGER_NAV_ITEMS.map((item) => (
             <NavLink
               key={item.href}
               href={item.href}
@@ -310,11 +288,6 @@ export function Header({ transparent: _transparent }: { transparent?: boolean } 
               onClick={() => setIsBurgerOpen(false)}
             />
           ))}
-          <NavLink
-            href="/contributors"
-            label="CONTRIBUTORS"
-            onClick={() => setIsBurgerOpen(false)}
-          />
           <button
             type="button"
             onClick={() => {

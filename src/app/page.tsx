@@ -6,6 +6,7 @@ import {
   SITE_SETTINGS_QUERY,
 } from '@/sanity/lib/queries'
 import { shopifyFetch } from '@/lib/shopify/client'
+import { normalizeShopifyProductHandle } from '@/lib/shopify/handle'
 import {
   FIRST_PRODUCT_QUERY,
   NEWSSTAND_6_PRODUCTS_QUERY,
@@ -13,6 +14,7 @@ import {
 } from '@/lib/shopify/queries'
 import { HomeScrollContainer } from '@/components/home/HomeScrollContainer'
 import type { HomeSection } from '@/components/home/StickyHeroStack'
+import type { PageIntroPortableText } from '@/components/shared/PageIntroText'
 import { Footer } from '@/components/layout/Footer'
 import { SuppressLayoutFooter } from '@/components/layout/SuppressLayoutFooter'
 
@@ -49,10 +51,13 @@ type HomePageSection = {
   }
   productHandles?: Array<{ handle: string }>
   description?: string | null
+  descriptionRichText?: PageIntroPortableText | null
   ctaLabel?: string | null
   videoUrl?: string | null
   headline?: string | null
+  titleRichText?: PageIntroPortableText | null
   subtitle?: string | null
+  subtitleRichText?: PageIntroPortableText | null
 }
 
 type NewsstandProductNode = {
@@ -91,6 +96,7 @@ export default async function Home() {
       instagramUrl?: string | null
       newsletterHeadline?: string | null
       newsletterSubtitle?: string | null
+      newsletterDescriptionRichText?: PageIntroPortableText | null
       newsletterImage?: { asset?: { _ref: string } } | null
     } | null>(SITE_SETTINGS_QUERY),
   ])
@@ -163,7 +169,9 @@ export default async function Home() {
         })
       } else if (block._type === 'homeNewsstandBlock' && block.productHandles?.length) {
         try {
-          const handles = block.productHandles.map((p) => p.handle).filter(Boolean)
+          const handles = block.productHandles
+            .map((p) => normalizeShopifyProductHandle(p.handle))
+            .filter((handle): handle is string => Boolean(handle))
           const productResults = await Promise.all(
             handles.map((handle) =>
               shopifyFetch<{ product: NewsstandProductNode | null }>({
@@ -183,7 +191,9 @@ export default async function Home() {
                 products,
                 featuredHandle,
                 title: block.title,
+                titleRichText: block.titleRichText,
                 description: block.description,
+                descriptionRichText: block.descriptionRichText,
                 ctaLabel: block.ctaLabel,
               },
             })
@@ -209,6 +219,7 @@ export default async function Home() {
             rightImageUrl: rightNewsletterImageUrl,
             headline: block.headline ?? settings?.newsletterHeadline ?? null,
             subtitle: block.subtitle ?? settings?.newsletterSubtitle ?? null,
+            subtitleRichText: block.subtitleRichText ?? settings?.newsletterDescriptionRichText ?? null,
           },
         })
       }

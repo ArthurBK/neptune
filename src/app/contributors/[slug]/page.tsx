@@ -13,6 +13,11 @@ import {
 
 import { AdBanner } from '@/components/shared/AdBanner'
 import { ArticleCard } from '@/components/editorial/ArticleCard'
+import {
+  PageIntroText,
+  hasPortableTextContent,
+  type PageIntroPortableText,
+} from '@/components/shared/PageIntroText'
 
 export const revalidate = 86400
 
@@ -30,7 +35,8 @@ type ContributorData = {
   name: string
   slug: string
   role?: string | null
-  bio: string
+  bio?: string | null
+  bioRichText?: PageIntroPortableText | null
   portrait?: { asset?: { _ref: string }; alt?: string } | null
   location?: string | null
 }
@@ -64,6 +70,10 @@ export default async function ContributorPage({ params }: ContributorPageProps) 
   const portraitUrl = contributor.portrait?.asset
     ? urlFor(contributor.portrait).width(600).height(800).url()
     : null
+  const bioRichText = hasPortableTextContent(contributor.bioRichText)
+    ? contributor.bioRichText
+    : null
+  const legacyBio = !bioRichText ? contributor.bio?.trim() : null
 
   return (
     <main>
@@ -95,11 +105,17 @@ export default async function ContributorPage({ params }: ContributorPageProps) 
             {contributor.location && (
               <p className="mt-2 text-base text-[#6B6B6B]">{contributor.location}</p>
             )}
-            <div className="mt-6 prose prose-lg max-w-none">
-              <p className="text-sm md:text-[15px] text-[#1A1A1A] leading-relaxed whitespace-pre-line font-[Helvetica,Arial,sans-serif] text-center max-w-2xl mx-auto">
-                {contributor.bio}
-              </p>
-            </div>
+            {(bioRichText || legacyBio) && (
+              <div className="mt-6 text-center">
+                {bioRichText ? (
+                  <PageIntroText value={bioRichText} />
+                ) : (
+                  <p className="mx-auto max-w-2xl whitespace-pre-line text-center text-sm leading-relaxed text-[#1A1A1A] font-[Helvetica,Arial,sans-serif] md:text-[15px]">
+                    {legacyBio}
+                  </p>
+                )}
+              </div>
+            )}
           </div>
         </header>
 

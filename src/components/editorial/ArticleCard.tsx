@@ -7,7 +7,7 @@ import { urlFor } from '@/sanity/lib/image'
 interface ArticleCardProps {
   title: string
   slug: string
-  category: string
+  category?: string | null
   subcategory?: string | null
   coverImage: {
     asset?: { _ref: string }
@@ -34,7 +34,6 @@ interface ArticleCardProps {
 export function ArticleCard({
   title,
   slug,
-  category,
   subcategory,
   coverImage,
   author,
@@ -48,6 +47,7 @@ export function ArticleCard({
   titleClassName,
 }: ArticleCardProps) {
   const displayTitle = articleTitleSingleLine(title)
+  const articleHref = `/stories/${slug}`
   const isCompact = size === 'compact'
   const isFeatured = size === 'featured'
   const imageWidth = isCompact ? 400 : 600
@@ -78,7 +78,7 @@ export function ArticleCard({
       <article className="group h-full">
         <div className="mx-auto w-full md:max-w-[920px] flex h-full flex-col md:flex-row gap-4 md:gap-6 items-stretch">
           <Link
-            href={`/${category}/${slug}`}
+            href={articleHref}
             className="block w-full md:w-[40%] shrink-0 overflow-hidden"
           >
             <div className="relative aspect-3/2 bg-[#E5E5E5] overflow-hidden">
@@ -105,7 +105,7 @@ export function ArticleCard({
                   {subcategory}
                 </p>
               )}
-              <Link href={`/${category}/${slug}`} className="block w-full text-left">
+              <Link href={articleHref} className="block w-full text-left">
                 <h3 className={`font-serif text-[#1A1A1A] group-hover:underline line-clamp-3 ${horizontalTitleClass}`}>
                   {displayTitle}
                 </h3>
@@ -129,7 +129,7 @@ export function ArticleCard({
     return (
       <article className="group lg:h-full lg:flex lg:flex-col">
         <Link
-          href={`/${category}/${slug}`}
+          href={articleHref}
           className="block lg:flex-1 lg:min-h-0 overflow-hidden"
         >
           <div className="aspect-3/4 lg:aspect-auto lg:h-full bg-[#E5E5E5] overflow-hidden">
@@ -156,7 +156,7 @@ export function ArticleCard({
               {subcategory}
             </p>
           )}
-          <Link href={`/${category}/${slug}`}>
+          <Link href={articleHref}>
             <h3 className={`font-serif text-[#1A1A1A] group-hover:underline line-clamp-2 ${titleSizeClass}`}>
               {displayTitle}
             </h3>
@@ -177,7 +177,7 @@ export function ArticleCard({
   return (
     <article>
       <div className="group">
-        <Link href={`/${category}/${slug}`} className="block overflow-hidden">
+        <Link href={articleHref} className="block overflow-hidden">
           <div className={imageContainerClass}>
             {imageUrl ? (
               <Image
@@ -206,7 +206,7 @@ export function ArticleCard({
               {subcategory}
             </p>
           )}
-          <Link href={`/${category}/${slug}`}>
+          <Link href={articleHref}>
             <h3
               className={`font-serif text-[#1A1A1A] group-hover:underline line-clamp-2 ${titleSizeClass}`}
             >

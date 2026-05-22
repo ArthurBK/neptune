@@ -76,7 +76,7 @@ export function HeroCarousel({ articles, featuredProduct }: HeroCarouselProps) {
             aria-hidden={!isActive}
           >
             <Link
-              href={`/${article.category}/${article.slug}`}
+              href={`/stories/${article.slug}`}
               className="block h-full w-full relative"
             >
               {imageUrl ? (

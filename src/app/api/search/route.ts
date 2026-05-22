@@ -76,7 +76,7 @@ async function fetchSearch(q: string) {
       category: a.category,
       coverImage: a.coverImage,
       author: a.author,
-      href: `/${a.category}/${a.slug}`,
+      href: `/stories/${a.slug}`,
     })),
     contributors: contributors.map((c) => ({
       _id: c._id,

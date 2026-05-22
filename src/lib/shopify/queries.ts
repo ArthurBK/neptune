@@ -2,6 +2,7 @@ const PRODUCT_FIELDS = `
   id
   title
   handle
+  createdAt
   priceRange {
     minVariantPrice { amount currencyCode }
   }
@@ -19,13 +20,18 @@ const PRODUCT_FIELDS = `
 `
 
 export const NEWSSTAND_PRODUCTS_QUERY = `
-  query NewsstandProducts {
+  query NewsstandProducts($first: Int!, $after: String) {
     collection(handle: "newsstand") {
-      products(first: 100, sortKey: CREATED, reverse: true) {
+      products(first: $first, after: $after, sortKey: CREATED, reverse: true) {
         edges {
+          cursor
           node {
             ${PRODUCT_FIELDS}
           }
+        }
+        pageInfo {
+          hasNextPage
+          endCursor
         }
       }
     }
@@ -98,12 +104,17 @@ export const FIRST_PRODUCT_QUERY = `
 
 /** All products (Shopify allows up to 250), sorted by created date */
 export const ALL_PRODUCTS_QUERY = `
-  query AllProducts {
-    products(first: 100, sortKey: CREATED_AT, reverse: true) {
+  query AllProducts($first: Int!, $after: String) {
+    products(first: $first, after: $after, sortKey: CREATED_AT, reverse: true) {
       edges {
+        cursor
         node {
           ${PRODUCT_FIELDS}
         }
+      }
+      pageInfo {
+        hasNextPage
+        endCursor
       }
     }
   }

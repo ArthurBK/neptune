@@ -2,11 +2,18 @@ import Link from 'next/link'
 
 import { sanityFetch } from '@/sanity/lib/client'
 import {
+  CONTRIBUTORS_PAGE_QUERY,
   CONTRIBUTORS_LIST_PAGE_QUERY,
   PHOTOGRAPHERS_LIST_PAGE_QUERY,
 } from '@/sanity/lib/queries'
 
 import { NewsstandCta } from '@/components/shared/NewsstandCta'
+import {
+  PageIntroText,
+  hasPortableTextContent,
+  portableTextToPlainText,
+  type PageIntroPortableText,
+} from '@/components/shared/PageIntroText'
 
 export const revalidate = 3600
 
@@ -14,46 +21,48 @@ type ListPerson = {
   _id: string
   name: string
   slug: string
-  bio: string
+  bio?: string | null
+  bioRichText?: PageIntroPortableText | null
   articleCount: number
 }
 
+type ContributorsPageData = {
+  description?: PageIntroPortableText | null
+}
+
 export default async function ContributorsPage() {
-  const [contributors, photographers] = await Promise.all([
+  const [contributors, photographers, contributorsPage] = await Promise.all([
     sanityFetch<ListPerson[]>(CONTRIBUTORS_LIST_PAGE_QUERY) ?? [],
     sanityFetch<ListPerson[]>(PHOTOGRAPHERS_LIST_PAGE_QUERY) ?? [],
+    sanityFetch<ContributorsPageData | null>(CONTRIBUTORS_PAGE_QUERY),
   ])
 
   const entries = [
     ...contributors.map((c) => ({
       ...c,
+      bioText: hasPortableTextContent(c.bioRichText)
+        ? portableTextToPlainText(c.bioRichText)
+        : c.bio?.trim() ?? '',
       href: `/contributors/${c.slug}` as const,
     })),
     ...photographers.map((p) => ({
       ...p,
+      bioText: p.bio?.trim() ?? '',
       href: `/contributors/photographer/${p.slug}` as const,
     })),
   ].sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: 'base' }))
+  const description = hasPortableTextContent(contributorsPage?.description)
+    ? contributorsPage.description
+    : null
 
   return (
     <main>
       <div className="max-w-7xl mx-auto px-6 md:px-12 lg:px-16 pt-4 md:pt-8 pb-6 md:pb-10">
-        <div className="mx-auto mb-6 md:mb-8 h-px w-1/3 max-w-md bg-(--neptune-logo-red)" />
-
-        <header className="mb-6 md:mb-12 text-center font-futura">
-          <h1 className="font-futura font-normal text-xl md:text-2xl text-[#1A1A1A] uppercase tracking-wide">
-            Contributors
-          </h1>
-          <p
-            className="mt-2 text-sm md:text-[16px] text-black max-w-2xl mx-auto whitespace-pre-line"
-            style={{ fontFamily: "var(--font-gill-sans)", fontWeight: 300 }}
-          >
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor
-            incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud
-            exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure
-            dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
-          </p>
-        </header>
+        {description && (
+          <section className="mb-6 text-center font-futura md:mb-12">
+            <PageIntroText value={description} />
+          </section>
+        )}
 
         {entries.length > 0 ? (
           <section className="max-w-5xl mx-auto">
@@ -73,10 +82,10 @@ export default async function ContributorsPage() {
                         {person.name}
                       </span>
                     )}
-                    {person.bio ? (
+                    {person.bioText ? (
                       <>
                         {' '}
-                        {person.bio.trim()}
+                        {person.bioText}
                       </>
                     ) : null}
                   </p>

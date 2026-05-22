@@ -25,6 +25,7 @@ export interface ShopifyProduct {
   id: string
   title: string
   handle: string
+  createdAt?: string
   priceRange: {
     minVariantPrice: Money
   }
@@ -50,19 +51,23 @@ export interface ShopifyProductDetail {
 }
 
 // Collection response
+export interface ProductConnection {
+  edges: Array<{ cursor?: string; node: ShopifyProduct }>
+  pageInfo: {
+    hasNextPage: boolean
+    endCursor: string | null
+  }
+}
+
 export interface NewsstandProductsResponse {
   collection: {
-    products: {
-      edges: Array<{ node: ShopifyProduct }>
-    }
+    products: ProductConnection
   } | null
 }
 
 // All products response (fallback when collection doesn't exist)
 export interface AllProductsResponse {
-  products: {
-    edges: Array<{ node: ShopifyProduct }>
-  }
+  products: ProductConnection
 }
 
 // Product by handle response

@@ -3,6 +3,7 @@ import { urlFor } from '@/sanity/lib/image'
 import { SITE_SETTINGS_QUERY } from '@/sanity/lib/queries'
 
 import { NewsletterPageContent } from '@/components/newsletter/NewsletterPageContent'
+import type { PageIntroPortableText } from '@/components/shared/PageIntroText'
 
 export const revalidate = 3600
 
@@ -10,6 +11,7 @@ export default async function NewslettersPage() {
   const settings = await sanityFetch<{
     newsletterHeadline?: string | null
     newsletterSubtitle?: string | null
+    newsletterDescriptionRichText?: PageIntroPortableText | null
     newsletterImage?: { asset?: { _ref: string } } | null
     newsletterImageLegend?: unknown | null
   } | null>(SITE_SETTINGS_QUERY)
@@ -21,8 +23,8 @@ export default async function NewslettersPage() {
 
   return (
     <NewsletterPageContent
-      headline={settings?.newsletterHeadline}
       subtitle={settings?.newsletterSubtitle}
+      descriptionRichText={settings?.newsletterDescriptionRichText}
       imageUrl={imageUrl}
       imageLegend={settings?.newsletterImageLegend}
     />

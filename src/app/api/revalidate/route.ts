@@ -7,8 +7,6 @@ import { revalidatePath } from 'next/cache'
 import { type NextRequest, NextResponse } from 'next/server'
 import { parseBody } from 'next-sanity/webhook'
 
-const CATEGORY_SLUGS = ['interiors', 'arts', 'gardens', 'fashion', 'travel'] as const
-
 type WebhookBody = {
   _type?: string
   slug?: string
@@ -71,15 +69,34 @@ export async function POST(req: NextRequest) {
 
     switch (body._type) {
       case 'article': {
-        const category = body.category
+        revalidatePath('/stories')
+        revalidated.push('/stories')
+
         const slug = body.slug
-        if (category && CATEGORY_SLUGS.includes(category as (typeof CATEGORY_SLUGS)[number])) {
-          revalidatePath(`/${category}`)
-          revalidated.push(`/${category}`)
-          if (slug) {
-            revalidatePath(`/${category}/${slug}`)
-            revalidated.push(`/${category}/${slug}`)
-          }
+        if (slug) {
+          revalidatePath(`/stories/${slug}`)
+          revalidated.push(`/stories/${slug}`)
+        }
+        break
+      }
+      case 'storiesPage': {
+        revalidatePath('/stories')
+        revalidated.push('/stories')
+        break
+      }
+      case 'contributorsPage': {
+        revalidatePath('/contributors')
+        revalidated.push('/contributors')
+        break
+      }
+      case 'contributor': {
+        revalidatePath('/contributors')
+        revalidated.push('/contributors')
+
+        const slug = body.slug
+        if (slug) {
+          revalidatePath(`/contributors/${slug}`)
+          revalidated.push(`/contributors/${slug}`)
         }
         break
       }

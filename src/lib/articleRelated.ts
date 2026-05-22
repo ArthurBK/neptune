@@ -2,7 +2,7 @@ export type RelatedArticleForCard = {
   _id: string
   title: string
   slug: string
-  category: string
+  category?: string | null
   subcategory?: string | null
   coverImage?: { asset?: { _ref: string }; alt?: string }
   author?: { name: string; slug: string } | null
@@ -18,8 +18,6 @@ export function relatedArticlesFromSanity(
         a?._id &&
         typeof a.slug === 'string' &&
         a.slug.length > 0 &&
-        typeof a.category === 'string' &&
-        a.category.length > 0 &&
         typeof a.title === 'string'
       )
   )
