@@ -571,6 +571,14 @@ function NewsstandHeroContent({
               {description}
             </p>
           ) : null}
+          <div className="mt-4 md:mt-5">
+            <Link
+              href="/newsstand"
+              className="inline-block bg-black text-white font-header font-medium text-sm tracking-[0.18em] uppercase px-5 py-2.5 transition-colors hover:bg-[#1f1f1f]"
+            >
+              {cta}
+            </Link>
+          </div>
         </div>
 
         <div className="mt-4 flex min-h-0 w-full flex-1 items-center justify-center md:mt-5">
@@ -581,15 +589,6 @@ function NewsstandHeroContent({
               priority={priority}
             />
           ) : null}
-        </div>
-
-        <div className="mt-4 shrink-0 md:mt-5">
-          <Link
-            href="/newsstand"
-            className="inline-block bg-black text-white font-header font-medium text-sm tracking-[0.18em] uppercase px-5 py-2.5 transition-colors hover:bg-[#1f1f1f]"
-          >
-            {cta}
-          </Link>
         </div>
       </div>
     </div>
