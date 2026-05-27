@@ -20,8 +20,19 @@
   --font-sans: var(--font-cormorant), ui-serif, Georgia, serif;
   --font-serif: var(--font-cormorant), ui-serif, Georgia, serif;
   --font-accent: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-eb-garamond: var(--font-eb-garamond-source), "EB Garamond", Garamond, Georgia, serif;
   --font-header: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --font-helvetica: Helvetica, "Helvetica Neue", Arial, sans-serif;
+  --font-avenir: Avenir, "Avenir Next", "Helvetica Neue", Helvetica, Arial, sans-serif;
   --font-futura: Futura, "Futura PT", "Futura Std", "Trebuchet MS", Arial, sans-serif;
+  --font-gill: var(--font-gill-sans), "Gill Sans", "Gill Sans MT", Calibri, sans-serif;
+  --font-inter-ui: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-georgia: Georgia, "Times New Roman", Times, serif;
+  --font-times: "Times New Roman", Times, serif;
+  --font-garamond: Garamond, "Cormorant Garamond", Baskerville, Georgia, serif;
+  --font-arial: Arial, Helvetica, sans-serif;
+  --font-editorial-mono: "Courier New", Courier, monospace;
+  --font-system-sans: Arial, Helvetica, sans-serif;
 }
 
 html {

@@ -1,17 +1,7 @@
 import { defineField } from 'sanity'
 import { HexColorInput } from '../../components/HexColorInput'
-
-const PAGE_INTRO_FONT_FAMILIES = [
-  { title: 'Serif', value: 'serif' },
-  { title: 'Futura', value: 'futura' },
-  { title: 'Header', value: 'header' },
-  { title: 'Sans-serif', value: 'sans' },
-]
-
-const PAGE_INTRO_FONT_SIZE_OPTIONS = Array.from({ length: 45 }, (_, i) => {
-  const px = i + 6
-  return { title: `${px}px`, value: px }
-})
+import { FontSizeCounterInput } from '../../components/FontSizeCounterInput'
+import { TEXT_STYLE_FONT_FAMILIES } from '../../../lib/textStyleFonts'
 
 export const pageIntroRichTextType = {
   type: 'array',
@@ -55,13 +45,13 @@ export const pageIntroRichTextType = {
                 name: 'fontFamily',
                 title: 'Font family',
                 type: 'string',
-                options: { list: PAGE_INTRO_FONT_FAMILIES },
+                options: { list: TEXT_STYLE_FONT_FAMILIES },
               }),
               defineField({
                 name: 'fontSize',
                 title: 'Font size',
                 type: 'number',
-                options: { list: PAGE_INTRO_FONT_SIZE_OPTIONS },
+                components: { input: FontSizeCounterInput },
                 validation: (rule) => rule.integer().min(6).max(50),
               }),
             ],

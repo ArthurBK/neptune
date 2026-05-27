@@ -1,6 +1,8 @@
 import { DocumentTextIcon, ImageIcon } from '@sanity/icons'
 import { defineArrayMember, defineField, defineType } from 'sanity'
 import { captionRichTextType } from './lib/captionRichText'
+import { TEXT_STYLE_FONT_FAMILIES } from '../../lib/textStyleFonts'
+import { FontSizeCounterInput } from '../components/FontSizeCounterInput'
 import { HexColorInput } from '../components/HexColorInput'
 
 function captionToPlainText(value: unknown): string {
@@ -165,23 +167,11 @@ const ARTICLE_CATEGORIES = [
   { title: 'Travel', value: 'travel' },
 ]
 
-const ARTICLE_FONT_FAMILIES = [
-  { title: 'Serif (default)', value: 'serif' },
-  { title: 'Futura', value: 'futura' },
-  { title: 'Header', value: 'header' },
-  { title: 'Sans-serif', value: 'sans' },
-]
-
 const ARTICLE_TEXT_SIZES = [
   { title: 'Small', value: 'sm' },
   { title: 'Medium (default)', value: 'md' },
   { title: 'Large', value: 'lg' },
 ]
-
-const INLINE_FONT_SIZE_OPTIONS = Array.from({ length: 45 }, (_, i) => {
-  const px = i + 6
-  return { title: `${px}px`, value: px }
-})
 
 export const article = defineType({
   name: 'article',
@@ -282,7 +272,7 @@ export const article = defineType({
           name: 'fontFamily',
           title: 'Font family',
           type: 'string',
-          options: { list: ARTICLE_FONT_FAMILIES },
+          options: { list: TEXT_STYLE_FONT_FAMILIES },
           initialValue: 'serif',
         }),
         defineField({
@@ -373,13 +363,13 @@ export const article = defineType({
                     name: 'fontFamily',
                     title: 'Font family',
                     type: 'string',
-                    options: { list: ARTICLE_FONT_FAMILIES },
+                    options: { list: TEXT_STYLE_FONT_FAMILIES },
                   }),
                   defineField({
                     name: 'fontSize',
                     title: 'Font size',
                     type: 'number',
-                    options: { list: INLINE_FONT_SIZE_OPTIONS },
+                    components: { input: FontSizeCounterInput },
                     validation: (rule) => rule.integer().min(6).max(50),
                   }),
                 ],
@@ -419,4 +409,3 @@ export const article = defineType({
 })
 
 export { pteImageBlock, pteImageGridBlock, adBannerEmbedBlock }
-

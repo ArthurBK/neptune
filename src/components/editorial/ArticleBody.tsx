@@ -5,6 +5,7 @@ import { urlFor } from '@/sanity/lib/image'
 import { SanityCaption, hasCaptionContent } from '@/components/shared/SanityCaption'
 import { ImageGridLightbox } from '@/components/editorial/ImageGridLightbox'
 import { ClickableSingleImage } from '@/components/editorial/ClickableSingleImage'
+import { getOptionalTextStyleFontClass } from '@/lib/textStyleFonts'
 
 const TextWrapper = ({
   children,
@@ -28,13 +29,6 @@ function createComponents(
   isFirstParagraph: { current: boolean },
   typography: TypographyOptions,
 ): PortableTextComponents {
-  const inlineFontClassByValue: Record<string, string> = {
-    serif: 'font-serif',
-    futura: 'font-futura',
-    header: 'font-header',
-    sans: 'font-[Helvetica,Arial,sans-serif]',
-  }
-
   const normalizeHexColor = (value: unknown): string | undefined => {
     if (typeof value !== 'string') return undefined
     const trimmed = value.trim()
@@ -126,7 +120,7 @@ function createComponents(
         const fontSizeValue = typeof value?.fontSize === 'number' ? value.fontSize : undefined
         const color = normalizeHexColor(value?.textColor)
 
-        const className = [fontFamilyValue ? inlineFontClassByValue[fontFamilyValue] : '']
+        const className = [getOptionalTextStyleFontClass(fontFamilyValue)]
           .filter(Boolean)
           .join(' ')
 

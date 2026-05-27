@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { Inter } from 'next/font/google'
+import { EB_Garamond, Inter } from 'next/font/google'
 import localFont from 'next/font/local'
 
 import { sanityFetch } from '@/sanity/lib/client'
@@ -11,6 +11,12 @@ import './globals.css'
 const inter = Inter({
   subsets: ['latin'],
   variable: '--font-inter',
+  display: 'swap',
+})
+
+const ebGaramond = EB_Garamond({
+  subsets: ['latin'],
+  variable: '--font-eb-garamond-source',
   display: 'swap',
 })
 
@@ -74,7 +80,7 @@ export default async function RootLayout({
   const instagramUrl = settings?.instagramUrl ?? null
 
   return (
-    <html lang="en" className={`${cormorantGaramond.variable} ${inter.variable} ${gillSans.variable}`} suppressHydrationWarning>
+    <html lang="en" className={`${cormorantGaramond.variable} ${ebGaramond.variable} ${inter.variable} ${gillSans.variable}`} suppressHydrationWarning>
       <body className="min-h-dvh flex flex-col bg-white text-[#1A1A1A] antialiased font-sans font-light" suppressHydrationWarning>
         <LayoutShell instagramUrl={instagramUrl}>{children}</LayoutShell>
       </body>

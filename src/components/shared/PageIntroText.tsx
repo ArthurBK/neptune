@@ -1,15 +1,9 @@
 import type { PortableTextBlock } from '@portabletext/types'
 import { PortableText, type PortableTextComponents } from 'next-sanity'
 import type { CSSProperties } from 'react'
+import { getOptionalTextStyleFontClass } from '@/lib/textStyleFonts'
 
 export type PageIntroPortableText = PortableTextBlock[]
-
-const inlineFontClassByValue: Record<string, string> = {
-  serif: 'font-serif',
-  futura: 'font-futura',
-  header: 'font-header',
-  sans: 'font-[Helvetica,Arial,sans-serif]',
-}
 
 function normalizedHexColor(value: string | null | undefined): string | undefined {
   if (!value) return undefined
@@ -58,7 +52,7 @@ const pageIntroTextComponents: PortableTextComponents = {
         typeof value?.fontFamily === 'string' ? value.fontFamily : undefined
       const fontSizeValue = typeof value?.fontSize === 'number' ? value.fontSize : undefined
       const color = normalizedHexColor(value?.textColor)
-      const className = fontFamilyValue ? inlineFontClassByValue[fontFamilyValue] : undefined
+      const className = getOptionalTextStyleFontClass(fontFamilyValue)
       const style: CSSProperties = {
         ...(color ? { color } : {}),
         ...(fontSizeValue ? { fontSize: `${fontSizeValue}px` } : {}),

@@ -8,6 +8,7 @@ import Link from 'next/link'
 
 import { useOpenNewsletterModal } from '@/contexts/NewsletterModalContext'
 import { articleTitleSingleLine } from '@/lib/articleTitle'
+import { getOptionalTextStyleFontClass } from '@/lib/textStyleFonts'
 import { urlFor } from '@/sanity/lib/image'
 import { NewsstandCta } from '@/components/shared/NewsstandCta'
 
@@ -30,13 +31,6 @@ export interface FeaturedProduct {
 
 type HomeRichText = PortableTextBlock[]
 
-const inlineFontClassByValue: Record<string, string> = {
-  serif: 'font-serif',
-  futura: 'font-futura',
-  header: 'font-header',
-  sans: 'font-[Helvetica,Arial,sans-serif]',
-}
-
 function hasRichText(value: HomeRichText | null | undefined): value is HomeRichText {
   return Array.isArray(value) && value.length > 0
 }
@@ -57,7 +51,7 @@ const homeRichTextMarks: NonNullable<PortableTextComponents['marks']> = {
       typeof value?.fontFamily === 'string' ? value.fontFamily : undefined
     const fontSizeValue = typeof value?.fontSize === 'number' ? value.fontSize : undefined
     const color = normalizedHexColor(value?.textColor)
-    const className = fontFamilyValue ? inlineFontClassByValue[fontFamilyValue] : undefined
+    const className = getOptionalTextStyleFontClass(fontFamilyValue)
     const style: CSSProperties = {
       ...(color ? { color } : {}),
       ...(fontSizeValue ? { fontSize: `${fontSizeValue}px` } : {}),
