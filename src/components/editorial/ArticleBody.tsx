@@ -25,6 +25,92 @@ interface TypographyOptions {
   textColor?: string
 }
 
+type VideoEmbed =
+  | { kind: 'direct'; src: string }
+  | { kind: 'iframe'; src: string; title: string }
+
+function hostMatches(host: string, domain: string): boolean {
+  return host === domain || host.endsWith(`.${domain}`)
+}
+
+function youtubeEmbedFromUrl(url: URL): VideoEmbed | null {
+  const host = url.hostname.replace(/^www\./, '').toLowerCase()
+  let id: string | null = null
+
+  if (host === 'youtu.be') {
+    id = url.pathname.split('/').filter(Boolean)[0] ?? null
+  } else if (hostMatches(host, 'youtube.com') || hostMatches(host, 'youtube-nocookie.com')) {
+    const parts = url.pathname.split('/').filter(Boolean)
+    if (parts[0] === 'embed' || parts[0] === 'shorts' || parts[0] === 'live') {
+      id = parts[1] ?? null
+    } else {
+      id = url.searchParams.get('v')
+    }
+  }
+
+  if (!id || !/^[\w-]+$/.test(id)) return null
+
+  const params = new URLSearchParams({
+    autoplay: '1',
+    controls: '1',
+    loop: '1',
+    mute: '1',
+    playsinline: '1',
+    playlist: id,
+    rel: '0',
+  })
+
+  return {
+    kind: 'iframe',
+    src: `https://www.youtube-nocookie.com/embed/${encodeURIComponent(id)}?${params.toString()}`,
+    title: 'YouTube video',
+  }
+}
+
+function vimeoEmbedFromUrl(url: URL): VideoEmbed | null {
+  const host = url.hostname.replace(/^www\./, '').toLowerCase()
+  if (!hostMatches(host, 'vimeo.com')) return null
+
+  const parts = url.pathname.split('/').filter(Boolean)
+  const id =
+    host === 'player.vimeo.com' && parts[0] === 'video'
+      ? parts[1]
+      : parts.find((part) => /^\d+$/.test(part))
+
+  if (!id) return null
+
+  const params = new URLSearchParams({
+    autoplay: '1',
+    autopause: '0',
+    controls: '1',
+    loop: '1',
+    muted: '1',
+    playsinline: '1',
+  })
+
+  return {
+    kind: 'iframe',
+    src: `https://player.vimeo.com/video/${encodeURIComponent(id)}?${params.toString()}`,
+    title: 'Vimeo video',
+  }
+}
+
+function videoEmbedFromUrl(rawUrl: unknown): VideoEmbed | null {
+  if (typeof rawUrl !== 'string') return null
+
+  try {
+    const url = new URL(rawUrl)
+    if (url.protocol !== 'https:') return null
+
+    const directVideo = /\.(mp4|webm|mov)$/i.test(url.pathname)
+    if (directVideo) return { kind: 'direct', src: url.toString() }
+
+    return youtubeEmbedFromUrl(url) ?? vimeoEmbedFromUrl(url)
+  } catch {
+    return null
+  }
+}
+
 function createComponents(
   isFirstParagraph: { current: boolean },
   typography: TypographyOptions,
@@ -275,6 +361,85 @@ function createComponents(
           .filter((x): x is NonNullable<typeof x> => x !== null)
 
         return <ImageGridLightbox images={gridImages} />
+      },
+      pteVideoBlock: ({ value }) => {
+        const embed = videoEmbedFromUrl(value?.url)
+        const layout = (value?.layout as string) ?? 'full'
+        const layoutClasses: Record<string, string> = {
+          full: 'clear-both mx-auto w-full px-6 md:px-12 my-6 md:my-8',
+          wide: 'clear-both mx-auto w-full px-6 md:px-12 my-6 md:my-8',
+          center: 'clear-both mx-auto w-full px-6 md:px-12 my-6 md:my-8',
+        }
+        const layoutMaxWidths: Record<string, string> = {
+          full: '100vw',
+          wide: '70vw',
+          center: '850px',
+        }
+        const figureClass = layoutClasses[layout] ?? layoutClasses.full
+        const figureMaxWidth = layoutMaxWidths[layout] ?? layoutMaxWidths.full
+        const posterUrl = value?.posterImage?.asset
+          ? urlFor(value.posterImage).width(1600).quality(90).url()
+          : undefined
+
+        if (!embed) {
+          if (typeof value?.url !== 'string') return null
+          return (
+            <figure className={figureClass} style={{ maxWidth: figureMaxWidth }}>
+              <a
+                href={value.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block underline hover:no-underline"
+                style={{ color: typography.textColor ?? '#1A1A1A' }}
+              >
+                Watch video
+              </a>
+              {hasCaptionContent(value.caption) && (
+                <figcaption
+                  className={`mt-2 text-sm text-[#6B6B6B] ${layout === 'center' ? 'text-center' : ''}`}
+                >
+                  <SanityCaption value={value.caption} />
+                </figcaption>
+              )}
+            </figure>
+          )
+        }
+
+        return (
+          <figure className={figureClass} style={{ maxWidth: figureMaxWidth }}>
+            <div className="relative w-full aspect-video overflow-hidden bg-black">
+              {embed.kind === 'direct' ? (
+                <video
+                  autoPlay
+                  muted
+                  loop
+                  playsInline
+                  controls
+                  preload="metadata"
+                  poster={posterUrl}
+                  className="w-full h-full object-cover"
+                  src={embed.src}
+                  aria-label="Article video"
+                />
+              ) : (
+                <iframe
+                  src={embed.src}
+                  title={embed.title}
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  allowFullScreen
+                  className="absolute inset-0 w-full h-full border-0"
+                />
+              )}
+            </div>
+            {hasCaptionContent(value.caption) && (
+              <figcaption
+                className={`mt-2 text-sm text-[#6B6B6B] ${layout === 'center' ? 'text-center' : ''}`}
+              >
+                <SanityCaption value={value.caption} />
+              </figcaption>
+            )}
+          </figure>
+        )
       },
       adBannerEmbedBlock: ({ value }) => {
         if (!value?.adBanner?.image) return null

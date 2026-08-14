@@ -1,4 +1,4 @@
-import { DocumentTextIcon, ImageIcon } from '@sanity/icons'
+import { DocumentTextIcon, ImageIcon, VideoIcon } from '@sanity/icons'
 import { defineArrayMember, defineField, defineType } from 'sanity'
 import { captionRichTextType } from './lib/captionRichText'
 import { TEXT_STYLE_FONT_FAMILIES } from '../../lib/textStyleFonts'
@@ -135,6 +135,57 @@ const pteImageGridBlock = defineType({
       title: `Image Grid (${Array.isArray(images) ? images.length : 0})`,
       media,
     }),
+  },
+})
+
+// Portable Text block: video embed by external URL
+const pteVideoBlock = defineType({
+  name: 'pteVideoBlock',
+  title: 'Video',
+  type: 'object',
+  icon: VideoIcon,
+  fields: [
+    defineField({
+      name: 'url',
+      title: 'Video URL',
+      type: 'url',
+      description: 'Public HTTPS URL from YouTube, Vimeo, or a direct MP4/WebM/MOV file.',
+      validation: (rule) =>
+        rule
+          .required()
+          .uri({ scheme: ['https'] })
+          .error('Use a valid HTTPS URL.'),
+    }),
+    defineField({
+      name: 'caption',
+      title: 'Caption',
+      ...captionRichTextType,
+    }),
+    defineField({
+      name: 'posterImage',
+      title: 'Poster Image',
+      type: 'image',
+      options: { hotspot: true },
+      description: 'Optional image shown before direct video files start loading.',
+    }),
+    defineField({
+      name: 'layout',
+      title: 'Layout',
+      type: 'string',
+      options: {
+        list: [
+          { title: 'Full width', value: 'full' },
+          { title: 'Wide (bleed)', value: 'wide' },
+          { title: 'Center', value: 'center' },
+        ],
+        layout: 'radio',
+      },
+      initialValue: 'full',
+    }),
+  ],
+  preview: {
+    select: { title: 'url', media: 'posterImage' },
+    prepare: ({ title, media }) => ({ title: title || 'Video', media }),
   },
 })
 
@@ -379,6 +430,7 @@ export const article = defineType({
         },
         defineArrayMember({ type: 'pteImageBlock' }),
         defineArrayMember({ type: 'pteImageGridBlock' }),
+        defineArrayMember({ type: 'pteVideoBlock' }),
         defineArrayMember({ type: 'adBannerEmbedBlock' }),
       ],
       validation: (rule) => rule.required(),
@@ -408,4 +460,4 @@ export const article = defineType({
   },
 })
 
-export { pteImageBlock, pteImageGridBlock, adBannerEmbedBlock }
+export { pteImageBlock, pteImageGridBlock, pteVideoBlock, adBannerEmbedBlock }

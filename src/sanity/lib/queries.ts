@@ -166,6 +166,12 @@ export const ARTICLE_BY_SLUG_QUERY = `
           "imageDimensions": asset->metadata.dimensions
         }
       },
+      _type == "pteVideoBlock" => {
+        url,
+        caption,
+        posterImage,
+        layout
+      },
       _type == "adBannerEmbedBlock" => {
         "adBanner": adBanner->{ image, linkUrl, title }
       },
@@ -196,6 +202,12 @@ export const ARTICLE_BY_STORY_SLUG_QUERY = `
           ...,
           "imageDimensions": asset->metadata.dimensions
         }
+      },
+      _type == "pteVideoBlock" => {
+        url,
+        caption,
+        posterImage,
+        layout
       },
       _type == "adBannerEmbedBlock" => {
         "adBanner": adBanner->{ image, linkUrl, title }
