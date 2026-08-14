@@ -279,7 +279,27 @@ export function Header() {
         aria-hidden={!isBurgerOpen}
         style={{ WebkitOverflowScrolling: 'touch' } as CSSProperties}
       >
-        <nav className="flex min-h-full flex-col gap-3 px-6 pt-8 pb-12">
+        <button
+          type="button"
+          aria-label="Close menu"
+          onClick={() => setIsBurgerOpen(false)}
+          className="absolute right-3 top-3 flex h-10 w-10 items-center justify-center text-black transition-colors hover:text-[#63382E]"
+        >
+          <svg
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.5"
+            strokeLinecap="round"
+            aria-hidden
+          >
+            <path d="M18 6 6 18" />
+            <path d="m6 6 12 12" />
+          </svg>
+        </button>
+        <nav className="flex min-h-full flex-col gap-3 px-6 pt-16 pb-12">
           {BURGER_NAV_ITEMS.map((item) => (
             <NavLink
               key={item.href}
