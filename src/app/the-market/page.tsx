@@ -1,5 +1,5 @@
 import { sanityFetch } from '@/sanity/lib/client'
-import { MARKET_PAGE_PRODUCTS_QUERY } from '@/sanity/lib/queries'
+import { MARKET_PAGE_QUERY } from '@/sanity/lib/queries'
 
 import { MarketPageContent } from '@/components/market/MarketPageContent'
 
@@ -15,8 +15,20 @@ type AffiliateProduct = {
   category: string
 }
 
-export default async function TheMarketPage() {
-  const products = await sanityFetch<AffiliateProduct[]>(MARKET_PAGE_PRODUCTS_QUERY) ?? []
+type MarketPage = {
+  title?: string | null
+  description?: string | null
+  affiliateDisclosure?: string | null
+  products?: AffiliateProduct[] | null
+}
 
-  return <MarketPageContent products={products} />
+export default async function TheMarketPage() {
+  const marketPage = await sanityFetch<MarketPage | null>(MARKET_PAGE_QUERY)
+
+  return (
+    <MarketPageContent
+      copy={marketPage}
+      products={marketPage?.products ?? []}
+    />
+  )
 }

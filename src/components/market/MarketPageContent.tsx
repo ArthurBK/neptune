@@ -15,6 +15,14 @@ const CATEGORY_LABELS: Record<string, string> = {
 
 const CATEGORY_ORDER = ['furniture', 'books', 'objects', 'scents', 'fashion', 'clothing'] as const
 
+const DEFAULT_MARKET_PAGE_COPY = {
+  title: 'Neptune Market',
+  description:
+    'Discover our curated shopping edit, featuring a variety of products, including books, objects of all kinds, furniture, and fashion gems that our editors adore and have on their wish lists (and soon, you will too!).',
+  affiliateDisclosure:
+    'Our editors independently curate all products featured on Neptune.\nWe may receive compensation from retailers and/or from purchases of products through these links.',
+} as const
+
 type AffiliateProduct = {
   _id: string
   title: string
@@ -25,12 +33,31 @@ type AffiliateProduct = {
   category: string
 }
 
+type MarketPageCopy = {
+  title?: string | null
+  description?: string | null
+  affiliateDisclosure?: string | null
+}
+
 interface MarketPageContentProps {
+  copy?: MarketPageCopy | null
   products: AffiliateProduct[]
 }
 
-export function MarketPageContent({ products }: MarketPageContentProps) {
+function textWithFallback(value: string | null | undefined, fallback: string) {
+  const trimmed = value?.trim()
+  return trimmed ? trimmed : fallback
+}
+
+export function MarketPageContent({ copy, products }: MarketPageContentProps) {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
+
+  const title = textWithFallback(copy?.title, DEFAULT_MARKET_PAGE_COPY.title)
+  const description = textWithFallback(copy?.description, DEFAULT_MARKET_PAGE_COPY.description)
+  const affiliateDisclosure = textWithFallback(
+    copy?.affiliateDisclosure,
+    DEFAULT_MARKET_PAGE_COPY.affiliateDisclosure,
+  )
 
   const categories = useMemo(() => {
     const seen = new Set<string>()
@@ -59,18 +86,17 @@ export function MarketPageContent({ products }: MarketPageContentProps) {
       <div className="max-w-7xl mx-auto px-6 md:px-12 lg:px-16 pt-4 md:pt-8 pb-16 md:pb-24">
         <header className="mb-6 md:mb-12 text-center font-futura">
           <h1 className="font-futura font-normal text-xl md:text-2xl uppercase tracking-wide text-[#1A1A1A]">
-            Neptune Market
+            {title}
           </h1>
           <p
             className="mt-2 text-sm md:text-[16px] text-black max-w-2xl mx-auto whitespace-pre-line"
             style={{ fontFamily: 'var(--font-gill-sans)', fontWeight: 300 }}
           >
-            Discover our curated shopping edit, featuring a variety of products, including books, objects of all kinds, furniture, and fashion gems that our editors adore and have on their wish lists (and soon, you will too!).
+            {description}
             <br />
             <br />
             <span className="text-xs italic leading-[1.1]">
-              <span className="block">Our editors independently curate all products featured on Neptune.</span>
-              <span className="block">We may receive compensation from retailers and/or from purchases of products through these links.</span>
+              {affiliateDisclosure}
             </span>
           </p>
         </header>

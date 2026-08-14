@@ -1,3 +1,5 @@
+import { defineQuery } from 'next-sanity'
+
 // Home page sections (configurable in Studio)
 export const HOME_PAGE_QUERY = `
   *[_type == "homePage" && _id == "homePage"][0] {
@@ -248,18 +250,23 @@ export const AFFILIATE_PRODUCTS_QUERY = `
   }
 `
 
-// Ordered affiliate products for Market page (manual drag-and-drop order in Studio)
-export const MARKET_PAGE_PRODUCTS_QUERY = `
-  *[_type == "marketPage" && _id == "marketPage"][0].products[]->{
-    _id,
+// Market page copy and ordered affiliate products (manual drag-and-drop order in Studio)
+export const MARKET_PAGE_QUERY = defineQuery(/* groq */ `
+  *[_type == "marketPage" && _id == "marketPage"][0]{
     title,
-    brand,
-    price,
-    image,
-    affiliateUrl,
-    category
+    description,
+    affiliateDisclosure,
+    "products": products[]->{
+      _id,
+      title,
+      brand,
+      price,
+      image,
+      affiliateUrl,
+      category
+    }
   }
-`
+`)
 
 // Affiliate products by category (e.g. fashion)
 export const AFFILIATE_PRODUCTS_BY_CATEGORY_QUERY = `
