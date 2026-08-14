@@ -114,107 +114,121 @@ export function VerticalImageCarousel({
 
   if (total === 0) return null
 
+  const widestImageAspectRatio = images.reduce((maxRatio, image) => {
+    if (!image.width || !image.height) return maxRatio
+    return Math.max(maxRatio, image.width / image.height)
+  }, 0.75)
+
   return (
     <div
       ref={containerRef}
-      className="relative h-full w-full overflow-hidden"
+      className="relative h-full w-full"
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
     >
-      {/* Slides */}
-      <div
-        className="flex flex-col transition-transform duration-500 ease-out"
-        style={{
-          height: `${total * 100}%`,
-          transform: `translateY(-${(current / total) * 100}%)`,
-        }}
-      >
-        {images.map((img, i) => (
+      <div className="flex h-full w-full items-start justify-center gap-3">
+        <div
+          className="relative h-full min-w-0 overflow-hidden"
+          style={{
+            width: `min(calc(100% - ${total > 1 ? '2rem' : '0rem'}), calc((100vh - var(--header-height) - 1rem) * ${widestImageAspectRatio}))`,
+          }}
+        >
+          {/* Slides */}
           <div
-            key={img.url}
-            className="flex items-start justify-center"
-            style={{ height: `${100 / total}%` }}
+            className="flex flex-col transition-transform duration-500 ease-out"
+            style={{
+              height: `${total * 100}%`,
+              transform: `translateY(-${(current / total) * 100}%)`,
+            }}
           >
-            <Image
-              src={img.url}
-              alt={img.altText ?? productTitle}
-              width={img.width ?? 800}
-              height={img.height ?? 1067}
-              sizes="(max-width: 1024px) 100vw, 33vw"
-              className="max-h-full max-w-full object-contain"
-              priority={i === 0}
-            />
+            {images.map((img, i) => (
+              <div
+                key={img.url}
+                className="flex items-start justify-end"
+                style={{ height: `${100 / total}%` }}
+              >
+                <Image
+                  src={img.url}
+                  alt={img.altText ?? productTitle}
+                  width={img.width ?? 800}
+                  height={img.height ?? 1067}
+                  sizes="(max-width: 1024px) 100vw, 55vw"
+                  className="max-h-full max-w-full object-contain"
+                  priority={i === 0}
+                />
+              </div>
+            ))}
           </div>
-        ))}
-      </div>
 
-      {/* Vertical dots */}
-      {total > 1 && (
-        <div className="absolute right-3 top-1/2 z-10 flex -translate-y-1/2 flex-col gap-2">
-          {images.map((img, i) => (
-            <button
-              key={img.url}
-              type="button"
-              onClick={() => goTo(i)}
-              className={`rounded-full transition-all duration-300 ${
-                i === current
-                  ? 'h-6 w-1.5 bg-[#1A1A1A]'
-                  : 'h-1.5 w-1.5 bg-[#1A1A1A]/30 hover:bg-[#1A1A1A]/60'
-              }`}
-              aria-label={`Go to image ${i + 1}`}
-              aria-current={i === current}
-            />
-          ))}
+          {/* Up / Down arrows */}
+          {total > 1 && (
+            <>
+              <button
+                type="button"
+                onClick={prev}
+                disabled={current === 0}
+                className="absolute top-3 left-1/2 z-10 -translate-x-1/2 rounded-full p-1.5 text-[#6B6B6B] transition-colors hover:text-[#1A1A1A] disabled:opacity-0"
+                aria-label="Previous image"
+              >
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  aria-hidden
+                >
+                  <path d="M18 15l-6-6-6 6" />
+                </svg>
+              </button>
+              <button
+                type="button"
+                onClick={next}
+                disabled={current === total - 1}
+                className="absolute bottom-3 left-1/2 z-10 -translate-x-1/2 rounded-full p-1.5 text-[#6B6B6B] transition-colors hover:text-[#1A1A1A] disabled:opacity-0"
+                aria-label="Next image"
+              >
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  aria-hidden
+                >
+                  <path d="M6 9l6 6 6-6" />
+                </svg>
+              </button>
+            </>
+          )}
         </div>
-      )}
 
-      {/* Up / Down arrows */}
-      {total > 1 && (
-        <>
-          <button
-            type="button"
-            onClick={prev}
-            disabled={current === 0}
-            className="absolute top-3 left-1/2 z-10 -translate-x-1/2 rounded-full p-1.5 text-[#6B6B6B] transition-colors hover:text-[#1A1A1A] disabled:opacity-0"
-            aria-label="Previous image"
-          >
-            <svg
-              width="20"
-              height="20"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              aria-hidden
-            >
-              <path d="M18 15l-6-6-6 6" />
-            </svg>
-          </button>
-          <button
-            type="button"
-            onClick={next}
-            disabled={current === total - 1}
-            className="absolute bottom-3 left-1/2 z-10 -translate-x-1/2 rounded-full p-1.5 text-[#6B6B6B] transition-colors hover:text-[#1A1A1A] disabled:opacity-0"
-            aria-label="Next image"
-          >
-            <svg
-              width="20"
-              height="20"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              aria-hidden
-            >
-              <path d="M6 9l6 6 6-6" />
-            </svg>
-          </button>
-        </>
-      )}
+        {/* Vertical dots */}
+        {total > 1 && (
+          <div className="z-10 flex h-full flex-col justify-center gap-2">
+            {images.map((img, i) => (
+              <button
+                key={img.url}
+                type="button"
+                onClick={() => goTo(i)}
+                className={`rounded-full transition-all duration-300 ${
+                  i === current
+                    ? 'h-1.5 w-1.5 bg-[#1A1A1A]'
+                    : 'h-1.5 w-1.5 bg-[#1A1A1A]/30 hover:bg-[#1A1A1A]/60'
+                }`}
+                aria-label={`Go to image ${i + 1}`}
+                aria-current={i === current}
+              />
+            ))}
+          </div>
+        )}
+      </div>
 
     </div>
   )

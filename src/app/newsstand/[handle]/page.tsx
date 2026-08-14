@@ -49,11 +49,8 @@ export default async function NewsstandProductPage({ params }: ProductPageProps)
 
   return (
     <main className="min-h-[calc(100vh-var(--header-height))]">
-      <div className="grid grid-cols-1 lg:grid-cols-3 lg:min-h-[calc(100vh-var(--header-height))]">
-        {/* Box 1 — empty on large screens */}
-        <div className="hidden lg:block" />
-
-        {/* Box 2 — images */}
+      <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,11fr)_minmax(440px,9fr)] lg:min-h-[calc(100vh-var(--header-height))]">
+        {/* Images */}
         {/* Mobile / tablet: horizontal carousel (swipe left/right); vertical scroll = page scroll */}
         <div className="px-4 pt-3 lg:hidden">
           <HorizontalImageCarousel images={images} productTitle={product.title} />
@@ -67,7 +64,7 @@ export default async function NewsstandProductPage({ params }: ProductPageProps)
           <VerticalImageCarousel images={images} productTitle={product.title} />
         </div>
 
-        {/* Box 3 — product info */}
+        {/* Product info */}
         <div className="flex flex-col bg-white lg:justify-start">
           <div className="px-4 pt-4 pb-6 lg:px-8 lg:pt-4 lg:pb-16">
             <h1 className="font-serif text-xl md:text-2xl text-[#1A1A1A] uppercase tracking-wide">
