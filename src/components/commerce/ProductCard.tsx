@@ -23,18 +23,18 @@ export function ProductCard({
   const firstVariant = variants.edges[0]?.node
 
   return (
-    <article className={`group ${compact ? 'max-w-[240px] sm:max-w-[200px]' : ''}`}>
+    <article className={`group ${compact ? 'w-[260px] max-w-[calc(100vw-3rem)] sm:w-[240px]' : ''}`}>
       <Link href={`/newsstand/${handle}`} className="block overflow-hidden">
         <div className="aspect-3/4 overflow-hidden bg-white">
           {featuredImage?.url ? (
             <Image
               src={featuredImage.url}
               alt={featuredImage.altText ?? title}
-              width={compact ? 200 : size === 'small' ? 280 : 400}
-              height={compact ? 267 : size === 'small' ? 373 : 533}
+              width={compact ? 240 : size === 'small' ? 280 : 400}
+              height={compact ? 320 : size === 'small' ? 373 : 533}
               sizes={
                 compact
-                  ? '(max-width: 640px) 50vw, 200px'
+                  ? '(max-width: 640px) 260px, 240px'
                   : size === 'small'
                     ? '(max-width: 640px) 50vw, (max-width: 1024px) 50vw, 25vw'
                     : '(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw'
