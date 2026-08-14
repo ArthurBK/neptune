@@ -1,10 +1,12 @@
 import { defineField } from 'sanity'
 import { HexColorInput } from '../../components/HexColorInput'
 import { FontSizeCounterInput } from '../../components/FontSizeCounterInput'
+import { InlineTextStylePortableTextInput } from '../../components/InlineTextStylePortableTextInput'
 import { TEXT_STYLE_FONT_FAMILIES } from '../../../lib/textStyleFonts'
 
 export const pageIntroRichTextType = {
   type: 'array',
+  components: { input: InlineTextStylePortableTextInput as never },
   of: [
     {
       type: 'block',
