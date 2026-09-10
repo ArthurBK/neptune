@@ -147,8 +147,8 @@ export function Header() {
     top: 0,
     left: 0,
     right: 0,
-    background: hasSolidBg ? 'rgba(255, 255, 255, 0.9)' : 'transparent',
-    backdropFilter: hasSolidBg ? 'saturate(180%) blur(10px)' : 'none',
+    background: hasSolidBg ? '#fff' : 'transparent',
+    backdropFilter: 'none',
     borderColor: 'transparent',
   }
   const iconClass = lightText
