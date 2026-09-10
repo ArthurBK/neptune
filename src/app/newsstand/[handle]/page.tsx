@@ -58,7 +58,7 @@ export default async function NewsstandProductPage({ params }: ProductPageProps)
 
         {/* Desktop: vertical image carousel with controlled scroll */}
         <div
-          className="hidden lg:block px-6 pt-4"
+          className="hidden lg:block pl-6 pr-2 pt-4"
           style={{ height: 'calc(100vh - var(--header-height))' }}
         >
           <VerticalImageCarousel images={images} productTitle={product.title} />
@@ -66,7 +66,7 @@ export default async function NewsstandProductPage({ params }: ProductPageProps)
 
         {/* Product info */}
         <div className="flex flex-col bg-white lg:justify-start">
-          <div className="px-4 pt-4 pb-6 lg:px-8 lg:pt-4 lg:pb-16">
+          <div className="px-4 pt-4 pb-6 lg:pl-4 lg:pr-8 lg:pt-4 lg:pb-16">
             <h1 className="font-serif text-xl md:text-2xl text-[#1A1A1A] uppercase tracking-wide">
               {product.title}
             </h1>
@@ -98,7 +98,7 @@ export default async function NewsstandProductPage({ params }: ProductPageProps)
           {relatedProducts.length > 0 ? (
             <div className="flex flex-wrap justify-center gap-6 md:gap-8">
               {relatedProducts.map((p) => (
-                <ProductCard key={p.id} product={p} compact />
+                <ProductCard key={p.id} product={p} compact compactSize="large" />
               ))}
             </div>
           ) : null}

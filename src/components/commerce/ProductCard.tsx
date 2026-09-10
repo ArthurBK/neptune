@@ -8,6 +8,7 @@ import type { ShopifyProduct } from '@/lib/shopify/types'
 interface ProductCardProps {
   product: ShopifyProduct
   compact?: boolean
+  compactSize?: 'default' | 'large'
   size?: 'default' | 'small'
   titleFontFamily?: 'serif' | 'futura' | 'inter'
 }
@@ -15,6 +16,7 @@ interface ProductCardProps {
 export function ProductCard({
   product,
   compact = false,
+  compactSize = 'default',
   size = 'default',
   titleFontFamily = 'serif',
 }: ProductCardProps) {
@@ -24,10 +26,13 @@ export function ProductCard({
   const hoverImage = images?.edges
     .map(({ node }) => node)
     .find((image) => image.url !== featuredImage?.url)
-  const imageWidth = compact ? 240 : size === 'small' ? 280 : 400
-  const imageHeight = compact ? 320 : size === 'small' ? 373 : 533
+  const isLargeCompact = compact && compactSize === 'large'
+  const imageWidth = isLargeCompact ? 300 : compact ? 240 : size === 'small' ? 280 : 400
+  const imageHeight = isLargeCompact ? 400 : compact ? 320 : size === 'small' ? 373 : 533
   const imageSizes = compact
-    ? '(max-width: 640px) 260px, 240px'
+    ? isLargeCompact
+      ? '(max-width: 640px) 325px, 300px'
+      : '(max-width: 640px) 260px, 240px'
     : size === 'small'
       ? '(max-width: 640px) 50vw, (max-width: 1024px) 50vw, 25vw'
       : '(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw'
@@ -36,7 +41,15 @@ export function ProductCard({
     : 'group-hover:opacity-90'
 
   return (
-    <article className={`group ${compact ? 'w-[260px] max-w-[calc(100vw-3rem)] sm:w-[240px]' : ''}`}>
+    <article
+      className={`group ${
+        compact
+          ? isLargeCompact
+            ? 'w-[325px] max-w-[calc(100vw-3rem)] sm:w-[300px]'
+            : 'w-[260px] max-w-[calc(100vw-3rem)] sm:w-[240px]'
+          : ''
+      }`}
+    >
       <Link href={`/newsstand/${handle}`} className="block overflow-hidden">
         <div className="relative aspect-3/4 overflow-hidden bg-white">
           {featuredImage?.url ? (

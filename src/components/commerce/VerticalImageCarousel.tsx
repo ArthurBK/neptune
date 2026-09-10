@@ -126,7 +126,7 @@ export function VerticalImageCarousel({
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
     >
-      <div className="flex h-full w-full items-start justify-center gap-3">
+      <div className="flex h-full w-full items-start justify-end gap-3">
         <div
           className="relative h-full min-w-0 overflow-hidden"
           style={{
