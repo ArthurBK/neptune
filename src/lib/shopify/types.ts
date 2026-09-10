@@ -30,6 +30,9 @@ export interface ShopifyProduct {
     minVariantPrice: Money
   }
   featuredImage: ProductImage | null
+  images?: {
+    edges: Array<{ node: ProductImage }>
+  }
   variants: {
     edges: Array<{ node: ProductVariant }>
   }

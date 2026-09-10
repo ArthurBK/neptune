@@ -7,6 +7,11 @@ const PRODUCT_FIELDS = `
     minVariantPrice { amount currencyCode }
   }
   featuredImage { url altText }
+  images(first: 2) {
+    edges {
+      node { url altText }
+    }
+  }
   variants(first: 10) {
     edges {
       node {

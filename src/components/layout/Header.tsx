@@ -4,7 +4,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import type { CSSProperties } from 'react'
 import { usePathname } from 'next/navigation'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useState, useSyncExternalStore } from 'react'
 
 import { CART_OPEN_EVENT, getCartId } from '@/lib/cart'
 import { useHeaderVariant } from '@/contexts/HeaderVariantContext'
@@ -31,6 +31,15 @@ function isHomePath(path: string): boolean {
   const trimmed = path.trim()
   if (!trimmed) return true
   return trimmed.replace(/\/+$/, '') === ''
+}
+
+function subscribeToPathnameChanges(callback: () => void): () => void {
+  window.addEventListener('popstate', callback)
+  return () => window.removeEventListener('popstate', callback)
+}
+
+function getBrowserPathname(): string {
+  return window.location.pathname
 }
 
 function NavLink({
@@ -118,10 +127,14 @@ export function Header() {
     }
   }, [fetchCartCount])
 
-  // usePathname() drives re-renders on every navigation and is the single source of truth.
-  // isHomePath treats null/''/trailing-slash-only as home, covering any brief empty value
-  // during hydration without needing a window.location fallback.
-  const pathname = usePathname() ?? '/'
+  const routerPathname = usePathname() ?? '/'
+  // Keep the first client render aligned with SSR, then prefer the real browser
+  // path so the header cannot keep a solid background for a frame on home.
+  const pathname = useSyncExternalStore(
+    subscribeToPathnameChanges,
+    getBrowserPathname,
+    () => routerPathname
+  )
   const isHomePage = isHomePath(pathname)
   const hasSolidBg = !isHomePage
   const lightText = isHomePage && variant === 'dark'
