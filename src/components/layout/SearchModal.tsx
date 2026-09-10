@@ -3,6 +3,7 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
 
 import { urlFor } from '@/sanity/lib/image'
 
@@ -115,9 +116,9 @@ export function SearchModal({ isOpen, onClose }: SearchModalProps) {
 
   if (!isOpen) return null
 
-  return (
+  const modal = (
     <div
-      className="fixed inset-0 z-[100] bg-black/40 backdrop-blur-sm"
+      className="fixed inset-x-0 bottom-0 top-[var(--header-height)] z-40 bg-black/40 backdrop-blur-sm"
       onClick={onClose}
       onKeyDown={(e) => {
         if (e.key === 'Enter' || e.key === ' ') onClose()
@@ -128,20 +129,40 @@ export function SearchModal({ isOpen, onClose }: SearchModalProps) {
       tabIndex={-1}
     >
       <div
-        className="mx-auto mt-[var(--header-height)] max-w-2xl bg-white shadow-xl"
+        className="mx-auto max-w-2xl bg-white shadow-xl"
         onClick={(e) => e.stopPropagation()}
         onKeyDown={(e) => e.stopPropagation()}
       >
-        <div className="border-b border-[#E5E5E5] px-6 py-4">
+        <div className="flex items-center gap-3 border-b border-[#E5E5E5] px-6 py-4">
           <input
             ref={inputRef}
             type="search"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Search articles, contributors, or products..."
-            className="w-full bg-transparent text-lg text-[#1A1A1A] placeholder:text-[#6B6B6B] focus:outline-none"
+            className="min-w-0 flex-1 appearance-none bg-transparent text-lg text-[#1A1A1A] placeholder:text-[#6B6B6B] focus:outline-none [&::-webkit-search-cancel-button]:appearance-none [&::-webkit-search-decoration]:appearance-none"
             autoComplete="off"
           />
+          <button
+            type="button"
+            onClick={onClose}
+            className="flex h-8 w-8 shrink-0 items-center justify-center text-[#1A1A1A] transition-colors hover:text-[#63382E] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#63382E]"
+            aria-label="Close search"
+          >
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.8"
+              strokeLinecap="round"
+              aria-hidden="true"
+            >
+              <path d="M6 6l12 12" />
+              <path d="M18 6L6 18" />
+            </svg>
+          </button>
         </div>
 
         <div className="max-h-[60vh] overflow-y-auto">
@@ -282,4 +303,8 @@ export function SearchModal({ isOpen, onClose }: SearchModalProps) {
       </div>
     </div>
   )
+
+  if (typeof document === 'undefined') return null
+
+  return createPortal(modal, document.body)
 }
