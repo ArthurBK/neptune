@@ -2,8 +2,8 @@ import Image from 'next/image'
 import Link from 'next/link'
 
 import { AddToCartButton } from './AddToCartButton'
+import { ProductPrice } from './ProductPrice'
 import type { ShopifyProduct } from '@/lib/shopify/types'
-import { formatPriceNoDecimals } from '@/lib/shopify/types'
 
 interface ProductCardProps {
   product: ShopifyProduct
@@ -85,13 +85,13 @@ export function ProductCard({
             {title}
           </h3>
         </Link>
-        <p
+        <ProductPrice
+          productHandle={handle}
+          initialPrice={price}
           className={`font-futura mt-1 text-center text-[#1A1A1A] ${
             compact ? 'text-xs' : size === 'small' ? 'text-xs' : 'text-sm'
           }`}
-        >
-          {formatPriceNoDecimals(price.amount, price.currencyCode)}
-        </p>
+        />
         {!compact && firstVariant?.availableForSale && (
           <div className="mt-3 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity flex justify-center">
             <AddToCartButton

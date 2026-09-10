@@ -10,6 +10,7 @@ import {
   markCountryAsManual,
   setStoredCountry,
 } from '@/lib/currency'
+import { clearCart, dispatchCartUpdated } from '@/lib/cart'
 
 const DEFAULT_COUNTRY = 'FR'
 
@@ -78,6 +79,8 @@ export function CountrySelector() {
     setSelected(countryCode)
     setStoredCountry(countryCode)
     markCountryAsManual()
+    clearCart()
+    dispatchCartUpdated()
     dispatchCountryChanged(countryCode)
   }
 

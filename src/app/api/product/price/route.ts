@@ -7,6 +7,9 @@ export const dynamic = 'force-dynamic'
 
 interface ProductPriceContextResponse {
   product: {
+    priceRange: {
+      minVariantPrice: { amount: string; currencyCode: string }
+    }
     variants: {
       edges: Array<{
         node: {
@@ -42,7 +45,7 @@ export async function GET(request: Request) {
     }
 
     const variants = data.product.variants.edges.map((e) => e.node)
-    return NextResponse.json({ variants })
+    return NextResponse.json({ priceRange: data.product.priceRange, variants })
   } catch (err) {
     console.error('Product price API error:', err)
     return NextResponse.json(

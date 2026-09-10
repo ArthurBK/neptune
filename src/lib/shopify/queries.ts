@@ -323,6 +323,9 @@ export const SHOP_CURRENCIES_QUERY = `
 export const PRODUCT_PRICE_CONTEXT_QUERY = `
   query ProductPriceContext($handle: String!, $country: CountryCode!) @inContext(country: $country) {
     product(handle: $handle) {
+      priceRange {
+        minVariantPrice { amount currencyCode }
+      }
       variants(first: 10) {
         edges {
           node {

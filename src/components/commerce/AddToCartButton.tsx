@@ -9,6 +9,7 @@ import {
   setCartId,
   setCheckoutUrl,
 } from '@/lib/cart'
+import { getStoredCountry } from '@/lib/currency'
 import type { ProductVariant } from '@/lib/shopify/types'
 
 interface AddToCartButtonProps {
@@ -27,7 +28,6 @@ function getVariantNumericId(gid: string): string | null {
 
 export function AddToCartButton({
   variant,
-  productTitle,
   label = 'Add to Cart',
   className = '',
   countryCode,
@@ -35,7 +35,7 @@ export function AddToCartButton({
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [added, setAdded] = useState(false)
-  const [checkoutUrl, setCheckoutUrl] = useState<string | null>(null)
+  const [checkoutUrl, setAddedCheckoutUrl] = useState<string | null>(null)
 
   async function handleAddToCart() {
     if (!variant.availableForSale || isLoading) return
@@ -44,6 +44,7 @@ export function AddToCartButton({
     setAdded(false)
     try {
       const cartId = getCartId()
+      const selectedCountryCode = countryCode ?? getStoredCountry() ?? undefined
       const res = await fetch('/api/cart/add', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -51,7 +52,7 @@ export function AddToCartButton({
           variantId: variant.id,
           quantity: 1,
           ...(cartId && { cartId }),
-          ...(countryCode && { countryCode }),
+          ...(selectedCountryCode && { countryCode: selectedCountryCode }),
         }),
       })
       const data = await res.json()
@@ -61,7 +62,7 @@ export function AddToCartButton({
           setCartId(data.cartId)
           setCheckoutUrl(data.checkoutUrl)
         }
-        setCheckoutUrl(data.checkoutUrl)
+        setAddedCheckoutUrl(data.checkoutUrl)
         setAdded(true)
         dispatchCartUpdated(data.cart)
         dispatchOpenCart()
