@@ -136,10 +136,9 @@ export function Header() {
     () => routerPathname
   )
   const isHomePage = isHomePath(pathname)
-  const hasSolidBg = !isHomePage
-  const lightText = isHomePage && variant === 'dark'
-  const headerClass = `fixed left-0 right-0 top-0 z-50 w-full flex flex-col border-b shrink-0 ${isHomePage ? '' : 'transition-colors'
-    }`
+  const hasTransparentBg = isHomePage && variant === 'dark'
+  const lightText = hasTransparentBg
+  const headerClass = 'fixed left-0 right-0 top-0 z-50 w-full flex flex-col border-b shrink-0 transition-colors'
   const headerStyle: CSSProperties = {
     height: 'var(--header-height)',
     minHeight: 'var(--header-height)',
@@ -147,7 +146,7 @@ export function Header() {
     top: 0,
     left: 0,
     right: 0,
-    background: hasSolidBg ? '#fff' : 'transparent',
+    background: hasTransparentBg ? 'transparent' : '#fff',
     backdropFilter: 'none',
     borderColor: 'transparent',
   }

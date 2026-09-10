@@ -129,7 +129,7 @@ export function HomeScrollContainer({ sections, children }: HomeScrollContainerP
     updateVariant()
     el.addEventListener('scroll', updateVariant, { passive: true })
     return () => el.removeEventListener('scroll', updateVariant)
-  }, [sections, setHeaderVariant])
+  }, [sections, setHeaderVariant, totalSections])
 
   // Wheel: advance/retreat one section. Block native scroll. Ignore while animating.
   useEffect(() => {
