@@ -34,6 +34,7 @@ type HomePageSection = {
   _type: string
   _key?: string
   article?: HomePageArticle
+  heroArticle?: HomePageArticle | null
   articles?: HomePageArticle[] | null
   image?: { asset?: { _ref: string }; alt?: string } | null
   layout?: 'single' | 'split'
@@ -136,6 +137,7 @@ export default async function Home() {
             data: {
               _key: block._key,
               title: block.title,
+              heroArticle: block.heroArticle ?? null,
               articles,
             },
           })

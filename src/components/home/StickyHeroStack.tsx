@@ -168,7 +168,12 @@ export type HomeSection =
   | { type: 'article'; data: CarouselArticle }
   | {
     type: 'articleRow'
-    data: { _key?: string; title?: string | null; articles: CarouselArticle[] }
+    data: {
+      _key?: string
+      title?: string | null
+      heroArticle?: CarouselArticle | null
+      articles: CarouselArticle[]
+    }
   }
   | {
     type: 'image'
@@ -796,86 +801,128 @@ function ArticleSplitContent({
 
 function ThreeArticlesContent({
   articles,
+  heroArticle,
   title,
   priority = false,
 }: {
   articles: CarouselArticle[]
+  heroArticle?: CarouselArticle | null
   title?: string | null
   priority?: boolean
 }) {
   return (
     <div className="flex h-full min-h-0 w-full min-w-0 bg-white pt-[var(--header-height)]">
-      <div className="mx-auto flex h-full w-full max-w-[1120px] min-w-0 flex-col items-center justify-center px-3 py-4 sm:px-5 md:px-8 lg:px-10">
+      <div className="mx-auto flex h-full w-full max-w-[900px] min-w-0 flex-col items-center justify-center px-3 py-3 sm:px-5 md:px-8 lg:px-10">
         {title ? (
-          <h2 className="mb-3 max-w-full break-words text-center font-serif text-sm font-bold leading-tight text-black sm:text-base md:mb-4 md:text-lg lg:text-xl">
+          <h2 className="mb-2 max-w-full break-words text-center font-serif text-xs font-bold leading-tight text-black sm:text-sm md:mb-3 md:text-base lg:text-lg">
             {title}
           </h2>
         ) : null}
-        <div className="grid w-full min-w-0 grid-cols-3 items-start gap-4 sm:gap-6 md:gap-12">
+        {heroArticle ? (
+          <HomeArticleTile
+            article={heroArticle}
+            variant="hero"
+            priority={priority}
+          />
+        ) : null}
+        <div
+          className={`grid w-full max-w-[820px] min-w-0 grid-cols-3 items-start gap-3 sm:gap-4 md:gap-8 ${
+            heroArticle ? 'mt-2 md:mt-3' : title ? 'mt-2 md:mt-3' : ''
+          }`}
+        >
           {articles.slice(0, 3).map((article) => {
-            const title = articleTitleSingleLine(article.title)
-            const href = `/stories/${article.slug}`
-            const imageUrl = article.coverImage?.asset
-              ? urlFor(article.coverImage).width(760).quality(92).format('webp').url()
-              : null
-
             return (
-              <article
+              <HomeArticleTile
                 key={article._id}
-                className="group flex min-w-0 flex-col"
-              >
-                <Link
-                  href={href}
-                  className="relative block aspect-[4/3] w-full overflow-hidden bg-[#E5E5E5]"
-                >
-                  {imageUrl ? (
-                    <Image
-                      src={imageUrl}
-                      alt={article.coverImage?.alt ?? title}
-                      fill
-                      className="object-cover object-center transition-transform duration-300 ease-out group-hover:scale-[1.02]"
-                      sizes="(max-width: 768px) 33vw, 33vw"
-                      priority={priority}
-                    />
-                  ) : (
-                    <div className="flex h-full w-full items-center justify-center px-2 text-center text-[10px] text-[#6B6B6B] md:text-sm">
-                      No image
-                    </div>
-                  )}
-                </Link>
-                <div className="shrink-0 pt-1.5 text-center sm:pt-2 md:pt-3">
-                  <div className="min-h-[12px] min-w-0 sm:min-h-[14px] md:min-h-[16px]">
-                    {article.subcategory ? (
-                      <Link
-                        href="/stories"
-                        className="block truncate font-header text-[7px] font-extrabold uppercase text-[color:var(--neptune-logo-red)] underline-offset-2 hover:underline sm:text-[8px] md:text-[10px]"
-                      >
-                        {article.subcategory}
-                      </Link>
-                    ) : null}
-                  </div>
-                  <Link href={href} className="block min-w-0">
-                    <h2 className="line-clamp-3 max-w-full break-words font-serif text-[10px] font-bold leading-tight text-black underline-offset-4 transition-opacity group-hover:underline sm:text-xs md:text-lg lg:text-xl">
-                      {title}
-                    </h2>
-                  </Link>
-                  {article.author ? (
-                    <Link
-                      href={`/contributors/${article.author.slug}`}
-                      className="mt-0.5 block min-w-0 whitespace-normal break-words text-[9px] leading-tight text-[#6B6B6B] underline-offset-2 transition-colors hover:text-black hover:underline sm:text-[10px] md:text-xs"
-                    >
-                      By {article.author.name}
-                    </Link>
-                  ) : (
-                    <span className="mt-0.5 block" aria-hidden="true" />
-                  )}
-                </div>
-              </article>
+                article={article}
+                variant="row"
+                priority={priority}
+              />
             )
           })}
         </div>
       </div>
     </div>
+  )
+}
+
+function HomeArticleTile({
+  article,
+  variant,
+  priority,
+}: {
+  article: CarouselArticle
+  variant: 'hero' | 'row'
+  priority?: boolean
+}) {
+  const title = articleTitleSingleLine(article.title)
+  const href = `/stories/${article.slug}`
+  const imageUrl = article.coverImage?.asset
+    ? urlFor(article.coverImage).width(variant === 'hero' ? 1200 : 760).quality(92).format('webp').url()
+    : null
+  const isHero = variant === 'hero'
+
+  return (
+    <article
+      className={`group flex min-w-0 flex-col ${
+        isHero ? 'w-full max-w-[280px] sm:max-w-[320px] md:max-w-[380px] lg:max-w-[420px]' : ''
+      }`}
+    >
+      <Link
+        href={href}
+        className={`relative block w-full overflow-hidden bg-[#E5E5E5] ${
+          isHero ? 'aspect-[16/9]' : 'aspect-[4/3]'
+        }`}
+      >
+        {imageUrl ? (
+          <Image
+            src={imageUrl}
+            alt={article.coverImage?.alt ?? title}
+            fill
+            className="object-cover object-center transition-transform duration-300 ease-out group-hover:scale-[1.02]"
+            sizes={isHero ? '(max-width: 768px) 82vw, 420px' : '(max-width: 768px) 30vw, 260px'}
+            priority={priority}
+          />
+        ) : (
+          <div className="flex h-full w-full items-center justify-center px-2 text-center text-[10px] text-[#6B6B6B] md:text-sm">
+            No image
+          </div>
+        )}
+      </Link>
+      <div className={`shrink-0 pt-1.5 text-center sm:pt-2 ${isHero ? 'md:pt-2' : 'md:pt-3'}`}>
+        <div className="min-h-[11px] min-w-0 sm:min-h-[12px] md:min-h-[14px]">
+          {article.subcategory ? (
+            <Link
+              href="/stories"
+              className="block truncate font-header text-[7px] font-extrabold uppercase text-[color:var(--neptune-logo-red)] underline-offset-2 hover:underline sm:text-[8px] md:text-[9px]"
+            >
+              {article.subcategory}
+            </Link>
+          ) : null}
+        </div>
+        <Link href={href} className="block min-w-0">
+          <h2
+            className={`max-w-full break-words font-serif font-bold leading-tight text-black underline-offset-4 transition-opacity group-hover:underline ${
+              isHero
+                ? 'line-clamp-2 text-[11px] sm:text-xs md:text-base lg:text-lg'
+                : 'line-clamp-3 text-[9px] sm:text-[11px] md:text-base lg:text-lg'
+            }`}
+          >
+            {title}
+          </h2>
+        </Link>
+        {article.author ? (
+          <Link
+            href={`/contributors/${article.author.slug}`}
+            className="mt-0.5 block min-w-0 whitespace-normal break-words text-[8px] leading-tight text-[#6B6B6B] underline-offset-2 transition-colors hover:text-black hover:underline sm:text-[9px] md:text-[11px]"
+          >
+            By {article.author.name}
+          </Link>
+        ) : (
+          <span className="mt-0.5 block" aria-hidden="true" />
+        )}
+      </div>
+    </article>
   )
 }
 
@@ -1157,12 +1204,14 @@ function renderSectionContent(
   }
   if (item.type === 'articleRow') {
     const articles = item.data.articles.slice(0, 3)
-    const key = item.data._key ?? `article-row-${articles.map((article) => article._id).join('-')}`
+    const heroKey = item.data.heroArticle?._id ?? 'no-hero'
+    const key = item.data._key ?? `article-row-${heroKey}-${articles.map((article) => article._id).join('-')}`
 
     return {
       content: (
         <ThreeArticlesContent
           articles={articles}
+          heroArticle={item.data.heroArticle}
           title={item.data.title}
           priority={priority}
         />

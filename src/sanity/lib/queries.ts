@@ -20,6 +20,16 @@ export const HOME_PAGE_QUERY = `
       },
       _type == "homeThreeArticlesBlock" => {
         title,
+        "heroArticle": heroArticle->{
+          _id,
+          title,
+          "slug": slug.current,
+          "category": coalesce(category, categories[0]),
+          subcategory,
+          categories,
+          coverImage,
+          "author": author->{ name, "slug": slug.current }
+        },
         "articles": articles[]->{
           _id,
           title,

@@ -37,6 +37,13 @@ const homeThreeArticlesBlock = defineType({
       description: 'Optional title shown above the three articles.',
     }),
     defineField({
+      name: 'heroArticle',
+      title: 'Hero article',
+      type: 'reference',
+      description: 'Optional larger article shown above the row of three articles.',
+      to: [{ type: 'article' }],
+    }),
+    defineField({
       name: 'articles',
       title: 'Articles',
       type: 'array',
@@ -51,10 +58,13 @@ const homeThreeArticlesBlock = defineType({
     }),
   ],
   preview: {
-    select: { title: 'title', articles: 'articles' },
-    prepare: ({ title, articles }) => {
+    select: { title: 'title', heroTitle: 'heroArticle.title', articles: 'articles' },
+    prepare: ({ title, heroTitle, articles }) => {
       const count = Array.isArray(articles) ? articles.length : 0
-      return { title: title || `3 articles (${count}/3)` }
+      return {
+        title: title || `3 articles${heroTitle ? ' + hero' : ''} (${count}/3)`,
+        subtitle: heroTitle ? `Hero: ${heroTitle}` : undefined,
+      }
     },
   },
 })
