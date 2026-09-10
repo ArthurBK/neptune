@@ -15,6 +15,7 @@ import {
   homeNewsletterBlock,
   homePage,
   homeProductBlock,
+  homeThreeArticlesBlock,
   homeVideoBlock,
 } from './homePage'
 import { affiliateProduct } from './affiliateProduct'
@@ -32,6 +33,7 @@ export const schema: { types: SchemaTypeDefinition[] } = {
     contributorsPage,
     homePage,
     homeArticleBlock,
+    homeThreeArticlesBlock,
     homeImageBlock,
     homeProductBlock,
     homeNewsstandBlock,

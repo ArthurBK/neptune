@@ -23,6 +23,42 @@ const homeArticleBlock = defineType({
   },
 })
 
+// Home section: row of three article references
+const homeThreeArticlesBlock = defineType({
+  name: 'homeThreeArticlesBlock',
+  title: '3 articles',
+  type: 'object',
+  icon: DocumentTextIcon,
+  fields: [
+    defineField({
+      name: 'title',
+      title: 'Title',
+      type: 'string',
+      description: 'Optional title shown above the three articles.',
+    }),
+    defineField({
+      name: 'articles',
+      title: 'Articles',
+      type: 'array',
+      description: 'Select exactly 3 articles. They render on the same line on the home page.',
+      of: [
+        defineArrayMember({
+          type: 'reference',
+          to: [{ type: 'article' }],
+        }),
+      ],
+      validation: (rule) => rule.required().length(3).unique(),
+    }),
+  ],
+  preview: {
+    select: { title: 'title', articles: 'articles' },
+    prepare: ({ title, articles }) => {
+      const count = Array.isArray(articles) ? articles.length : 0
+      return { title: title || `3 articles (${count}/3)` }
+    },
+  },
+})
+
 // Home section: standalone image
 const homeImageBlock = defineType({
   name: 'homeImageBlock',
@@ -358,6 +394,7 @@ export const homePage = defineType({
       of: [
         defineArrayMember({ type: 'homeVideoBlock' }),
         defineArrayMember({ type: 'homeArticleBlock' }),
+        defineArrayMember({ type: 'homeThreeArticlesBlock' }),
         defineArrayMember({ type: 'homeImageBlock' }),
         defineArrayMember({ type: 'homeProductBlock' }),
         defineArrayMember({ type: 'homeNewsstandBlock' }),
@@ -371,4 +408,12 @@ export const homePage = defineType({
   },
 })
 
-export { homeArticleBlock, homeImageBlock, homeProductBlock, homeNewsstandBlock, homeNewsletterBlock, homeVideoBlock }
+export {
+  homeArticleBlock,
+  homeThreeArticlesBlock,
+  homeImageBlock,
+  homeProductBlock,
+  homeNewsstandBlock,
+  homeNewsletterBlock,
+  homeVideoBlock,
+}

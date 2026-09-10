@@ -167,6 +167,10 @@ const newsletterSubtitleComponents: PortableTextComponents = {
 export type HomeSection =
   | { type: 'article'; data: CarouselArticle }
   | {
+    type: 'articleRow'
+    data: { _key?: string; title?: string | null; articles: CarouselArticle[] }
+  }
+  | {
     type: 'image'
     data: {
       _key?: string
@@ -790,6 +794,91 @@ function ArticleSplitContent({
   )
 }
 
+function ThreeArticlesContent({
+  articles,
+  title,
+  priority = false,
+}: {
+  articles: CarouselArticle[]
+  title?: string | null
+  priority?: boolean
+}) {
+  return (
+    <div className="flex h-full min-h-0 w-full min-w-0 bg-white pt-[var(--header-height)]">
+      <div className="mx-auto flex h-full w-full max-w-[1120px] min-w-0 flex-col items-center justify-center px-3 py-4 sm:px-5 md:px-8 lg:px-10">
+        {title ? (
+          <h2 className="mb-3 max-w-full break-words text-center font-serif text-sm font-bold leading-tight text-black sm:text-base md:mb-4 md:text-lg lg:text-xl">
+            {title}
+          </h2>
+        ) : null}
+        <div className="grid w-full min-w-0 grid-cols-3 items-start gap-4 sm:gap-6 md:gap-12">
+          {articles.slice(0, 3).map((article) => {
+            const title = articleTitleSingleLine(article.title)
+            const href = `/stories/${article.slug}`
+            const imageUrl = article.coverImage?.asset
+              ? urlFor(article.coverImage).width(760).quality(92).format('webp').url()
+              : null
+
+            return (
+              <article
+                key={article._id}
+                className="group flex min-w-0 flex-col"
+              >
+                <Link
+                  href={href}
+                  className="relative block aspect-[4/3] w-full overflow-hidden bg-[#E5E5E5]"
+                >
+                  {imageUrl ? (
+                    <Image
+                      src={imageUrl}
+                      alt={article.coverImage?.alt ?? title}
+                      fill
+                      className="object-cover object-center transition-transform duration-300 ease-out group-hover:scale-[1.02]"
+                      sizes="(max-width: 768px) 33vw, 33vw"
+                      priority={priority}
+                    />
+                  ) : (
+                    <div className="flex h-full w-full items-center justify-center px-2 text-center text-[10px] text-[#6B6B6B] md:text-sm">
+                      No image
+                    </div>
+                  )}
+                </Link>
+                <div className="shrink-0 pt-1.5 text-center sm:pt-2 md:pt-3">
+                  <div className="min-h-[12px] min-w-0 sm:min-h-[14px] md:min-h-[16px]">
+                    {article.subcategory ? (
+                      <Link
+                        href="/stories"
+                        className="block truncate font-header text-[7px] font-extrabold uppercase text-[color:var(--neptune-logo-red)] underline-offset-2 hover:underline sm:text-[8px] md:text-[10px]"
+                      >
+                        {article.subcategory}
+                      </Link>
+                    ) : null}
+                  </div>
+                  <Link href={href} className="block min-w-0">
+                    <h2 className="line-clamp-3 max-w-full break-words font-serif text-[10px] font-bold leading-tight text-black underline-offset-4 transition-opacity group-hover:underline sm:text-xs md:text-lg lg:text-xl">
+                      {title}
+                    </h2>
+                  </Link>
+                  {article.author ? (
+                    <Link
+                      href={`/contributors/${article.author.slug}`}
+                      className="mt-0.5 block min-w-0 whitespace-normal break-words text-[9px] leading-tight text-[#6B6B6B] underline-offset-2 transition-colors hover:text-black hover:underline sm:text-[10px] md:text-xs"
+                    >
+                      By {article.author.name}
+                    </Link>
+                  ) : (
+                    <span className="mt-0.5 block" aria-hidden="true" />
+                  )}
+                </div>
+              </article>
+            )
+          })}
+        </div>
+      </div>
+    </div>
+  )
+}
+
 /** Product with title and DISCOVER button above the image */
 function ProductContent({
   imageUrl,
@@ -1064,6 +1153,26 @@ function renderSectionContent(
       zIndex,
       bgWhite: true,
       bgTransparent: false,
+    }
+  }
+  if (item.type === 'articleRow') {
+    const articles = item.data.articles.slice(0, 3)
+    const key = item.data._key ?? `article-row-${articles.map((article) => article._id).join('-')}`
+
+    return {
+      content: (
+        <ThreeArticlesContent
+          articles={articles}
+          title={item.data.title}
+          priority={priority}
+        />
+      ),
+      key,
+      keyProp: key,
+      zIndex,
+      bgWhite: true,
+      bgTransparent: false,
+      noPadding: true,
     }
   }
   if (item.type === 'image') {

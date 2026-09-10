@@ -20,18 +20,21 @@ import { SuppressLayoutFooter } from '@/components/layout/SuppressLayoutFooter'
 
 export const revalidate = 3600
 
+type HomePageArticle = {
+  _id: string
+  title: string
+  slug: string
+  category: string
+  subcategory?: string | null
+  coverImage: { asset?: { _ref: string }; alt?: string }
+  author?: { name: string; slug: string } | null
+}
+
 type HomePageSection = {
   _type: string
   _key?: string
-  article?: {
-    _id: string
-    title: string
-    slug: string
-    category: string
-    subcategory?: string | null
-    coverImage: { asset?: { _ref: string }; alt?: string }
-    author?: { name: string; slug: string } | null
-  }
+  article?: HomePageArticle
+  articles?: HomePageArticle[] | null
   image?: { asset?: { _ref: string }; alt?: string } | null
   layout?: 'single' | 'split'
   alt?: string
@@ -123,6 +126,20 @@ export default async function Home() {
             author: block.article.author,
           },
         })
+      } else if (block._type === 'homeThreeArticlesBlock' && block.articles?.length) {
+        const articles = block.articles.filter((article): article is HomePageArticle =>
+          Boolean(article)
+        )
+        if (articles.length === 3) {
+          sections.push({
+            type: 'articleRow',
+            data: {
+              _key: block._key,
+              title: block.title,
+              articles,
+            },
+          })
+        }
       } else if (block._type === 'homeImageBlock') {
         if (
           block.layout === 'split' &&
@@ -228,17 +245,7 @@ export default async function Home() {
 
   // Fallback: no config or empty — use legacy articles + first newsstand product
   if (sections.length === 0) {
-    const articles = await sanityFetch<
-      Array<{
-        _id: string
-        title: string
-        slug: string
-        category: string
-        subcategory?: string | null
-        coverImage: { asset?: { _ref: string }; alt?: string }
-        author?: { name: string; slug: string } | null
-      }>
-    >(FEATURED_ARTICLES_HOME_QUERY)
+    const articles = await sanityFetch<Array<HomePageArticle>>(FEATURED_ARTICLES_HOME_QUERY)
 
     for (const a of articles ?? []) {
       sections.push({ type: 'article', data: a })
