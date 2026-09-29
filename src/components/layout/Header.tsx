@@ -3,7 +3,6 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import type { CSSProperties } from 'react'
-import { usePathname } from 'next/navigation'
 import { useCallback, useEffect, useState } from 'react'
 
 import { CART_OPEN_EVENT, getCartId } from '@/lib/cart'
@@ -25,13 +24,6 @@ const BURGER_NAV_ITEMS = [
   { label: 'NEWSLETTER', href: '/newsletters' },
   { label: 'CONTACT', href: '/contact' },
 ] as const
-
-/** True for `/`, ``, trailing-slash only, and other empty-looking paths — avoids a white header flash on home when usePathname is briefly empty. */
-function isHomePath(path: string): boolean {
-  const trimmed = path.trim()
-  if (!trimmed) return true
-  return trimmed.replace(/\/+$/, '') === ''
-}
 
 function NavLink({
   href,
@@ -61,7 +53,7 @@ function NavLink({
   )
 }
 
-export function Header() {
+export function Header({ isHomePage }: { isHomePage: boolean }) {
   const variant = useHeaderVariant()
   const [isBurgerOpen, setIsBurgerOpen] = useState(false)
   const [isSearchOpen, setIsSearchOpen] = useState(false)
@@ -118,8 +110,6 @@ export function Header() {
     }
   }, [fetchCartCount])
 
-  const pathname = usePathname() ?? '/'
-  const isHomePage = isHomePath(pathname)
   const hasTransparentBg = isHomePage && variant === 'dark'
   const lightText = hasTransparentBg
   const headerClass = 'fixed left-0 right-0 top-0 z-50 w-full flex flex-col border-b shrink-0 transition-colors'

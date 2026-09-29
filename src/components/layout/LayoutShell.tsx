@@ -1,6 +1,6 @@
 'use client'
 
-import { usePathname } from 'next/navigation'
+import { usePathname, useSelectedLayoutSegment } from 'next/navigation'
 
 import { HeaderVariantProvider } from '@/contexts/HeaderVariantContext'
 import { FooterVisibilityProvider, useFooterVisibility } from '@/contexts/FooterVisibilityContext'
@@ -20,16 +20,18 @@ function LayoutShellInner({
   children,
   instagramUrl,
   cookieBannerLocale,
+  isHomePage,
 }: {
   children: React.ReactNode
   instagramUrl?: string | null
   cookieBannerLocale: 'en' | 'fr'
+  isHomePage: boolean
 }) {
   const { isFooterSuppressed } = useFooterVisibility()
 
   return (
     <>
-      <Header />
+      <Header isHomePage={isHomePage} />
       <div className="flex-1 min-h-0 min-w-0 pt-(--header-height)">{children}</div>
       {!isFooterSuppressed && <Footer instagramUrl={instagramUrl} />}
       <CookieBanner locale={cookieBannerLocale} />
@@ -45,8 +47,12 @@ export function LayoutShell({
   instagramUrl?: string | null
 }) {
   const pathname = usePathname()
+  const segment = useSelectedLayoutSegment()
   const isStudio = pathname?.startsWith('/studio')
-  const isHome = !pathname || pathname === '/' || pathname.replace(/\/+$/, '') === ''
+  // Vercel can regenerate the homepage with the internal pathname /index.
+  // The selected route segment still identifies the actual homepage in SSR
+  // and hydration, so the cached HTML cannot start with a solid header.
+  const isHome = segment === null
   const cookieBannerLocale = getCookieBannerLocale(pathname)
 
   if (isStudio) {
@@ -57,7 +63,7 @@ export function LayoutShell({
     <HeaderVariantProvider initialVariant={isHome ? 'dark' : 'light'}>
       <FooterVisibilityProvider>
         <NewsletterModalProvider>
-          <LayoutShellInner instagramUrl={instagramUrl} cookieBannerLocale={cookieBannerLocale}>
+          <LayoutShellInner instagramUrl={instagramUrl} cookieBannerLocale={cookieBannerLocale} isHomePage={isHome}>
             {children}
           </LayoutShellInner>
         </NewsletterModalProvider>
