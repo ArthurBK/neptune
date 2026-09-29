@@ -1,11 +1,13 @@
 import { PortableText, type PortableTextComponents } from 'next-sanity'
 import type { TypedObject } from '@portabletext/types'
+import { PortableTextStyle } from './PortableTextStyle'
 
 const captionComponents: PortableTextComponents = {
   block: {
     normal: ({ children }) => <span className="block">{children}</span>,
   },
   marks: {
+    textStyle: PortableTextStyle,
     strong: ({ children }) => <strong className="font-semibold">{children}</strong>,
     em: ({ children }) => <em className="italic">{children}</em>,
     captionSizeSm: ({ children }) => (
@@ -48,4 +50,3 @@ export function SanityCaption({ value }: { value: unknown }) {
   // `hasCaptionContent` ensures we're dealing with a non-empty block array.
   return <PortableText value={value as TypedObject[]} components={captionComponents} />
 }
-

@@ -246,18 +246,74 @@ const homeVideoBlock = defineType({
   },
 })
 
-// Home section: newsstand products (Shopify handles)
+// Home section: fullscreen photos with individual destinations.
 const homeNewsstandBlock = defineType({
   name: 'homeNewsstandBlock',
-  title: 'Newsstand Hero',
+  title: 'Photo Carousel',
   type: 'object',
   icon: ImageIcon,
   fields: [
     defineField({
-      name: 'productHandles',
-      title: 'Products',
+      name: 'photos',
+      title: 'Photos',
       type: 'array',
-      description: 'Exactly 6 Shopify product handles or product URLs from Newsstand. Drag to reorder. First product is used for the CTA link.',
+      description: 'Full-screen photos that advance automatically every 5 seconds. Drag to reorder. Each photo has its own button and destination.',
+      of: [
+        defineArrayMember({
+          name: 'newsstandPhoto',
+          title: 'Photo',
+          type: 'object',
+          icon: ImageIcon,
+          fields: [
+            defineField({
+              name: 'image',
+              title: 'Photo',
+              type: 'image',
+              options: { hotspot: true },
+              description: 'Use the hotspot to choose the area to keep visible on smaller screens.',
+              validation: (rule) => rule.required().assetRequired(),
+            }),
+            defineField({
+              name: 'alt',
+              title: 'Image description',
+              type: 'string',
+              validation: (rule) => rule.required(),
+            }),
+            defineField({
+              name: 'ctaLabel',
+              title: 'Button label',
+              type: 'string',
+              initialValue: 'Discover',
+              validation: (rule) => rule.required(),
+            }),
+            defineField({
+              name: 'linkUrl',
+              title: 'Button destination',
+              type: 'url',
+              description: 'A page on this site (e.g. /newsstand) or a complete https:// URL.',
+              validation: (rule) => rule.required().uri({ allowRelative: true, scheme: ['http', 'https'] }),
+            }),
+          ],
+          preview: {
+            select: { title: 'ctaLabel', subtitle: 'linkUrl', media: 'image' },
+            prepare: ({ title, subtitle, media }) => ({ title: title || 'Photo', subtitle, media }),
+          },
+        }),
+      ],
+      validation: (rule) => rule.custom((value, context) => {
+        const parent = context.parent as { productHandles?: unknown[] } | undefined
+        return value?.length || parent?.productHandles?.length
+          ? true
+          : 'Add at least one photo.'
+      }),
+    }),
+    defineField({
+      name: 'productHandles',
+      title: 'Previous products',
+      type: 'array',
+      description: 'Used until photos are added above.',
+      readOnly: true,
+      hidden: ({ parent, value }) => !value || Boolean(parent?.photos?.length),
       of: [
         {
           type: 'object',
@@ -276,18 +332,21 @@ const homeNewsstandBlock = defineType({
           },
         },
       ],
-      validation: (rule) => rule.required().length(6),
     }),
     defineField({
       name: 'titleRichText',
       title: 'Headline',
       ...pageIntroRichTextType,
+      readOnly: true,
+      hidden: ({ parent, value }) => !value || Boolean(parent?.photos?.length),
       description: 'Optional rich text headline shown above the Newsstand carousel.',
     }),
     defineField({
       name: 'descriptionRichText',
       title: 'Description',
       ...pageIntroRichTextType,
+      readOnly: true,
+      hidden: ({ parent, value }) => !value || Boolean(parent?.photos?.length),
       description: 'Optional rich text description shown below the headline.',
     }),
     defineField({
@@ -308,14 +367,19 @@ const homeNewsstandBlock = defineType({
       name: 'ctaLabel',
       title: 'CTA label',
       type: 'string',
+      readOnly: true,
+      hidden: ({ parent, value }) => !value || Boolean(parent?.photos?.length),
       description: 'Optional — e.g. "DISCOVER OUR ANNIVERSARY ISSUE"',
     }),
   ],
   preview: {
-    select: { productHandles: 'productHandles' },
-    prepare: ({ productHandles }) => {
+    select: { photos: 'photos', productHandles: 'productHandles', media: 'photos.0.image' },
+    prepare: ({ photos, productHandles, media }) => {
+      if (Array.isArray(photos) && photos.length > 0) {
+        return { title: `Photo Carousel (${photos.length} photos)`, media }
+      }
       const count = Array.isArray(productHandles) ? productHandles.length : 0
-      return { title: `Newsstand Hero (${count} products)` }
+      return { title: 'Photo Carousel', subtitle: `${count} previous products — add photos to replace them` }
     },
   },
 })

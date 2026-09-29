@@ -4,7 +4,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import type { CSSProperties } from 'react'
 import { usePathname } from 'next/navigation'
-import { useCallback, useEffect, useState, useSyncExternalStore } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 
 import { CART_OPEN_EVENT, getCartId } from '@/lib/cart'
 import { useHeaderVariant } from '@/contexts/HeaderVariantContext'
@@ -31,15 +31,6 @@ function isHomePath(path: string): boolean {
   const trimmed = path.trim()
   if (!trimmed) return true
   return trimmed.replace(/\/+$/, '') === ''
-}
-
-function subscribeToPathnameChanges(callback: () => void): () => void {
-  window.addEventListener('popstate', callback)
-  return () => window.removeEventListener('popstate', callback)
-}
-
-function getBrowserPathname(): string {
-  return window.location.pathname
 }
 
 function NavLink({
@@ -127,14 +118,7 @@ export function Header() {
     }
   }, [fetchCartCount])
 
-  const routerPathname = usePathname() ?? '/'
-  // Keep the first client render aligned with SSR, then prefer the real browser
-  // path so the header cannot keep a solid background for a frame on home.
-  const pathname = useSyncExternalStore(
-    subscribeToPathnameChanges,
-    getBrowserPathname,
-    () => routerPathname
-  )
+  const pathname = usePathname() ?? '/'
   const isHomePage = isHomePath(pathname)
   const hasTransparentBg = isHomePage && variant === 'dark'
   const lightText = hasTransparentBg
@@ -155,7 +139,7 @@ export function Header() {
     : 'text-black hover:text-[#63382E] transition-colors duration-300'
 
   return (
-    <header className={headerClass} style={headerStyle} suppressHydrationWarning>
+    <header className={headerClass} style={headerStyle}>
       <div className="relative flex flex-1 w-full min-w-0 px-4 sm:px-6 md:px-8 lg:px-10 py-1.5 md:py-2.5 overflow-visible shrink-0 items-center">
         {/* Left: burger + primary links | Center: logo (desktop) | Right: cart + search */}
         <div className="relative flex items-center w-full min-w-0 min-h-[1.5rem] md:min-h-0">

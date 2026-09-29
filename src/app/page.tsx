@@ -7,6 +7,7 @@ import {
 } from '@/sanity/lib/queries'
 import { shopifyFetch } from '@/lib/shopify/client'
 import { normalizeShopifyProductHandle } from '@/lib/shopify/handle'
+import { getNewsstandPhotoSlides, type NewsstandPhoto } from '@/lib/newsstandPhotos'
 import {
   FIRST_PRODUCT_QUERY,
   NEWSSTAND_6_PRODUCTS_QUERY,
@@ -54,6 +55,7 @@ type HomePageSection = {
     affiliateUrl: string
   }
   productHandles?: Array<{ handle: string }>
+  photos?: NewsstandPhoto[] | null
   description?: string | null
   descriptionRichText?: PageIntroPortableText | null
   ctaLabel?: string | null
@@ -186,7 +188,14 @@ export default async function Home() {
             affiliateUrl: block.product.affiliateUrl,
           },
         })
-      } else if (block._type === 'homeNewsstandBlock' && block.productHandles?.length) {
+      } else if (block._type === 'homeNewsstandBlock') {
+        const slides = getNewsstandPhotoSlides(block.photos)
+        if (slides.length > 0) {
+          sections.push({ type: 'newsstandPhotos', data: { _key: block._key, slides } })
+          continue
+        }
+        // Preserve the published section until its replacement photos are ready.
+        if (!block.productHandles?.length) continue
         try {
           const handles = block.productHandles
             .map((p) => normalizeShopifyProductHandle(p.handle))

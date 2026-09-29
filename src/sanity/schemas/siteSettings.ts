@@ -1,8 +1,10 @@
 import { CogIcon } from '@sanity/icons'
-import { defineField, defineType } from 'sanity'
+import { defineArrayMember, defineField, defineType } from 'sanity'
+import { InlineTextStylePortableTextInput } from '../components/InlineTextStylePortableTextInput'
 import { plainTextToPortableText } from '../lib/portableText'
 import { captionRichTextType } from './lib/captionRichText'
 import { pageIntroRichTextType } from './lib/pageIntroRichText'
+import { textStyleAnnotation } from './lib/textStyleAnnotation'
 
 const DEFAULT_NEWSLETTER_DESCRIPTION =
   'Sign up to the Neptune newsletters for an exclusive access to great interiors and great conversations.'
@@ -74,7 +76,25 @@ export const siteSettings = defineType({
       name: 'aboutText',
       title: 'About Text',
       type: 'array',
-      of: [{ type: 'block' }],
+      components: { input: InlineTextStylePortableTextInput as never },
+      of: [
+        defineArrayMember({
+          type: 'block',
+          marks: {
+            // Keep the default link annotation and all existing block styles
+            // and decorators when adding typography controls.
+            annotations: [
+              {
+                name: 'link',
+                title: 'Link',
+                type: 'object',
+                fields: [defineField({ name: 'href', title: 'URL', type: 'url' })],
+              },
+              textStyleAnnotation,
+            ],
+          },
+        }),
+      ],
       group: 'content',
     }),
     defineField({

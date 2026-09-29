@@ -22,6 +22,15 @@ export function HeaderVariantProvider({
   initialVariant?: HeaderVariant
 }) {
   const [variant, setVariant] = useState<HeaderVariant>(initialVariant)
+  const [previousInitialVariant, setPreviousInitialVariant] = useState(initialVariant)
+
+  // The layout persists across navigation. Reset before rendering its children
+  // so returning home never paints the previous page's solid header.
+  if (previousInitialVariant !== initialVariant) {
+    setPreviousInitialVariant(initialVariant)
+    setVariant(initialVariant)
+  }
+
   return (
     <HeaderVariantContext.Provider value={{ variant, setVariant }}>
       {children}

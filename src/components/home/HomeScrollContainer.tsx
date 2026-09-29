@@ -37,12 +37,6 @@ interface HomeScrollContainerProps {
   children?: React.ReactNode
 }
 
-/** Only video sections use white header text. */
-function isSectionDark(section: HomeSection | undefined): boolean {
-  if (!section) return false
-  return section.type === 'video'
-}
-
 export function HomeScrollContainer({ sections, children }: HomeScrollContainerProps) {
   const scrollRef = useRef<HTMLDivElement>(null)
   const currentIndexRef = useRef(0)
@@ -63,11 +57,9 @@ export function HomeScrollContainer({ sections, children }: HomeScrollContainerP
     if (targetIndex === currentIndexRef.current && !isScrollingRef.current) return
 
     currentIndexRef.current = targetIndex
-    const targetSection = sections[targetIndex]
-    setHeaderVariant(isSectionDark(targetSection) ? 'dark' : 'light')
     isScrollingRef.current = true
     el.scrollTo({ top: targetIndex * sectionHeight, behavior: 'smooth' })
-  }, [sections, setHeaderVariant])
+  }, [])
 
   const goToSectionRef = useRef(goToSection)
   useEffect(() => {
@@ -111,25 +103,26 @@ export function HomeScrollContainer({ sections, children }: HomeScrollContainerP
     }
   }, [])
 
-  // Update header variant based on current section
+  // Use the actual scroll position, including during smooth scrolling. Section
+  // types and rounded indices must not change the header's transparency.
   useEffect(() => {
     const el = scrollRef.current
-    if (!el || sections.length === 0) return
+    if (!el) return
 
     const updateVariant = () => {
+      // Clamp Safari's negative overscroll and allow subpixel rounding at the top.
+      setHeaderVariant(el.scrollTop <= 1 ? 'dark' : 'light')
       const sectionHeight = el.clientHeight
       if (sectionHeight <= 0) return
       const rawIndex = Math.round(el.scrollTop / sectionHeight)
       const index = Math.max(0, Math.min(rawIndex, totalSections - 1))
       currentIndexRef.current = index
-      const section = sections[Math.min(index, sections.length - 1)]
-      setHeaderVariant(isSectionDark(section) ? 'dark' : 'light')
     }
 
     updateVariant()
     el.addEventListener('scroll', updateVariant, { passive: true })
     return () => el.removeEventListener('scroll', updateVariant)
-  }, [sections, setHeaderVariant, totalSections])
+  }, [setHeaderVariant, totalSections])
 
   // Wheel: advance/retreat one section. Block native scroll. Ignore while animating.
   useEffect(() => {

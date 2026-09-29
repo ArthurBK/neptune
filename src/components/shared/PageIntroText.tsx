@@ -1,16 +1,8 @@
 import type { PortableTextBlock } from '@portabletext/types'
 import { PortableText, type PortableTextComponents } from 'next-sanity'
-import type { CSSProperties } from 'react'
-import { getOptionalTextStyleFontClass } from '@/lib/textStyleFonts'
+import { PortableTextStyle } from './PortableTextStyle'
 
 export type PageIntroPortableText = PortableTextBlock[]
-
-function normalizedHexColor(value: string | null | undefined): string | undefined {
-  if (!value) return undefined
-  const trimmed = value.trim()
-  const isHex = /^#(?:[0-9a-fA-F]{3}){1,2}$/.test(trimmed)
-  return isHex ? trimmed : undefined
-}
 
 const pageIntroTextComponents: PortableTextComponents = {
   block: {
@@ -47,23 +39,7 @@ const pageIntroTextComponents: PortableTextComponents = {
     strong: ({ children }) => <strong className="font-medium">{children}</strong>,
     em: ({ children }) => <em className="italic">{children}</em>,
     underline: ({ children }) => <u>{children}</u>,
-    textStyle: ({ value, children }) => {
-      const fontFamilyValue =
-        typeof value?.fontFamily === 'string' ? value.fontFamily : undefined
-      const fontSizeValue = typeof value?.fontSize === 'number' ? value.fontSize : undefined
-      const color = normalizedHexColor(value?.textColor)
-      const className = getOptionalTextStyleFontClass(fontFamilyValue)
-      const style: CSSProperties = {
-        ...(color ? { color } : {}),
-        ...(fontSizeValue ? { fontSize: `${fontSizeValue}px` } : {}),
-      }
-
-      return (
-        <span className={className} style={style}>
-          {children}
-        </span>
-      )
-    },
+    textStyle: PortableTextStyle,
   },
 }
 

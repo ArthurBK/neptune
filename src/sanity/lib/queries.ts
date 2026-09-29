@@ -63,6 +63,7 @@ export const HOME_PAGE_QUERY = `
         }
       },
       _type == "homeNewsstandBlock" => {
+        photos[] { _key, image, alt, ctaLabel, linkUrl },
         "productHandles": productHandles[] { handle },
         title,
         titleRichText[] {

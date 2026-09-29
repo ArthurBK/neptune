@@ -499,7 +499,8 @@ export function InlineTextStylePortableTextInput(props: PortableTextInputProps) 
       <PortableTextInput
         {...props}
         editorRef={editorRef}
-        hideToolbar
+        // Keep Sanity's link editing and fullscreen controls for linked text.
+        hideToolbar={!hasAnnotation(props, 'link')}
         onEditorChange={(change, editor) => {
           props.onEditorChange?.(change, editor)
           syncToolbarState(editor)

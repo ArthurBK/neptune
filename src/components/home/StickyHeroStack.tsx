@@ -11,6 +11,7 @@ import { articleTitleSingleLine } from '@/lib/articleTitle'
 import { getOptionalTextStyleFontClass } from '@/lib/textStyleFonts'
 import { urlFor } from '@/sanity/lib/image'
 import { NewsstandCta } from '@/components/shared/NewsstandCta'
+import { NewsstandPhotoHero, type NewsstandPhotoSlide } from './NewsstandPhotoHero'
 
 export interface CarouselArticle {
   _id: string
@@ -201,6 +202,10 @@ export type HomeSection =
       image: { asset?: { _ref: string }; alt?: string }
       affiliateUrl: string
     }
+  }
+  | {
+    type: 'newsstandPhotos'
+    data: { _key?: string; slides: NewsstandPhotoSlide[] }
   }
   | {
     type: 'newsstandProduct'
@@ -1285,6 +1290,17 @@ function renderSectionContent(
       bgTransparent: false,
     }
   }
+  if (item.type === 'newsstandPhotos') {
+    return {
+      content: <NewsstandPhotoHero slides={item.data.slides} priority={priority} />,
+      key: item.data._key ?? `newsstand-photos-${index}`,
+      keyProp: item.data._key ?? `newsstand-photos-${index}`,
+      zIndex,
+      bgWhite: false,
+      bgTransparent: false,
+      noPadding: true,
+    }
+  }
   if (item.type === 'newsstandProduct') {
     const {
       products,
@@ -1359,12 +1375,12 @@ export function StickyHeroStack({
     <div className="w-full min-w-0">
       {withNavbar ? (
         <>
-          {/* First block: one section height. When first section is video: video full screen with menu on top; else header + content below */}
+          {/* Fullscreen media extends behind the transparent header. */}
           <div
             className="sticky top-0 flex flex-col w-full min-w-0 shrink-0 h-[var(--section-height,100vh)] min-h-[var(--section-height,100vh)] overflow-hidden relative"
             style={{ zIndex: 1 }}
           >
-            {sections[0]?.type === 'video' ? (
+            {sections[0]?.type === 'video' || sections[0]?.type === 'newsstandPhotos' ? (
               <>
                 {/* Video full screen, then menu on top */}
                 <div className="absolute inset-0 w-full h-full min-h-full">

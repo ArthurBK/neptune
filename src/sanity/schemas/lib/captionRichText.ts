@@ -1,7 +1,12 @@
+import { defineArrayMember } from 'sanity'
+import { InlineTextStylePortableTextInput } from '../../components/InlineTextStylePortableTextInput'
+import { textStyleAnnotation } from './textStyleAnnotation'
+
 export const captionRichTextType = {
   type: 'array',
+  components: { input: InlineTextStylePortableTextInput as never },
   of: [
-    {
+    defineArrayMember({
       type: 'block',
       styles: [{ title: 'Normal', value: 'normal' }],
       marks: {
@@ -12,9 +17,8 @@ export const captionRichTextType = {
           { title: 'Size: Medium', value: 'captionSizeMd' },
           { title: 'Size: Large', value: 'captionSizeLg' },
         ],
-        annotations: [],
+        annotations: [textStyleAnnotation],
       },
-    },
+    }),
   ],
 }
-

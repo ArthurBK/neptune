@@ -1,5 +1,5 @@
 import Image from 'next/image'
-import { PortableText } from 'next-sanity'
+import { PortableText, type PortableTextComponents } from 'next-sanity'
 import type { TypedObject } from '@portabletext/types'
 
 import { sanityFetch } from '@/sanity/lib/client'
@@ -7,8 +7,13 @@ import { urlFor } from '@/sanity/lib/image'
 import { SITE_SETTINGS_QUERY } from '@/sanity/lib/queries'
 
 import { SanityCaption } from '@/components/shared/SanityCaption'
+import { PortableTextStyle } from '@/components/shared/PortableTextStyle'
 
 export const revalidate = 3600
+
+const aboutTextComponents: PortableTextComponents = {
+  marks: { textStyle: PortableTextStyle },
+}
 
 type AboutImage = {
   asset?: { _ref?: string } | null
@@ -44,7 +49,7 @@ export default async function AboutPage() {
         {settings?.aboutText?.length ? (
           <section className="max-w-3xl mx-auto mb-10 md:mb-14">
             <div className="font-[Helvetica,Arial,sans-serif] text-[15px] leading-[1.75] text-black text-center space-y-4">
-              <PortableText value={settings.aboutText} />
+              <PortableText value={settings.aboutText} components={aboutTextComponents} />
             </div>
           </section>
         ) : null}
