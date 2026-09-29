@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
+import { createCarouselWheelGesture } from '@/lib/carouselWheel'
 
 export interface NewsstandPhotoSlide {
   _key: string
@@ -38,13 +39,9 @@ function PhotoCarousel({ slides, priority }: { slides: NewsstandPhotoSlide[]; pr
   const [isTouching, setIsTouching] = useState(false)
   const sectionRef = useRef<HTMLElement>(null)
   const touchStartRef = useRef<{ x: number; y: number } | null>(null)
-  const wheelGestureRef = useRef({
-    lastEventAt: -Infinity,
-    lastHandledAt: -Infinity,
-    axis: null as 'horizontal' | 'vertical' | null,
-    distance: 0,
-    consumed: false,
-  })
+  const [wheelGesture] = useState(createCarouselWheelGesture)
+  const lastWheelHandledAtRef = useRef(-Infinity)
+  const pendingMoveRef = useRef<number | null>(null)
   const index = multiple ? (position - 1 + slides.length) % slides.length : 0
   const slide = slides[index]
   // Copies at both ends keep forward and backward swipes moving naturally.
@@ -58,6 +55,20 @@ function PhotoCarousel({ slides, priority }: { slides: NewsstandPhotoSlide[]; pr
     return true
   }, [position, multiple, isLoopCopy, loadedSlides])
 
+  const requestMove = useCallback((direction: number) => {
+    pendingMoveRef.current = move(direction) ? null : direction
+  }, [move])
+
+  useEffect(() => {
+    if (pendingMoveRef.current === null) return
+    // Keep a deliberate gesture made while the loop resets or an image decodes.
+    const frame = window.requestAnimationFrame(() => {
+      const direction = pendingMoveRef.current
+      if (direction !== null && move(direction)) pendingMoveRef.current = null
+    })
+    return () => window.cancelAnimationFrame(frame)
+  }, [move])
+
   const resetLoop = useCallback(() => {
     if (!isLoopCopy) return
     setFrame({ position: position === 0 ? slides.length : 1, animate: false })
@@ -68,7 +79,7 @@ function PhotoCarousel({ slides, priority }: { slides: NewsstandPhotoSlide[]; pr
 
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)')
     const timer = window.setInterval(() => {
-      if (document.hidden || reducedMotion.matches || performance.now() - wheelGestureRef.current.lastHandledAt < 350) return
+      if (document.hidden || reducedMotion.matches || performance.now() - lastWheelHandledAtRef.current < 350) return
       move(1)
     }, 5000)
 
@@ -117,7 +128,7 @@ function PhotoCarousel({ slides, priority }: { slides: NewsstandPhotoSlide[]; pr
         // vertical swipes still bubble to its full-page scrolling behavior.
         event.preventDefault()
         event.stopPropagation()
-        move(dx < 0 ? 1 : -1)
+        requestMove(dx < 0 ? 1 : -1)
       }
     }
     const cancel = () => {
@@ -135,7 +146,7 @@ function PhotoCarousel({ slides, priority }: { slides: NewsstandPhotoSlide[]; pr
       section.removeEventListener('touchend', end)
       section.removeEventListener('touchcancel', cancel)
     }
-  }, [multiple, move])
+  }, [multiple, requestMove])
 
   useEffect(() => {
     const section = sectionRef.current
@@ -149,33 +160,26 @@ function PhotoCarousel({ slides, priority }: { slides: NewsstandPhotoSlide[]; pr
       }
       if (event.deltaX === 0 && event.deltaY === 0) return
 
-      const gesture = wheelGestureRef.current
-      if (event.timeStamp - gesture.lastEventAt > 200) {
-        gesture.axis = null
-        gesture.distance = 0
-        gesture.consumed = false
-      }
-      gesture.lastEventAt = event.timeStamp
-      gesture.axis ??= Math.abs(event.deltaX) > Math.abs(event.deltaY) ? 'horizontal' : 'vertical'
-      if (gesture.axis === 'vertical') return
+      const unit = event.deltaMode === 1 ? 16 : event.deltaMode === 2 ? section.clientWidth : 1
+      const shiftScroll = event.shiftKey && event.deltaX === 0
+      const result = wheelGesture(
+        (shiftScroll ? event.deltaY : event.deltaX) * unit,
+        (shiftScroll ? 0 : event.deltaY) * unit,
+        event.timeStamp,
+      )
+      if (result.axis === 'vertical') return
 
       // This native listener runs before the homepage's vertical wheel handler.
-      // Keep the axis locked through momentum, even when the trailing deltas drift.
+      // Hold small undecided movements here until their direction is clear.
       event.preventDefault()
       event.stopPropagation()
-      gesture.lastHandledAt = performance.now()
-      if (gesture.consumed) return
-
-      const unit = event.deltaMode === 1 ? 16 : event.deltaMode === 2 ? section.clientWidth : 1
-      gesture.distance += event.deltaX * unit
-      if (Math.abs(gesture.distance) >= 40) {
-        gesture.consumed = move(gesture.distance > 0 ? 1 : -1)
-      }
+      lastWheelHandledAtRef.current = performance.now()
+      if (result.direction) requestMove(result.direction)
     }
 
     section.addEventListener('wheel', onWheel, { passive: false })
     return () => section.removeEventListener('wheel', onWheel)
-  }, [multiple, move])
+  }, [multiple, requestMove, wheelGesture])
 
   if (!slide) return null
 
@@ -246,7 +250,10 @@ function PhotoCarousel({ slides, priority }: { slides: NewsstandPhotoSlide[]; pr
               aria-label={`Go to photo ${photoIndex + 1}`}
               aria-current={photoIndex === index ? 'true' : undefined}
               disabled={!loadedSlides.has(photoIndex + 1)}
-              onClick={() => setFrame({ position: photoIndex + 1, animate: true })}
+              onClick={() => {
+                pendingMoveRef.current = null
+                setFrame({ position: photoIndex + 1, animate: true })
+              }}
               className="flex h-8 w-5 items-center justify-center rounded-full focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white disabled:cursor-wait"
             >
               <span className={`h-2 w-2 rounded-full border border-white transition-colors ${photoIndex === index ? 'bg-white' : 'bg-white/30'}`} />
