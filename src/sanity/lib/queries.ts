@@ -20,6 +20,10 @@ export const HOME_PAGE_QUERY = `
       },
       _type == "homeThreeArticlesBlock" => {
         title,
+        titleRichText[] {
+          ...,
+          markDefs[] { ... }
+        },
         "heroArticle": heroArticle->{
           _id,
           title,

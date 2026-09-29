@@ -139,6 +139,7 @@ export default async function Home() {
             data: {
               _key: block._key,
               title: block.title,
+              titleRichText: block.titleRichText,
               heroArticle: block.heroArticle ?? null,
               articles,
             },

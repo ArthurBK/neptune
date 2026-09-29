@@ -211,12 +211,7 @@ async function migrateContributorBios() {
 async function migrateHomeRichTextBlocks() {
   const homePage = await client.fetch<HomePageDoc | null>(
     `*[_id == "homePage"][0]{
-      sections[] {
-        ...,
-        titleRichText,
-        descriptionRichText,
-        subtitleRichText
-      }
+      sections
     }`,
   )
 

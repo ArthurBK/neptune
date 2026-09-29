@@ -13,6 +13,7 @@ import {media} from 'sanity-plugin-media'
 import {apiVersion, dataset, projectId} from './src/sanity/env'
 import {schema} from './src/sanity/schemas'
 import {structure} from './src/sanity/structure'
+import {contributorDeleteAction} from './src/sanity/actions/contributorDeleteAction'
 
 export default defineConfig({
   basePath: '/studio',
@@ -20,6 +21,14 @@ export default defineConfig({
   dataset,
   // Add and edit the content schema in the './sanity/schemas' folder
   schema,
+  document: {
+    actions: (actions, {schemaType}) =>
+      schemaType === 'contributor'
+        ? actions.map((action) =>
+            action.action === 'delete' ? contributorDeleteAction(action) : action,
+          )
+        : actions,
+  },
   plugins: [
     structureTool({structure}),
     // Media: browse assets, bulk upload, select multiple at once

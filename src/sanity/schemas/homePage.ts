@@ -31,10 +31,17 @@ const homeThreeArticlesBlock = defineType({
   icon: DocumentTextIcon,
   fields: [
     defineField({
-      name: 'title',
+      name: 'titleRichText',
       title: 'Title',
+      ...pageIntroRichTextType,
+      description: 'Section title displayed as entered. Select text to change its font, size, color or formatting.',
+    }),
+    defineField({
+      name: 'title',
+      title: 'Legacy title',
       type: 'string',
-      description: 'Optional title shown above the three articles.',
+      hidden: true,
+      readOnly: true,
     }),
     defineField({
       name: 'heroArticle',
@@ -58,11 +65,14 @@ const homeThreeArticlesBlock = defineType({
     }),
   ],
   preview: {
-    select: { title: 'title', heroTitle: 'heroArticle.title', articles: 'articles' },
-    prepare: ({ title, heroTitle, articles }) => {
+    select: { title: 'title', titleRichText: 'titleRichText', heroTitle: 'heroArticle.title', articles: 'articles' },
+    prepare: ({ title, titleRichText, heroTitle, articles }) => {
       const count = Array.isArray(articles) ? articles.length : 0
+      const richTitle = Array.isArray(titleRichText)
+        ? titleRichText.map((block) => block.children?.map((child: { text?: string }) => child.text ?? '').join('') ?? '').join(' ')
+        : undefined
       return {
-        title: title || `3 articles${heroTitle ? ' + hero' : ''} (${count}/3)`,
+        title: (richTitle ?? title) || `3 articles${heroTitle ? ' + hero' : ''} (${count}/3)`,
         subtitle: heroTitle ? `Hero: ${heroTitle}` : undefined,
       }
     },

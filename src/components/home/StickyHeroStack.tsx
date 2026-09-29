@@ -97,6 +97,20 @@ const newsstandHeadlineComponents: PortableTextComponents = {
   marks: homeRichTextMarks,
 }
 
+const articleSectionTitleComponents: PortableTextComponents = {
+  block: {
+    normal: ({ children }) => <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl">{children}</h2>,
+    h2: ({ children }) => <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl">{children}</h2>,
+    h3: ({ children }) => <h3 className="text-lg sm:text-xl md:text-2xl lg:text-3xl">{children}</h3>,
+    blockquote: ({ children }) => <blockquote className="text-xl italic md:text-3xl">{children}</blockquote>,
+    pullQuote: ({ children }) => <blockquote className="text-2xl italic md:text-4xl">{children}</blockquote>,
+  },
+  marks: {
+    ...homeRichTextMarks,
+    strong: ({ children }) => <strong className="font-bold">{children}</strong>,
+  },
+}
+
 const newsstandDescriptionComponents: PortableTextComponents = {
   block: {
     normal: ({ children }) => (
@@ -172,6 +186,7 @@ export type HomeSection =
     data: {
       _key?: string
       title?: string | null
+      titleRichText?: HomeRichText | null
       heroArticle?: CarouselArticle | null
       articles: CarouselArticle[]
     }
@@ -808,18 +823,27 @@ function ThreeArticlesContent({
   articles,
   heroArticle,
   title,
+  titleRichText,
   priority = false,
 }: {
   articles: CarouselArticle[]
   heroArticle?: CarouselArticle | null
   title?: string | null
+  titleRichText?: HomeRichText | null
   priority?: boolean
 }) {
+  const usesRichTitle = Array.isArray(titleRichText)
+  const showTitle = usesRichTitle ? hasRichText(titleRichText) : Boolean(title)
+
   return (
     <div className="flex h-full min-h-0 w-full min-w-0 bg-white pt-[var(--header-height)]">
       <div className="mx-auto flex h-full w-full max-w-[900px] min-w-0 flex-col items-center justify-center px-3 py-3 sm:px-5 md:px-8 lg:px-10">
-        {title ? (
-          <h2 className="mb-2 max-w-full break-words text-center font-serif text-xs font-bold leading-tight text-black sm:text-sm md:mb-3 md:text-base lg:text-lg">
+        {usesRichTitle && showTitle ? (
+          <div className="mb-3 max-w-full break-words text-center font-serif font-normal leading-tight text-black md:mb-4">
+            <PortableText value={titleRichText} components={articleSectionTitleComponents} />
+          </div>
+        ) : !usesRichTitle && title ? (
+          <h2 className="mb-3 max-w-full break-words text-center font-serif text-xl font-bold leading-tight text-black sm:text-2xl md:mb-4 md:text-3xl lg:text-4xl">
             {title}
           </h2>
         ) : null}
@@ -832,7 +856,7 @@ function ThreeArticlesContent({
         ) : null}
         <div
           className={`grid w-full max-w-[820px] min-w-0 grid-cols-3 items-start gap-3 sm:gap-4 md:gap-8 ${
-            heroArticle ? 'mt-2 md:mt-3' : title ? 'mt-2 md:mt-3' : ''
+            heroArticle || showTitle ? 'mt-2 md:mt-3' : ''
           }`}
         >
           {articles.slice(0, 3).map((article) => {
@@ -1218,6 +1242,7 @@ function renderSectionContent(
           articles={articles}
           heroArticle={item.data.heroArticle}
           title={item.data.title}
+          titleRichText={item.data.titleRichText}
           priority={priority}
         />
       ),
