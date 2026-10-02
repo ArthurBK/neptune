@@ -227,12 +227,12 @@ function PhotoCarousel({ slides, priority }: { slides: NewsstandPhotoSlide[]; pr
             style={{ backgroundColor: backgrounds[photo._key] }}
             aria-hidden={photoIndex !== position}
           >
-            <div className="absolute inset-x-0 top-[var(--header-height)] bottom-44 md:inset-0">
+            <div className="absolute inset-x-0 top-[var(--header-height)] bottom-44 overflow-hidden md:inset-0">
               <Image
                 src={photo.imageUrl}
                 alt={photo.alt}
                 fill
-                sizes="100vw"
+                sizes="(max-width: 767px) 135vw, 100vw"
                 loading="eager"
                 priority={priority && photoIndex === (multiple ? 1 : 0)}
                 onLoad={(event) => {
@@ -245,7 +245,7 @@ function PhotoCarousel({ slides, priority }: { slides: NewsstandPhotoSlide[]; pr
                   // Next Image fires onLoad after decoding the displayed image.
                   setLoadedSlides((loaded) => loaded.has(photoIndex) ? loaded : new Set(loaded).add(photoIndex))
                 }}
-                className="object-contain md:object-cover"
+                className="scale-[1.35] object-contain md:scale-100 md:object-cover"
                 style={{ objectPosition: photo.objectPosition }}
               />
             </div>
