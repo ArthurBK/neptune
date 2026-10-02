@@ -14,6 +14,24 @@ export interface NewsstandPhotoSlide {
   objectPosition?: string
 }
 
+function getImageBackground(image: HTMLImageElement): string | null {
+  try {
+    const canvas = document.createElement('canvas')
+    canvas.width = 1
+    canvas.height = 1
+    const context = canvas.getContext('2d')
+    if (!context) return null
+
+    // Sample the outer background, not the photograph in the middle of the artwork.
+    context.drawImage(image, 0, 0, 1, 1, 0, 0, 1, 1)
+    const [red, green, blue, alpha] = context.getImageData(0, 0, 1, 1).data
+    return alpha === 255 ? `rgb(${red}, ${green}, ${blue})` : null
+  } catch {
+    // Keep the carousel usable if an image cannot be sampled (e.g. cross-origin SVG).
+    return null
+  }
+}
+
 export function NewsstandPhotoHero({
   slides,
   priority = false,
@@ -34,6 +52,7 @@ function PhotoCarousel({ slides, priority }: { slides: NewsstandPhotoSlide[]; pr
   const multiple = slides.length > 1
   const [{ position, animate }, setFrame] = useState({ position: multiple ? 1 : 0, animate: false })
   const [loadedSlides, setLoadedSlides] = useState<Set<number>>(() => new Set())
+  const [backgrounds, setBackgrounds] = useState<Record<string, string>>({})
   const [isControlHovered, setIsControlHovered] = useState(false)
   const [isControlFocused, setIsControlFocused] = useState(false)
   const [isTouching, setIsTouching] = useState(false)
@@ -205,22 +224,31 @@ function PhotoCarousel({ slides, priority }: { slides: NewsstandPhotoSlide[]; pr
           <div
             key={`${photo._key}-${photoIndex}`}
             className="relative h-full w-full shrink-0"
+            style={{ backgroundColor: backgrounds[photo._key] }}
             aria-hidden={photoIndex !== position}
           >
-            <Image
-              src={photo.imageUrl}
-              alt={photo.alt}
-              fill
-              sizes="100vw"
-              loading="eager"
-              priority={priority && photoIndex === (multiple ? 1 : 0)}
-              onLoad={() => {
-                // Next Image fires onLoad after decoding the displayed image.
-                setLoadedSlides((loaded) => loaded.has(photoIndex) ? loaded : new Set(loaded).add(photoIndex))
-              }}
-              className="object-cover"
-              style={{ objectPosition: photo.objectPosition }}
-            />
+            <div className="absolute inset-x-0 top-[var(--header-height)] bottom-44 md:inset-0">
+              <Image
+                src={photo.imageUrl}
+                alt={photo.alt}
+                fill
+                sizes="100vw"
+                loading="eager"
+                priority={priority && photoIndex === (multiple ? 1 : 0)}
+                onLoad={(event) => {
+                  const background = getImageBackground(event.currentTarget)
+                  if (background) {
+                    setBackgrounds((current) => current[photo._key] === background
+                      ? current
+                      : { ...current, [photo._key]: background })
+                  }
+                  // Next Image fires onLoad after decoding the displayed image.
+                  setLoadedSlides((loaded) => loaded.has(photoIndex) ? loaded : new Set(loaded).add(photoIndex))
+                }}
+                className="object-contain md:object-cover"
+                style={{ objectPosition: photo.objectPosition }}
+              />
+            </div>
           </div>
         ))}
       </div>
