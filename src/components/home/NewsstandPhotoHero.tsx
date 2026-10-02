@@ -224,7 +224,6 @@ function PhotoCarousel({ slides, priority }: { slides: NewsstandPhotoSlide[]; pr
           </div>
         ))}
       </div>
-      <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-black/10" />
       <div className="absolute inset-x-0 bottom-24 flex justify-center px-6 md:bottom-28">
         <Link
           href={slide.linkUrl}
@@ -239,10 +238,20 @@ function PhotoCarousel({ slides, priority }: { slides: NewsstandPhotoSlide[]; pr
         <div
           role="group"
           aria-label="Choose a photo"
-          className="absolute inset-x-0 bottom-14 flex flex-wrap justify-center gap-0 px-6"
+          className="absolute inset-x-0 bottom-12 flex items-center justify-center gap-2 px-6 md:gap-3"
           onMouseEnter={() => setIsControlHovered(true)}
           onMouseLeave={() => setIsControlHovered(false)}
         >
+          <button
+            type="button"
+            aria-label="Previous photo"
+            onClick={() => requestMove(-1)}
+            className="flex h-11 w-11 shrink-0 items-center justify-center text-white transition-opacity hover:opacity-60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="square" aria-hidden="true">
+              <path d="m14 5-7 7 7 7" />
+            </svg>
+          </button>
           {slides.map((photo, photoIndex) => (
             <button
               key={photo._key}
@@ -254,11 +263,21 @@ function PhotoCarousel({ slides, priority }: { slides: NewsstandPhotoSlide[]; pr
                 pendingMoveRef.current = null
                 setFrame({ position: photoIndex + 1, animate: true })
               }}
-              className="flex h-8 w-5 items-center justify-center rounded-full focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white disabled:cursor-wait"
+              className="flex h-11 w-8 min-w-0 items-center justify-center focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white disabled:cursor-wait md:w-12"
             >
-              <span className={`h-2 w-2 rounded-full border border-white transition-colors ${photoIndex === index ? 'bg-white' : 'bg-white/30'}`} />
+              <span className={`h-px w-full transition-colors ${photoIndex === index ? 'bg-white' : 'bg-white/40 hover:bg-white/70'}`} />
             </button>
           ))}
+          <button
+            type="button"
+            aria-label="Next photo"
+            onClick={() => requestMove(1)}
+            className="flex h-11 w-11 shrink-0 items-center justify-center text-white transition-opacity hover:opacity-60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="square" aria-hidden="true">
+              <path d="m10 5 7 7-7 7" />
+            </svg>
+          </button>
         </div>
       )}
     </section>
