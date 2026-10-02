@@ -49,7 +49,11 @@ function app(pathname, segment = null) {
   return React.createElement(PathnameContext.Provider, { value: pathname },
     React.createElement(LayoutRouterContext.Provider, { value: { parentTree: ['', { children: [segment ?? '__PAGE__', {}] }] } },
       React.createElement(LayoutShell, null, segment === null
-        ? React.createElement(HomeScrollContainer, { sections: [{ type: 'video', data: { videoUrl: '/test.mp4' } }] })
+        ? React.createElement(HomeScrollContainer, { sections: [
+          { type: 'video', data: { videoUrl: '/test.mp4' } },
+          { type: 'newsstandPhotos', data: { slides: [] } },
+          { type: 'image', data: {} },
+        ] })
         : React.createElement('main', null, 'Inner page'))))
 }
 
@@ -85,9 +89,22 @@ test('internal-path SSR hydrates without a white header; scrolling and navigatio
     const background = expected => assert.equal(document.querySelector('header').style.background, expected)
     background('transparent')
     const scroller = document.querySelector('.overflow-y-auto.w-full')
-    for (const top of [2, 800, 0]) {
+    for (const [top, transparent] of [
+      [2, true],
+      [500, true],
+      [799, true],
+      [800, true],
+      [1200, true],
+      [1600, false],
+      [2400, false],
+      [800, true],
+      [799, true],
+      [500, true],
+      [2, true],
+      [0, true],
+    ]) {
       await React.act(async () => { scroller.scrollTop = top; scroller.dispatchEvent(new window.Event('scroll')) })
-      background(top > 1 ? 'rgb(255, 255, 255)' : 'transparent')
+      background(transparent ? 'transparent' : 'rgb(255, 255, 255)')
     }
     await React.act(async () => root.render(app('/about', 'about')))
     background('rgb(255, 255, 255)')

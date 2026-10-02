@@ -103,16 +103,20 @@ export function HomeScrollContainer({ sections, children }: HomeScrollContainerP
     }
   }, [])
 
-  // Use the actual scroll position, including during smooth scrolling. Section
-  // types and rounded indices must not change the header's transparency.
+  // Use the section behind the header, rather than the rounded navigation index,
+  // so the first screen and photo carousels stay transparent throughout scrolling.
   useEffect(() => {
     const el = scrollRef.current
     if (!el) return
 
     const updateVariant = () => {
-      // Clamp Safari's negative overscroll and allow subpixel rounding at the top.
-      setHeaderVariant(el.scrollTop <= 1 ? 'dark' : 'light')
       const sectionHeight = el.clientHeight
+      // Allow subpixel rounding at section boundaries and Safari's overscroll.
+      const headerIndex = sectionHeight > 0
+        ? Math.max(0, Math.floor((el.scrollTop + 1) / sectionHeight))
+        : 0
+      const isPhotoCarousel = sections[headerIndex]?.type === 'newsstandPhotos'
+      setHeaderVariant(headerIndex === 0 || isPhotoCarousel ? 'dark' : 'light')
       if (sectionHeight <= 0) return
       const rawIndex = Math.round(el.scrollTop / sectionHeight)
       const index = Math.max(0, Math.min(rawIndex, totalSections - 1))
@@ -122,7 +126,7 @@ export function HomeScrollContainer({ sections, children }: HomeScrollContainerP
     updateVariant()
     el.addEventListener('scroll', updateVariant, { passive: true })
     return () => el.removeEventListener('scroll', updateVariant)
-  }, [setHeaderVariant, totalSections])
+  }, [setHeaderVariant, totalSections, sections])
 
   // Wheel: advance/retreat one section. Block native scroll. Ignore while animating.
   useEffect(() => {
