@@ -14,6 +14,14 @@ export const marketPage = defineType({
   icon: BasketIcon,
   fields: [
     defineField({
+      name: 'isVisible',
+      title: 'Show Shop page',
+      type: 'boolean',
+      initialValue: true,
+      description:
+        'Turn off to hide Shop from the site navigation and disable access to the Market page. Publish to apply changes. Existing pages remain visible until explicitly turned off.',
+    }),
+    defineField({
       name: 'title',
       title: 'Page title',
       type: 'string',

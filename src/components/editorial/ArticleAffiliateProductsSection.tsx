@@ -1,6 +1,7 @@
 import Link from 'next/link'
 
 import { AffiliateProductCard } from '@/components/market/AffiliateProductCard'
+import { isMarketVisible } from '@/sanity/lib/market'
 
 export type ArticleAffiliateProduct = {
   _id: string
@@ -11,7 +12,7 @@ export type ArticleAffiliateProduct = {
   affiliateUrl?: string | null
 }
 
-export function ArticleAffiliateProductsSection({
+export async function ArticleAffiliateProductsSection({
   products,
 }: {
   products: ArticleAffiliateProduct[] | null | undefined
@@ -21,6 +22,7 @@ export function ArticleAffiliateProductsSection({
       Boolean(p?._id && p?.affiliateUrl)
   )
   if (valid.length === 0) return null
+  const showShop = await isMarketVisible()
 
   return (
     <section
@@ -32,12 +34,12 @@ export function ArticleAffiliateProductsSection({
           <h2 className="font-serif text-2xl uppercase tracking-wide text-black md:text-3xl">
             Shop the edit
           </h2>
-          <Link
+          {showShop && <Link
             href="/the-market"
             className="font-futura mt-3 inline-block text-xs uppercase tracking-[0.1em] text-black transition-colors hover:text-black hover:underline"
           >
             Neptune Market
-          </Link>
+          </Link>}
         </div>
         <div className="grid grid-cols-2 gap-4 md:flex md:flex-wrap md:justify-center md:gap-8">
           {valid.map((p) => (

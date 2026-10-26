@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useState, type ReactNode } from 'react'
 
-export type HeaderVariant = 'light' | 'dark'
+export type HeaderVariant = 'light' | 'dark' | 'transparent-light'
 
 type HeaderVariantContextValue = {
   variant: HeaderVariant

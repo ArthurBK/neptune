@@ -278,6 +278,10 @@ export const AFFILIATE_PRODUCTS_QUERY = `
   }
 `
 
+export const MARKET_VISIBILITY_QUERY = defineQuery(/* groq */ `
+  coalesce(*[_type == "marketPage" && _id == "marketPage"][0].isVisible, true)
+`)
+
 // Market page copy and ordered affiliate products (manual drag-and-drop order in Studio)
 export const MARKET_PAGE_QUERY = defineQuery(/* groq */ `
   *[_type == "marketPage" && _id == "marketPage"][0]{

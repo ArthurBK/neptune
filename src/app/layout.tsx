@@ -4,6 +4,7 @@ import localFont from 'next/font/local'
 
 import { sanityFetch } from '@/sanity/lib/client'
 import { SITE_SETTINGS_QUERY } from '@/sanity/lib/queries'
+import { isMarketVisible } from '@/sanity/lib/market'
 import { LayoutShell } from '@/components/layout/LayoutShell'
 
 import './globals.css'
@@ -74,15 +75,16 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode
 }>) {
-  const settings = await sanityFetch<{ instagramUrl?: string | null } | null>(
-    SITE_SETTINGS_QUERY
-  )
+  const [settings, showShop] = await Promise.all([
+    sanityFetch<{ instagramUrl?: string | null } | null>(SITE_SETTINGS_QUERY),
+    isMarketVisible(),
+  ])
   const instagramUrl = settings?.instagramUrl ?? null
 
   return (
     <html lang="en" className={`${cormorantGaramond.variable} ${ebGaramond.variable} ${inter.variable} ${gillSans.variable}`} suppressHydrationWarning>
       <body className="min-h-dvh flex flex-col bg-white text-[#1A1A1A] antialiased font-sans font-light" suppressHydrationWarning>
-        <LayoutShell instagramUrl={instagramUrl}>{children}</LayoutShell>
+        <LayoutShell instagramUrl={instagramUrl} showShop={showShop}>{children}</LayoutShell>
       </body>
     </html>
   )

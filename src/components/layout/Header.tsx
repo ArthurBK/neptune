@@ -53,7 +53,7 @@ function NavLink({
   )
 }
 
-export function Header({ isHomePage }: { isHomePage: boolean }) {
+export function Header({ isHomePage, showShop = true }: { isHomePage: boolean; showShop?: boolean }) {
   const variant = useHeaderVariant()
   const [isBurgerOpen, setIsBurgerOpen] = useState(false)
   const [isSearchOpen, setIsSearchOpen] = useState(false)
@@ -110,8 +110,8 @@ export function Header({ isHomePage }: { isHomePage: boolean }) {
     }
   }, [fetchCartCount])
 
-  const hasTransparentBg = isHomePage && variant === 'dark'
-  const lightText = hasTransparentBg
+  const hasTransparentBg = isHomePage && variant !== 'light'
+  const lightText = isHomePage && variant === 'dark'
   const headerClass = 'fixed left-0 right-0 top-0 z-50 w-full flex flex-col border-b shrink-0 transition-colors'
   const headerStyle: CSSProperties = {
     height: 'var(--header-height)',
@@ -286,7 +286,7 @@ export function Header({ isHomePage }: { isHomePage: boolean }) {
           </svg>
         </button>
         <nav className="flex min-h-full flex-col gap-3 px-6 pt-16 pb-12">
-          {BURGER_NAV_ITEMS.map((item) => (
+          {BURGER_NAV_ITEMS.filter((item) => showShop || item.href !== '/the-market').map((item) => (
             <NavLink
               key={item.href}
               href={item.href}

@@ -21,17 +21,19 @@ function LayoutShellInner({
   instagramUrl,
   cookieBannerLocale,
   isHomePage,
+  showShop,
 }: {
   children: React.ReactNode
   instagramUrl?: string | null
   cookieBannerLocale: 'en' | 'fr'
   isHomePage: boolean
+  showShop: boolean
 }) {
   const { isFooterSuppressed } = useFooterVisibility()
 
   return (
     <>
-      <Header isHomePage={isHomePage} />
+      <Header isHomePage={isHomePage} showShop={showShop} />
       <div className="flex-1 min-h-0 min-w-0 pt-(--header-height)">{children}</div>
       {!isFooterSuppressed && <Footer instagramUrl={instagramUrl} />}
       <CookieBanner locale={cookieBannerLocale} />
@@ -42,9 +44,11 @@ function LayoutShellInner({
 export function LayoutShell({
   children,
   instagramUrl,
+  showShop = true,
 }: {
   children: React.ReactNode
   instagramUrl?: string | null
+  showShop?: boolean
 }) {
   const pathname = usePathname()
   const segment = useSelectedLayoutSegment()
@@ -63,7 +67,7 @@ export function LayoutShell({
     <HeaderVariantProvider initialVariant={isHome ? 'dark' : 'light'}>
       <FooterVisibilityProvider>
         <NewsletterModalProvider>
-          <LayoutShellInner instagramUrl={instagramUrl} cookieBannerLocale={cookieBannerLocale} isHomePage={isHome}>
+          <LayoutShellInner instagramUrl={instagramUrl} cookieBannerLocale={cookieBannerLocale} isHomePage={isHome} showShop={showShop}>
             {children}
           </LayoutShellInner>
         </NewsletterModalProvider>

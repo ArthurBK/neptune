@@ -116,7 +116,7 @@ export function HomeScrollContainer({ sections, children }: HomeScrollContainerP
         ? Math.max(0, Math.floor((el.scrollTop + 1) / sectionHeight))
         : 0
       const isPhotoCarousel = sections[headerIndex]?.type === 'newsstandPhotos'
-      setHeaderVariant(headerIndex === 0 || isPhotoCarousel ? 'dark' : 'light')
+      setHeaderVariant(isPhotoCarousel ? 'transparent-light' : headerIndex === 0 ? 'dark' : 'light')
       if (sectionHeight <= 0) return
       const rawIndex = Math.round(el.scrollTop / sectionHeight)
       const index = Math.max(0, Math.min(rawIndex, totalSections - 1))
