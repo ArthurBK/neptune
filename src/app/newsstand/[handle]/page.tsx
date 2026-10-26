@@ -67,7 +67,7 @@ export default async function NewsstandProductPage({ params }: ProductPageProps)
         {/* Product info */}
         <div className="flex flex-col bg-white lg:justify-start">
           <div className="px-4 pt-4 pb-6 lg:pl-4 lg:pr-8 lg:pt-4 lg:pb-16">
-            <h1 className="font-serif text-xl md:text-2xl text-[#1A1A1A] uppercase tracking-wide">
+            <h1 className="font-serif text-lg md:text-xl text-[#1A1A1A] uppercase tracking-wide">
               {product.title}
             </h1>
 
@@ -78,7 +78,7 @@ export default async function NewsstandProductPage({ params }: ProductPageProps)
             {(product.description || product.descriptionHtml) && (
               <div className="mt-6 lg:mt-6">
                 <div
-                  className="font-header font-light antialiased text-black text-sm leading-relaxed [&_p]:mb-4 [&_p:last-child]:mb-0 [&_a]:underline [&_a]:hover:text-black [&_strong]:font-bold [&_b]:font-bold [&_em]:italic [&_i]:italic [&_ul]:list-disc [&_ul]:pl-5 [&_ul]:mb-4 [&_ol]:list-decimal [&_ol]:pl-5 [&_ol]:mb-4 [&_li]:mb-1"
+                  className="font-header font-light antialiased text-black text-[13px] leading-relaxed [&_p]:mb-4 [&_p:last-child]:mb-0 [&_a]:underline [&_a]:hover:text-black [&_strong]:font-bold [&_b]:font-bold [&_em]:italic [&_i]:italic [&_ul]:list-disc [&_ul]:pl-5 [&_ul]:mb-4 [&_ol]:list-decimal [&_ol]:pl-5 [&_ol]:mb-4 [&_li]:mb-1"
                   // biome-ignore lint/security/noDangerouslySetInnerHtml: Shopify product HTML from trusted source
                   dangerouslySetInnerHTML={{ __html: product.descriptionHtml }}
                 />
