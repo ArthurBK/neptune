@@ -104,7 +104,7 @@ export default async function InteriorsArticlePage({ params }: ArticlePageProps)
               <p>
                 Photography by{' '}
                 <Link
-                  href={`/contributors/photographer/${article.photographer.slug}`}
+                  href={article.photographer.profileHref}
                   className="text-black hover:underline underline-offset-2 transition-colors"
                 >
                   {formatPersonName(article.photographer.name)}
@@ -223,7 +223,7 @@ type ArticleData = {
   coverImage?: { asset?: { _ref: string }; alt?: string; caption?: unknown }
   body: unknown
   author?: { name: string; slug: string } | null
-  photographer?: { name: string; slug: string } | null
+  photographer?: { name: string; slug: string; profileHref: string } | null
   relatedArticles?: RelatedArticleForCard[]
   affiliateProducts?: ArticleAffiliateProduct[]
 }

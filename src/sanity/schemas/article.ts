@@ -307,7 +307,9 @@ export const article = defineType({
       name: 'photographer',
       title: 'Photographer',
       type: 'reference',
-      to: [{ type: 'photographer' }],
+      description: 'Select a contributor for the photography credit.',
+      // The legacy type is kept so existing credits remain valid.
+      to: [{ type: 'contributor' }, { type: 'photographer' }],
     }),
     defineField({
       name: 'publishedAt',

@@ -1,4 +1,4 @@
-import { BasketIcon, CogIcon, DocumentTextIcon, HomeIcon } from '@sanity/icons'
+import { BasketIcon, CogIcon, DocumentTextIcon, HomeIcon, UserIcon } from '@sanity/icons'
 import type { StructureResolver } from 'sanity/structure'
 
 // https://www.sanity.io/docs/structure-builder-cheat-sheet
@@ -14,20 +14,34 @@ export const structure: StructureResolver = (S) =>
 
     const otherDocItems = S.documentTypeListItems().filter((item) => {
       const id = item.getId()
-      return typeof id === 'string' && !topSingletonIds.includes(id)
+      return typeof id === 'string' && !topSingletonIds.includes(id) && id !== 'photographer'
     })
 
     // Prefer a stable, opinionated order for the main content types.
     const preferredOrder = [
       'article',
       'contributor',
-      'photographer',
       'affiliateProduct',
       'adBanner',
     ]
 
     const orderedPreferred = preferredOrder
-      .map((id) => otherDocItems.find((item) => item.getId() === id))
+      .map((id) => id === 'contributor'
+        ? S.listItem()
+            .id('contributor')
+            .title('Contributors')
+            .icon(UserIcon)
+            .child(
+              S.documentList()
+                .id('contributors')
+                .title('Contributors')
+                .apiVersion('2026-03-06')
+                // Keep existing photographer IDs and article references intact.
+                .filter('_type in ["contributor", "photographer"]')
+                .defaultOrdering([{ field: 'name', direction: 'asc' }])
+                .initialValueTemplates([S.initialValueTemplateItem('contributor')]),
+            )
+        : otherDocItems.find((item) => item.getId() === id))
       .filter((item): item is typeof otherDocItems[number] => Boolean(item))
 
     const remainingOthers = otherDocItems.filter((item) => {

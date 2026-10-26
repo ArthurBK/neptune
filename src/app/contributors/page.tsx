@@ -47,7 +47,9 @@ export default async function ContributorsPage() {
     })),
     ...photographers.map((p) => ({
       ...p,
-      bioText: p.bio?.trim() ?? '',
+      bioText: hasPortableTextContent(p.bioRichText)
+        ? portableTextToPlainText(p.bioRichText)
+        : p.bio?.trim() ?? '',
       href: `/contributors/photographer/${p.slug}` as const,
     })),
   ].sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: 'base' }))

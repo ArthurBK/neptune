@@ -54,10 +54,12 @@ type ArticleCardData = {
 export default async function ContributorPage({ params }: ContributorPageProps) {
   const { slug } = await params
 
-  const [contributor, articles, adBanner] = await Promise.all([
-    sanityFetch<ContributorData | null>(CONTRIBUTOR_BY_SLUG_QUERY, { slug }),
-    sanityFetch<ArticleCardData[]>(ARTICLES_BY_CONTRIBUTOR_QUERY, {
-      contributorSlug: slug,
+  const contributor = await sanityFetch<ContributorData | null>(CONTRIBUTOR_BY_SLUG_QUERY, { slug })
+  if (!contributor) notFound()
+
+  const [articlesRaw, adBanner] = await Promise.all([
+    sanityFetch<ArticleCardData[] | null>(ARTICLES_BY_CONTRIBUTOR_QUERY, {
+      contributorId: contributor._id,
     }),
     sanityFetch<{ image: { asset?: { _ref: string } }; linkUrl?: string | null; title?: string | null } | null>(
       AD_BANNER_BY_PLACEMENT_QUERY,
@@ -65,7 +67,7 @@ export default async function ContributorPage({ params }: ContributorPageProps) 
     ),
   ])
 
-  if (!contributor) notFound()
+  const articles = articlesRaw ?? []
 
   const portraitUrl = contributor.portrait?.asset
     ? urlFor(contributor.portrait).width(600).height(800).url()

@@ -182,7 +182,11 @@ export const ARTICLE_BY_SLUG_QUERY = `
   )][0] {
     ...,
     "author": author->{ name, "slug": slug.current, bio, portrait },
-    "photographer": photographer->{ name, "slug": slug.current },
+    "photographer": photographer->{
+      name,
+      "slug": slug.current,
+      "profileHref": select(_type == "contributor" => "/contributors/", "/contributors/photographer/") + slug.current
+    },
     "affiliateProducts": affiliateProducts[]->{ _id, title, brand, price, image, affiliateUrl },
     "relatedArticles": relatedArticles[]->{ _id, title, "slug": slug.current, "category": coalesce(category, categories[0]), categories, subcategory, coverImage, "author": author->{ name, "slug": slug.current } },
     "body": body[] {
@@ -219,7 +223,11 @@ export const ARTICLE_BY_STORY_SLUG_QUERY = `
   *[_type == "article" && slug.current == $slug] | order(publishedAt desc)[0] {
     ...,
     "author": author->{ name, "slug": slug.current, bio, portrait },
-    "photographer": photographer->{ name, "slug": slug.current },
+    "photographer": photographer->{
+      name,
+      "slug": slug.current,
+      "profileHref": select(_type == "contributor" => "/contributors/", "/contributors/photographer/") + slug.current
+    },
     "affiliateProducts": affiliateProducts[]->{ _id, title, brand, price, image, affiliateUrl },
     "relatedArticles": relatedArticles[]->{ _id, title, "slug": slug.current, "category": coalesce(category, categories[0]), categories, subcategory, coverImage, "author": author->{ name, "slug": slug.current } },
     "body": body[] {
@@ -404,16 +412,25 @@ export const PHOTOGRAPHERS_LIST_PAGE_QUERY = `
     name,
     "slug": slug.current,
     bio,
+    bioRichText[] {
+      ...,
+      markDefs[] { ... }
+    },
     "articleCount": count(*[_type == "article" && references(^._id)])
   }
 `
 
 export const PHOTOGRAPHER_BY_SLUG_QUERY = `
-  *[_type == "photographer" && slug.current == $slug][0] {
+  *[_type in ["photographer", "contributor"] && slug.current == $slug]
+  | order(_type == "photographer" desc)[0] {
     _id,
     name,
     "slug": slug.current,
     bio,
+    bioRichText[] {
+      ...,
+      markDefs[] { ... }
+    },
     portrait,
     location
   }
@@ -423,9 +440,12 @@ export const PHOTOGRAPHER_SLUGS_QUERY = `
   *[_type == "photographer"] { "slug": slug.current }
 `
 
-// Articles by contributor (author reference)
+// Contributions include writing and photography, without matching legacy people
+// that happen to share the same slug.
 export const ARTICLES_BY_CONTRIBUTOR_QUERY = `
-  *[_type == "article" && author->slug.current == $contributorSlug] | order(publishedAt desc) {
+  *[_type == "article" && (
+    author._ref == $contributorId || photographer._ref == $contributorId
+  )] | order(publishedAt desc) {
     _id,
     title,
     "slug": slug.current,
@@ -439,7 +459,7 @@ export const ARTICLES_BY_CONTRIBUTOR_QUERY = `
 `
 
 export const ARTICLES_BY_PHOTOGRAPHER_QUERY = `
-  *[_type == "article" && photographer->slug.current == $photographerSlug] | order(publishedAt desc) {
+  *[_type == "article" && photographer._ref == $photographerId] | order(publishedAt desc) {
     _id,
     title,
     "slug": slug.current,

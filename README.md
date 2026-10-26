@@ -50,6 +50,18 @@ So that content changes in [Sanity Studio](https://neptune-psi.vercel.app/studio
 
    Save. After the next publish in Studio, the revalidate API is called and the relevant pages refresh on the next request.
 
+## Contributors in Sanity
+
+The **Contributors** list contains both contributors and existing photographer
+documents. Create new photographers as contributors and select them in an
+article's **Photographer** field. Their profile includes photography and writing
+credits.
+
+The legacy `photographer` schema is retained for existing document IDs, references,
+and profile URLs. It shares the contributor editing fields, but its creation
+template and duplicate action are disabled. No content migration is required.
+Run `node --test tests/contributors.test.cjs` to check profile and credit compatibility.
+
 ## Newsletter (Mailchimp)
 
 The site newsletter form sends addresses to `POST /api/newsletter`, which saves

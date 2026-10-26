@@ -89,6 +89,7 @@ export async function POST(req: NextRequest) {
         revalidated.push('/contributors')
         break
       }
+      case 'photographer':
       case 'contributor': {
         revalidatePath('/contributors')
         revalidated.push('/contributors')
@@ -97,6 +98,8 @@ export async function POST(req: NextRequest) {
         if (slug) {
           revalidatePath(`/contributors/${slug}`)
           revalidated.push(`/contributors/${slug}`)
+          revalidatePath(`/contributors/photographer/${slug}`)
+          revalidated.push(`/contributors/photographer/${slug}`)
         }
         break
       }

@@ -20,11 +20,15 @@ export default defineConfig({
   projectId,
   dataset,
   // Add and edit the content schema in the './sanity/schemas' folder
-  schema,
+  schema: {
+    ...schema,
+    // Existing photographer documents remain editable; all new people are contributors.
+    templates: (templates) => templates.filter((template) => template.schemaType !== 'photographer'),
+  },
   document: {
     actions: (actions, {schemaType}) =>
-      schemaType === 'contributor'
-        ? actions.map((action) =>
+      schemaType === 'contributor' || schemaType === 'photographer'
+        ? actions.filter((action) => schemaType !== 'photographer' || action.action !== 'duplicate').map((action) =>
             action.action === 'delete' ? contributorDeleteAction(action) : action,
           )
         : actions,
