@@ -47,7 +47,7 @@ export function ImageCarouselNavigation({
         >
           <span
             aria-hidden="true"
-            className={`${vertical ? 'h-full w-px' : 'h-px w-full'} transition-colors ${index === current ? 'bg-black' : 'bg-black/40 group-hover:bg-black/70'}`}
+            className={`${vertical ? 'h-6 max-h-full w-px' : 'h-px w-full'} transition-colors ${index === current ? 'bg-black' : 'bg-black/40 group-hover:bg-black/70'}`}
           />
         </button>
       ))}
