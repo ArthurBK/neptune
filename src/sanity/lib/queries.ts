@@ -434,7 +434,7 @@ export const PHOTOGRAPHERS_LIST_PAGE_QUERY = `
 
 export const PHOTOGRAPHER_BY_SLUG_QUERY = `
   *[_type in ["photographer", "contributor"] && slug.current == $slug]
-  | order(_type == "photographer" desc)[0] {
+  | order((_type == "photographer") desc)[0] {
     _id,
     name,
     "slug": slug.current,
