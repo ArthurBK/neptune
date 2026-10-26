@@ -1,9 +1,21 @@
 import { defineQuery } from 'next-sanity'
 
+// Seed the persistent header before the homepage hydrates.
+export const HOME_MENU_QUERY = defineQuery(/* groq */ `
+  *[_type == "homePage" && _id == "homePage"][0].sections[0] {
+    menuAppearance { textColor, background },
+    "type": select(
+      _type == "homeNewsstandBlock" && count(photos[defined(image.asset) && defined(linkUrl) && defined(ctaLabel)]) > 0 => "newsstandPhotos",
+      _type
+    )
+  }
+`)
+
 // Home page sections (configurable in Studio)
 export const HOME_PAGE_QUERY = `
   *[_type == "homePage" && _id == "homePage"][0] {
     sections[] {
+      menuAppearance { textColor, background },
       _type,
       _key,
       _type == "homeArticleBlock" => {

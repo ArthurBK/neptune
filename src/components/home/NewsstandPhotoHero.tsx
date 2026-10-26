@@ -232,7 +232,7 @@ function PhotoCarousel({ slides, priority }: { slides: NewsstandPhotoSlide[]; pr
                 src={photo.imageUrl}
                 alt={photo.alt}
                 fill
-                sizes="(max-width: 767px) 135vw, 100vw"
+                sizes="(max-width: 767px) 230vw, 100vw"
                 loading="eager"
                 priority={priority && photoIndex === (multiple ? 1 : 0)}
                 onLoad={(event) => {
@@ -245,7 +245,7 @@ function PhotoCarousel({ slides, priority }: { slides: NewsstandPhotoSlide[]; pr
                   // Next Image fires onLoad after decoding the displayed image.
                   setLoadedSlides((loaded) => loaded.has(photoIndex) ? loaded : new Set(loaded).add(photoIndex))
                 }}
-                className="scale-[1.35] object-contain md:scale-100 md:object-cover"
+                className="scale-[2.3] object-contain md:scale-100 md:object-cover"
                 style={{ objectPosition: photo.objectPosition }}
               />
             </div>

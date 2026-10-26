@@ -110,8 +110,8 @@ export function Header({ isHomePage, showShop = true }: { isHomePage: boolean; s
     }
   }, [fetchCartCount])
 
-  const hasTransparentBg = isHomePage && variant !== 'light'
-  const lightText = isHomePage && variant === 'dark'
+  const hasTransparentBg = isHomePage && (variant === 'dark' || variant === 'transparent-light')
+  const lightText = isHomePage && (variant === 'dark' || variant === 'white-on-white')
   const headerClass = 'fixed left-0 right-0 top-0 z-50 w-full flex flex-col border-b shrink-0 transition-colors'
   const headerStyle: CSSProperties = {
     height: 'var(--header-height)',

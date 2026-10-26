@@ -32,6 +32,7 @@ type HomePageArticle = {
 }
 
 type HomePageSection = {
+  menuAppearance?: import('@/lib/headerAppearance').HeaderAppearance | null
   _type: string
   _key?: string
   article?: HomePageArticle
@@ -113,11 +114,13 @@ export default async function Home() {
     for (const block of homePage.sections) {
       if (block._type === 'homeVideoBlock' && block.videoUrl) {
         sections.push({
+          menuAppearance: block.menuAppearance,
           type: 'video',
           data: { videoUrl: block.videoUrl },
         })
       } else if (block._type === 'homeArticleBlock' && block.article) {
         sections.push({
+          menuAppearance: block.menuAppearance,
           type: 'article',
           data: {
             _id: block.article._id,
@@ -135,6 +138,7 @@ export default async function Home() {
         )
         if (articles.length === 3) {
           sections.push({
+            menuAppearance: block.menuAppearance,
             type: 'articleRow',
             data: {
               _key: block._key,
@@ -152,6 +156,7 @@ export default async function Home() {
           block.rightImage
         ) {
           sections.push({
+            menuAppearance: block.menuAppearance,
             type: 'image',
             data: {
               _key: block._key,
@@ -167,6 +172,7 @@ export default async function Home() {
           })
         } else if (block.image) {
           sections.push({
+            menuAppearance: block.menuAppearance,
             type: 'image',
             data: {
               _key: block._key,
@@ -180,6 +186,7 @@ export default async function Home() {
         }
       } else if (block._type === 'homeProductBlock' && block.product) {
         sections.push({
+          menuAppearance: block.menuAppearance,
           type: 'affiliateProduct',
           data: {
             _key: block._key,
@@ -192,7 +199,7 @@ export default async function Home() {
       } else if (block._type === 'homeNewsstandBlock') {
         const slides = getNewsstandPhotoSlides(block.photos)
         if (slides.length > 0) {
-          sections.push({ type: 'newsstandPhotos', data: { _key: block._key, slides } })
+          sections.push({ menuAppearance: block.menuAppearance, type: 'newsstandPhotos', data: { _key: block._key, slides } })
           continue
         }
         // Preserve the published section until its replacement photos are ready.
@@ -215,6 +222,7 @@ export default async function Home() {
           const featuredHandle = handles[0]
           if (products.length > 0 && featuredHandle) {
             sections.push({
+              menuAppearance: block.menuAppearance,
               type: 'newsstandProduct',
               data: {
                 products,
@@ -242,6 +250,7 @@ export default async function Home() {
             ? urlFor(rightNewsletterImage).width(1200).quality(95).format('webp').url()
             : null
         sections.push({
+          menuAppearance: block.menuAppearance,
           type: 'newsletter',
           data: {
             leftImageUrl: leftNewsletterImageUrl,

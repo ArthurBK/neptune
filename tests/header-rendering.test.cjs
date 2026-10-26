@@ -20,6 +20,7 @@ function load(relativePath, mocks = {}) {
 }
 
 const context = load('src/contexts/HeaderVariantContext.tsx')
+const appearance = load('src/lib/headerAppearance.ts')
 const { Header } = load('src/components/layout/Header.tsx', {
   '@/contexts/HeaderVariantContext': context,
   'next/image': { default: props => {
@@ -41,16 +42,17 @@ const { LayoutShell } = load('src/components/layout/LayoutShell.tsx', {
   './CookieBanner': { CookieBanner: () => null },
 })
 const { HomeScrollContainer } = load('src/components/home/HomeScrollContainer.tsx', {
+  '@/lib/headerAppearance': appearance,
   '@/contexts/HeaderVariantContext': context,
   './StickyHeroStack': { StickyHeroStack: () => React.createElement('div', null, 'Hero') },
 })
 
-function app(pathname, segment = null) {
+function app(pathname, segment = null, menuAppearance) {
   return React.createElement(PathnameContext.Provider, { value: pathname },
     React.createElement(LayoutRouterContext.Provider, { value: { parentTree: ['', { children: [segment ?? '__PAGE__', {}] }] } },
-      React.createElement(LayoutShell, null, segment === null
+      React.createElement(LayoutShell, { initialHomeHeaderVariant: appearance.getHeaderVariant(menuAppearance, 'video', 0) }, segment === null
         ? React.createElement(HomeScrollContainer, { sections: [
-          { type: 'video', data: { videoUrl: '/test.mp4' } },
+          { type: 'video', menuAppearance, data: { videoUrl: '/test.mp4' } },
           { type: 'newsstandPhotos', data: { slides: [] } },
           { type: 'image', data: {} },
         ] })
@@ -60,6 +62,30 @@ function app(pathname, segment = null) {
 function headerMarkup(html) {
   return html.match(/<header[^>]*>/)?.[0] ?? ''
 }
+
+test('menu text and background can be chosen independently in initial HTML', () => {
+  for (const textColor of ['black', 'white']) {
+    for (const background of ['white', 'transparent']) {
+      const html = renderToString(app('/', null, { textColor, background }))
+      const dom = new JSDOM(html)
+      assert.equal(dom.window.document.querySelector('header').style.background,
+        background === 'white' ? 'rgb(255, 255, 255)' : 'transparent')
+      assert.equal(dom.window.document.querySelector('button[aria-label="Open menu"]').classList.contains('text-white'), textColor === 'white')
+      for (const logo of dom.window.document.querySelectorAll('img[alt="Neptune"]')) {
+        assert.equal(logo.classList.contains('invert'), textColor === 'white')
+      }
+      dom.window.close()
+    }
+  }
+})
+
+test('automatic and partial settings preserve section defaults', () => {
+  assert.equal(appearance.getHeaderVariant(null, 'video', 0), 'dark')
+  assert.equal(appearance.getHeaderVariant({}, 'newsstandPhotos', 0), 'transparent-light')
+  assert.equal(appearance.getHeaderVariant({ textColor: 'auto', background: 'auto' }, 'image', 2), 'light')
+  assert.equal(appearance.getHeaderVariant({ textColor: 'white' }, 'newsstandPhotos', 1), 'dark')
+  assert.equal(appearance.getHeaderVariant({ background: 'white' }, 'newsstandPhotos', 1), 'light')
+})
 
 test('homepage HTML is transparent for both public and Vercel internal paths', () => {
   assert.match(headerMarkup(renderToString(app('/'))), /background:transparent/)
@@ -110,6 +136,17 @@ test('internal-path SSR hydrates without a white header; scrolling and navigatio
     background('rgb(255, 255, 255)')
     await React.act(async () => root.render(app('/index')))
     background('transparent')
+    await React.act(async () => root.render(app('/', null, { textColor: 'black', background: 'white' })))
+    background('rgb(255, 255, 255)')
+    assert.equal(document.querySelector('button[aria-label="Open menu"]').classList.contains('text-black'), true)
+    const configuredScroller = document.querySelector('.overflow-y-auto.w-full')
+    await React.act(async () => { configuredScroller.scrollTop = 800; configuredScroller.dispatchEvent(new window.Event('scroll')) })
+    background('transparent')
+    await React.act(async () => { configuredScroller.scrollTop = 0; configuredScroller.dispatchEvent(new window.Event('scroll')) })
+    background('rgb(255, 255, 255)')
+    await React.act(async () => root.render(app('/about', 'about', { textColor: 'white', background: 'transparent' })))
+    background('rgb(255, 255, 255)')
+    assert.equal(document.querySelector('button[aria-label="Open menu"]').classList.contains('text-black'), true)
     assert.deepEqual(errors, [])
   } finally {
     if (root) await React.act(async () => root.unmount())

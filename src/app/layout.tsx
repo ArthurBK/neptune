@@ -3,7 +3,8 @@ import { EB_Garamond, Inter } from 'next/font/google'
 import localFont from 'next/font/local'
 
 import { sanityFetch } from '@/sanity/lib/client'
-import { SITE_SETTINGS_QUERY } from '@/sanity/lib/queries'
+import { HOME_MENU_QUERY, SITE_SETTINGS_QUERY } from '@/sanity/lib/queries'
+import { getHeaderVariant, type HeaderAppearance } from '@/lib/headerAppearance'
 import { isMarketVisible } from '@/sanity/lib/market'
 import { LayoutShell } from '@/components/layout/LayoutShell'
 
@@ -75,16 +76,21 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode
 }>) {
-  const [settings, showShop] = await Promise.all([
+  const [settings, showShop, homeMenu] = await Promise.all([
     sanityFetch<{ instagramUrl?: string | null } | null>(SITE_SETTINGS_QUERY),
     isMarketVisible(),
+    sanityFetch<{ type?: string; menuAppearance?: HeaderAppearance | null } | null>(HOME_MENU_QUERY),
   ])
   const instagramUrl = settings?.instagramUrl ?? null
 
   return (
     <html lang="en" className={`${cormorantGaramond.variable} ${ebGaramond.variable} ${inter.variable} ${gillSans.variable}`} suppressHydrationWarning>
       <body className="min-h-dvh flex flex-col bg-white text-[#1A1A1A] antialiased font-sans font-light" suppressHydrationWarning>
-        <LayoutShell instagramUrl={instagramUrl} showShop={showShop}>{children}</LayoutShell>
+        <LayoutShell
+          instagramUrl={instagramUrl}
+          showShop={showShop}
+          initialHomeHeaderVariant={getHeaderVariant(homeMenu?.menuAppearance, homeMenu?.type, 0)}
+        >{children}</LayoutShell>
       </body>
     </html>
   )

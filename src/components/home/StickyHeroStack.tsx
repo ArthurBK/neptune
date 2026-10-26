@@ -179,7 +179,7 @@ const newsletterSubtitleComponents: PortableTextComponents = {
   marks: homeRichTextMarks,
 }
 
-export type HomeSection =
+type HomeSectionContent =
   | { type: 'article'; data: CarouselArticle }
   | {
     type: 'articleRow'
@@ -245,6 +245,10 @@ export type HomeSection =
     }
   }
   | { type: 'video'; data: { videoUrl: string } }
+
+export type HomeSection = HomeSectionContent & {
+  menuAppearance?: import('@/lib/headerAppearance').HeaderAppearance | null
+}
 
 interface StickyHeroStackProps {
   sections: HomeSection[]

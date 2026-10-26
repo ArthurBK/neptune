@@ -3,6 +3,7 @@
 import { usePathname, useSelectedLayoutSegment } from 'next/navigation'
 
 import { HeaderVariantProvider } from '@/contexts/HeaderVariantContext'
+import type { HeaderVariant } from '@/lib/headerAppearance'
 import { FooterVisibilityProvider, useFooterVisibility } from '@/contexts/FooterVisibilityContext'
 import { NewsletterModalProvider } from '@/contexts/NewsletterModalContext'
 
@@ -45,10 +46,12 @@ export function LayoutShell({
   children,
   instagramUrl,
   showShop = true,
+  initialHomeHeaderVariant = 'dark',
 }: {
   children: React.ReactNode
   instagramUrl?: string | null
   showShop?: boolean
+  initialHomeHeaderVariant?: HeaderVariant
 }) {
   const pathname = usePathname()
   const segment = useSelectedLayoutSegment()
@@ -64,7 +67,7 @@ export function LayoutShell({
   }
 
   return (
-    <HeaderVariantProvider initialVariant={isHome ? 'dark' : 'light'}>
+    <HeaderVariantProvider initialVariant={isHome ? initialHomeHeaderVariant : 'light'}>
       <FooterVisibilityProvider>
         <NewsletterModalProvider>
           <LayoutShellInner instagramUrl={instagramUrl} cookieBannerLocale={cookieBannerLocale} isHomePage={isHome} showShop={showShop}>

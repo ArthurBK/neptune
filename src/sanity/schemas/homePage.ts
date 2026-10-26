@@ -1,6 +1,7 @@
 import { DocumentTextIcon, ImageIcon } from '@sanity/icons'
 import { defineArrayMember, defineField, defineType } from 'sanity'
 import { pageIntroRichTextType } from './lib/pageIntroRichText'
+import { menuAppearanceField } from './lib/menuAppearance'
 
 // Home section: article reference
 const homeArticleBlock = defineType({
@@ -9,6 +10,7 @@ const homeArticleBlock = defineType({
   type: 'object',
   icon: DocumentTextIcon,
   fields: [
+    menuAppearanceField,
     defineField({
       name: 'article',
       title: 'Article',
@@ -30,6 +32,7 @@ const homeThreeArticlesBlock = defineType({
   type: 'object',
   icon: DocumentTextIcon,
   fields: [
+    menuAppearanceField,
     defineField({
       name: 'titleRichText',
       title: 'Title',
@@ -86,6 +89,7 @@ const homeImageBlock = defineType({
   type: 'object',
   icon: ImageIcon,
   fields: [
+    menuAppearanceField,
     defineField({
       name: 'layout',
       title: 'Layout',
@@ -219,6 +223,7 @@ const homeProductBlock = defineType({
   type: 'object',
   icon: ImageIcon,
   fields: [
+    menuAppearanceField,
     defineField({
       name: 'product',
       title: 'Product',
@@ -240,6 +245,7 @@ const homeVideoBlock = defineType({
   type: 'object',
   icon: ImageIcon,
   fields: [
+    menuAppearanceField,
     defineField({
       name: 'video',
       title: 'Video',
@@ -263,6 +269,7 @@ const homeNewsstandBlock = defineType({
   type: 'object',
   icon: ImageIcon,
   fields: [
+    menuAppearanceField,
     defineField({
       name: 'photos',
       title: 'Photos',
@@ -401,6 +408,7 @@ const homeNewsletterBlock = defineType({
   type: 'object',
   icon: ImageIcon,
   fields: [
+    menuAppearanceField,
     defineField({
       name: 'headline',
       title: 'Headline',

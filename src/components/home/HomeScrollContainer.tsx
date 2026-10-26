@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 
 import { useSetHeaderVariant } from '@/contexts/HeaderVariantContext'
+import { getHeaderVariant } from '@/lib/headerAppearance'
 
 import { StickyHeroStack } from './StickyHeroStack'
 
@@ -103,8 +104,7 @@ export function HomeScrollContainer({ sections, children }: HomeScrollContainerP
     }
   }, [])
 
-  // Use the section behind the header, rather than the rounded navigation index,
-  // so the first screen and photo carousels stay transparent throughout scrolling.
+  // Use the section behind the header rather than the rounded navigation index.
   useEffect(() => {
     const el = scrollRef.current
     if (!el) return
@@ -115,8 +115,8 @@ export function HomeScrollContainer({ sections, children }: HomeScrollContainerP
       const headerIndex = sectionHeight > 0
         ? Math.max(0, Math.floor((el.scrollTop + 1) / sectionHeight))
         : 0
-      const isPhotoCarousel = sections[headerIndex]?.type === 'newsstandPhotos'
-      setHeaderVariant(isPhotoCarousel ? 'transparent-light' : headerIndex === 0 ? 'dark' : 'light')
+      const section = sections[headerIndex]
+      setHeaderVariant(getHeaderVariant(section?.menuAppearance, section?.type, headerIndex))
       if (sectionHeight <= 0) return
       const rawIndex = Math.round(el.scrollTop / sectionHeight)
       const index = Math.max(0, Math.min(rawIndex, totalSections - 1))
