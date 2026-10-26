@@ -29,6 +29,15 @@ export function ProductCard({
   const isLargeCompact = compact && compactSize === 'large'
   const imageWidth = isLargeCompact ? 300 : compact ? 240 : size === 'small' ? 280 : 400
   const imageHeight = isLargeCompact ? 400 : compact ? 320 : size === 'small' ? 373 : 533
+  const frameAspectRatio = 3 / 4
+  const coverAspectRatio = featuredImage?.width && featuredImage?.height
+    ? featuredImage.width / featuredImage.height
+    : frameAspectRatio
+  // Match the cover's visible footprint within the bottom-aligned 3:4 card.
+  const coverStyle = {
+    width: `${Math.min(1, coverAspectRatio / frameAspectRatio) * 100}%`,
+    height: `${Math.min(1, frameAspectRatio / coverAspectRatio) * 100}%`,
+  }
   const imageSizes = compact
     ? isLargeCompact
       ? '(max-width: 640px) 325px, 300px'
@@ -53,7 +62,10 @@ export function ProductCard({
       <Link href={`/newsstand/${handle}`} className="block overflow-hidden">
         <div className="relative aspect-3/4 overflow-hidden bg-white">
           {featuredImage?.url ? (
-            <>
+            <div
+              className="absolute bottom-0 left-1/2 -translate-x-1/2 overflow-hidden"
+              style={coverStyle}
+            >
               <Image
                 src={featuredImage.url}
                 alt={featuredImage.altText ?? title}
@@ -70,10 +82,10 @@ export function ProductCard({
                   width={imageWidth}
                   height={imageHeight}
                   sizes={imageSizes}
-                  className="absolute inset-0 w-full h-full object-contain object-bottom opacity-0 transition-opacity duration-300 ease-out md:group-hover:opacity-100 md:group-focus-within:opacity-100"
+                  className="absolute inset-0 w-full h-full object-cover opacity-0 transition-opacity duration-300 ease-out md:group-hover:opacity-100 md:group-focus-within:opacity-100"
                 />
               )}
-            </>
+            </div>
           ) : (
             <div className="w-full h-full flex items-center justify-center text-[#1A1A1A] text-sm">
               No image

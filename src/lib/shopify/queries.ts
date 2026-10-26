@@ -6,7 +6,7 @@ const PRODUCT_FIELDS = `
   priceRange {
     minVariantPrice { amount currencyCode }
   }
-  featuredImage { url altText }
+  featuredImage { url altText width height }
   images(first: 2) {
     edges {
       node { url altText }
