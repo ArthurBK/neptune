@@ -2,6 +2,7 @@
 
 import Image from 'next/image'
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { ImageCarouselNavigation } from './ImageCarouselNavigation'
 
 interface CarouselImage {
   url: string
@@ -130,7 +131,7 @@ export function VerticalImageCarousel({
         <div
           className="relative h-full min-w-0 overflow-hidden"
           style={{
-            width: `min(calc(100% - ${total > 1 ? '2rem' : '0rem'}), calc((100vh - var(--header-height) - 1rem) * ${widestImageAspectRatio}))`,
+            width: `min(calc(100% - ${total > 1 ? '3.5rem' : '0rem'}), calc((100vh - var(--header-height) - 1rem) * ${widestImageAspectRatio}))`,
           }}
         >
           {/* Slides */}
@@ -160,74 +161,14 @@ export function VerticalImageCarousel({
             ))}
           </div>
 
-          {/* Up / Down arrows */}
-          {total > 1 && (
-            <>
-              <button
-                type="button"
-                onClick={prev}
-                disabled={current === 0}
-                className="absolute top-3 left-1/2 z-10 -translate-x-1/2 rounded-full p-1.5 text-[#6B6B6B] transition-colors hover:text-[#1A1A1A] disabled:opacity-0"
-                aria-label="Previous image"
-              >
-                <svg
-                  width="20"
-                  height="20"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="1.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  aria-hidden
-                >
-                  <path d="M18 15l-6-6-6 6" />
-                </svg>
-              </button>
-              <button
-                type="button"
-                onClick={next}
-                disabled={current === total - 1}
-                className="absolute bottom-3 left-1/2 z-10 -translate-x-1/2 rounded-full p-1.5 text-[#6B6B6B] transition-colors hover:text-[#1A1A1A] disabled:opacity-0"
-                aria-label="Next image"
-              >
-                <svg
-                  width="20"
-                  height="20"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="1.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  aria-hidden
-                >
-                  <path d="M6 9l6 6 6-6" />
-                </svg>
-              </button>
-            </>
-          )}
         </div>
 
-        {/* Vertical dots */}
-        {total > 1 && (
-          <div className="z-10 flex h-full flex-col justify-center gap-2">
-            {images.map((img, i) => (
-              <button
-                key={img.url}
-                type="button"
-                onClick={() => goTo(i)}
-                className={`rounded-full transition-all duration-300 ${
-                  i === current
-                    ? 'h-1.5 w-1.5 bg-[#1A1A1A]'
-                    : 'h-1.5 w-1.5 bg-[#1A1A1A]/30 hover:bg-[#1A1A1A]/60'
-                }`}
-                aria-label={`Go to image ${i + 1}`}
-                aria-current={i === current}
-              />
-            ))}
-          </div>
-        )}
+        <ImageCarouselNavigation
+          total={total}
+          current={current}
+          onSelect={goTo}
+          vertical
+        />
       </div>
 
     </div>

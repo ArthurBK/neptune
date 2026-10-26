@@ -2,6 +2,7 @@
 
 import Image from 'next/image'
 import { useCallback, useRef, useState } from 'react'
+import { ImageCarouselNavigation } from './ImageCarouselNavigation'
 
 interface CarouselImage {
   url: string
@@ -74,75 +75,7 @@ export function HorizontalImageCarousel({
         ))}
       </div>
 
-      {/* Dots */}
-      {total > 1 && (
-        <div className="mt-2 flex justify-center gap-2 sm:mt-4">
-          {images.map((_, i) => (
-            <button
-              key={images[i].url}
-              type="button"
-              onClick={() => goTo(i)}
-              className={`h-1.5 w-1.5 rounded-full transition-all duration-300 ${
-                i === current
-                  ? 'bg-[#1A1A1A]'
-                  : 'bg-[#1A1A1A]/30 hover:bg-[#1A1A1A]/60'
-              }`}
-              aria-label={`Go to image ${i + 1}`}
-              aria-current={i === current}
-            />
-          ))}
-        </div>
-      )}
-
-      {/* Prev / Next */}
-      {total > 1 && (
-        <>
-          <button
-            type="button"
-            onClick={() => goTo(current - 1)}
-            disabled={current === 0}
-            className="absolute left-2 top-1/2 z-10 -translate-y-1/2 rounded-full p-2 text-[#6B6B6B] transition-colors hover:text-[#1A1A1A] disabled:opacity-0"
-            aria-label="Previous image"
-          >
-            <svg
-              width="20"
-              height="20"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              aria-hidden
-            >
-              <title>Previous</title>
-              <path d="M15 18l-6-6 6-6" />
-            </svg>
-          </button>
-          <button
-            type="button"
-            onClick={() => goTo(current + 1)}
-            disabled={current === total - 1}
-            className="absolute right-2 top-1/2 z-10 -translate-y-1/2 rounded-full p-2 text-[#6B6B6B] transition-colors hover:text-[#1A1A1A] disabled:opacity-0"
-            aria-label="Next image"
-          >
-            <svg
-              width="20"
-              height="20"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              aria-hidden
-            >
-              <title>Next</title>
-              <path d="M9 18l6-6-6-6" />
-            </svg>
-          </button>
-        </>
-      )}
+      <ImageCarouselNavigation total={total} current={current} onSelect={goTo} />
     </div>
   )
 }
