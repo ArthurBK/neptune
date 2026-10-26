@@ -25,14 +25,20 @@ function NewsletterModalInner({ children }: { children: ReactNode }) {
   const [isOpen, setIsOpen] = useState(false)
   const [email, setEmail] = useState('')
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
+  const [message, setMessage] = useState('')
 
-  const openModal = useCallback(() => setIsOpen(true), [])
+  const openModal = useCallback(() => {
+    setStatus((current) => current === 'loading' ? current : 'idle')
+    setMessage('')
+    setIsOpen(true)
+  }, [])
   const closeModal = useCallback(() => setIsOpen(false), [])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!email.trim()) return
+    if (!email.trim() || status === 'loading') return
     setStatus('loading')
+    setMessage('')
     try {
       const res = await fetch('/api/newsletter', {
         method: 'POST',
@@ -42,12 +48,15 @@ function NewsletterModalInner({ children }: { children: ReactNode }) {
       const data = await res.json()
       if (res.ok && data.success) {
         setStatus('success')
+        setMessage(data.message || 'Thank you for subscribing.')
         setEmail('')
       } else {
         setStatus('error')
+        setMessage(data.error || 'Something went wrong. Please try again.')
       }
     } catch {
       setStatus('error')
+      setMessage('Unable to connect. Please try again.')
     }
   }
 
@@ -97,13 +106,18 @@ function NewsletterModalInner({ children }: { children: ReactNode }) {
             </h2>
 
             {status === 'success' ? (
-              <p className="mt-6 text-center text-black">
-                Thank you for subscribing.
+              <p role="status" className="mt-6 text-center text-black">
+                {message}
               </p>
             ) : (
               <form onSubmit={handleSubmit} className="mt-8">
                 <input
                   type="email"
+                  name="email"
+                  autoComplete="email"
+                  aria-label="Email address"
+                  aria-describedby={status === 'error' ? 'newsletter-error' : undefined}
+                  maxLength={254}
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="your@email.com"
@@ -111,6 +125,11 @@ function NewsletterModalInner({ children }: { children: ReactNode }) {
                   disabled={status === 'loading'}
                   className="w-full py-3 border-b-2 border-black bg-transparent text-black placeholder:text-black/70 focus:outline-none focus:border-black disabled:opacity-60"
                 />
+                {status === 'error' && (
+                  <p id="newsletter-error" role="alert" className="mt-4 text-sm text-red-700">
+                    {message}
+                  </p>
+                )}
                 <button
                   type="submit"
                   disabled={status === 'loading'}

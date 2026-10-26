@@ -50,6 +50,29 @@ So that content changes in [Sanity Studio](https://neptune-psi.vercel.app/studio
 
    Save. After the next publish in Studio, the revalidate API is called and the relevant pages refresh on the next request.
 
+## Newsletter (Mailchimp)
+
+The site newsletter form sends addresses to `POST /api/newsletter`, which saves
+them in a Mailchimp audience using the [member upsert API](https://mailchimp.com/developer/marketing/api/lists/members/upsert-member).
+
+Configure these **server-only** variables in `.env.local` and in the Vercel
+environments where the form should work, then restart/redeploy:
+
+- `MAILCHIMP_API_KEY`: a Mailchimp API key, including its data center suffix
+  (for example `-us6`). Never use a `NEXT_PUBLIC_` prefix for this key.
+- `MAILCHIMP_AUDIENCE_ID`: the ID of the audience that should receive signups.
+
+New contacts are saved as `subscribed`. Repeated submissions use the same member
+record; existing subscription statuses are preserved. Pending contacts are told
+to check their inbox. Unsubscribed, cleaned, or transactional contacts receive an
+error and must use Mailchimp's resubscription process; the endpoint does not
+silently reactivate them. The form only requests an email, so other required
+audience merge fields are skipped. Credentials and addresses are not logged.
+
+Without configuration, the endpoint returns an error instead of a false success.
+Run the isolated integration tests with `node --test tests/newsletter.test.cjs`.
+They mock Mailchimp and do not add real contacts or send emails.
+
 ## Deploy on Vercel
 
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
