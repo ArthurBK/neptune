@@ -132,11 +132,11 @@ export default async function Home() {
             author: block.article.author,
           },
         })
-      } else if (block._type === 'homeThreeArticlesBlock' && block.articles?.length) {
-        const articles = block.articles.filter((article): article is HomePageArticle =>
+      } else if (block._type === 'homeThreeArticlesBlock') {
+        const articles = (block.articles ?? []).filter((article): article is HomePageArticle =>
           Boolean(article)
         )
-        if (articles.length === 3) {
+        if (articles.length > 0 || block.heroArticle) {
           sections.push({
             menuAppearance: block.menuAppearance,
             type: 'articleRow',

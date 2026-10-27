@@ -71,7 +71,7 @@ function uniqueRefs(ids: string[]) {
       seen.add(id)
       return true
     })
-    .map((id) => ({ _type: 'reference', _ref: id }))
+    .map((id) => ({ _type: 'reference', _weak: true, _ref: id }))
 }
 
 async function run() {

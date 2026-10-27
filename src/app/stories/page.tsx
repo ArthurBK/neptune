@@ -1,7 +1,8 @@
+import { notFound } from 'next/navigation'
 import { sanityFetch } from '@/sanity/lib/client'
+import { isStoriesVisible } from '@/sanity/lib/stories'
 import {
   AD_BANNER_BY_PLACEMENT_QUERY,
-  ALL_STORIES_QUERY,
   STORIES_PAGE_QUERY,
 } from '@/sanity/lib/queries'
 
@@ -31,26 +32,14 @@ type ArticleCardData = {
 type StoriesPageData = {
   description?: string | null
   introText?: PageIntroPortableText | null
-  articles?: ArticleCardData[] | null
+  articles?: (ArticleCardData | null)[] | null
   image?: { asset?: { _ref: string }; alt?: string; caption?: unknown } | null
 }
 
-function orderedStories(allStories: ArticleCardData[], prioritizedStories: ArticleCardData[] | null | undefined) {
-  const byId = new Set<string>()
-  const ordered: ArticleCardData[] = []
-
-  for (const article of [...(prioritizedStories ?? []), ...allStories]) {
-    if (!article?._id || byId.has(article._id)) continue
-    byId.add(article._id)
-    ordered.push(article)
-  }
-
-  return ordered
-}
-
 export default async function StoriesPage() {
-  const [articles, storiesPage, adBanner] = await Promise.all([
-    sanityFetch<ArticleCardData[]>(ALL_STORIES_QUERY),
+  if (!(await isStoriesVisible())) notFound()
+
+  const [storiesPage, adBanner] = await Promise.all([
     sanityFetch<StoriesPageData | null>(STORIES_PAGE_QUERY),
     sanityFetch<{
       image: { asset?: { _ref: string } }
@@ -59,7 +48,9 @@ export default async function StoriesPage() {
     } | null>(AD_BANNER_BY_PLACEMENT_QUERY, { placement: 'category-top' }),
   ])
 
-  const displayArticles = orderedStories(articles ?? [], storiesPage?.articles)
+  const displayArticles = (storiesPage?.articles ?? []).filter(
+    (article): article is ArticleCardData => Boolean(article?._id && article.slug)
+  )
   const introText = hasPortableTextContent(storiesPage?.introText) ? storiesPage.introText : null
   const legacyIntroText = !introText ? storiesPage?.description?.trim() : null
 
@@ -112,7 +103,7 @@ export default async function StoriesPage() {
             ))
           ) : (
             <p className="text-center text-base text-[#6B6B6B] py-16">
-              No articles yet. Add content in Sanity Studio.
+              No stories yet.
             </p>
           )}
         </section>

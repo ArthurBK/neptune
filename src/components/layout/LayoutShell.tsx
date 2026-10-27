@@ -4,6 +4,7 @@ import { usePathname, useSelectedLayoutSegment } from 'next/navigation'
 
 import { HeaderVariantProvider } from '@/contexts/HeaderVariantContext'
 import type { HeaderVariant } from '@/lib/headerAppearance'
+import { StoriesVisibilityProvider } from '@/components/shared/StoriesPageLink'
 import { FooterVisibilityProvider, useFooterVisibility } from '@/contexts/FooterVisibilityContext'
 import { NewsletterModalProvider } from '@/contexts/NewsletterModalContext'
 
@@ -23,18 +24,20 @@ function LayoutShellInner({
   cookieBannerLocale,
   isHomePage,
   showShop,
+  showStories,
 }: {
   children: React.ReactNode
   instagramUrl?: string | null
   cookieBannerLocale: 'en' | 'fr'
   isHomePage: boolean
   showShop: boolean
+  showStories: boolean
 }) {
   const { isFooterSuppressed } = useFooterVisibility()
 
   return (
     <>
-      <Header isHomePage={isHomePage} showShop={showShop} />
+      <Header isHomePage={isHomePage} showShop={showShop} showStories={showStories} />
       <div className="flex-1 min-h-0 min-w-0 pt-(--header-height)">{children}</div>
       {!isFooterSuppressed && <Footer instagramUrl={instagramUrl} />}
       <CookieBanner locale={cookieBannerLocale} />
@@ -46,11 +49,13 @@ export function LayoutShell({
   children,
   instagramUrl,
   showShop = true,
+  showStories = true,
   initialHomeHeaderVariant = 'dark',
 }: {
   children: React.ReactNode
   instagramUrl?: string | null
   showShop?: boolean
+  showStories?: boolean
   initialHomeHeaderVariant?: HeaderVariant
 }) {
   const pathname = usePathname()
@@ -67,14 +72,16 @@ export function LayoutShell({
   }
 
   return (
-    <HeaderVariantProvider initialVariant={isHome ? initialHomeHeaderVariant : 'light'}>
-      <FooterVisibilityProvider>
-        <NewsletterModalProvider>
-          <LayoutShellInner instagramUrl={instagramUrl} cookieBannerLocale={cookieBannerLocale} isHomePage={isHome} showShop={showShop}>
-            {children}
-          </LayoutShellInner>
-        </NewsletterModalProvider>
-      </FooterVisibilityProvider>
-    </HeaderVariantProvider>
+    <StoriesVisibilityProvider value={showStories}>
+      <HeaderVariantProvider initialVariant={isHome ? initialHomeHeaderVariant : 'light'}>
+        <FooterVisibilityProvider>
+          <NewsletterModalProvider>
+            <LayoutShellInner instagramUrl={instagramUrl} cookieBannerLocale={cookieBannerLocale} isHomePage={isHome} showShop={showShop} showStories={showStories}>
+              {children}
+            </LayoutShellInner>
+          </NewsletterModalProvider>
+        </FooterVisibilityProvider>
+      </HeaderVariantProvider>
+    </StoriesVisibilityProvider>
   )
 }

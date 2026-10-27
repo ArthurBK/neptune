@@ -12,6 +12,7 @@ import { articleTitleSingleLine } from '@/lib/articleTitle'
 import { getOptionalTextStyleFontClass } from '@/lib/textStyleFonts'
 import { urlFor } from '@/sanity/lib/image'
 import { NewsstandCta } from '@/components/shared/NewsstandCta'
+import { StoriesPageLink } from '@/components/shared/StoriesPageLink'
 import { NewsstandPhotoHero, type NewsstandPhotoSlide } from './NewsstandPhotoHero'
 
 export interface CarouselArticle {
@@ -781,12 +782,11 @@ function ArticleSplitContent({
         {/* Right: text */}
         <div className="flex-[0.65] md:flex-1 min-w-0 flex flex-col items-center md:items-start text-center md:text-left justify-start md:justify-center px-4 md:px-10 lg:px-16 pt-2 pb-1 md:py-12">
           {categoryHref && (
-            <Link
-              href={categoryHref}
+            <StoriesPageLink
               className="font-header font-extrabold text-[12px] tracking-[0.25em] uppercase text-[color:var(--neptune-logo-red)] hover:underline underline-offset-2 transition-colors mb-0"
             >
               {categoryLabel ?? 'Cover Story'}
-            </Link>
+            </StoriesPageLink>
           )}
           <Link href={href} className="group">
             <h2 className="max-w-full whitespace-pre-line break-words font-serif text-2xl font-bold leading-[0.98] md:leading-[1.22] tracking-wide text-black group-hover:opacity-80 group-hover:underline underline-offset-4 transition-opacity sm:text-3xl md:text-4xl max-lg:landscape:text-xl max-lg:landscape:leading-tight [-webkit-text-size-adjust:100%] [text-size-adjust:100%]">
@@ -926,12 +926,11 @@ function HomeArticleTile({
       <div className={`shrink-0 pt-1.5 text-center sm:pt-2 ${isHero ? 'md:pt-2' : 'md:pt-3'}`}>
         <div className="min-h-[11px] min-w-0 sm:min-h-[12px] md:min-h-[14px]">
           {article.subcategory ? (
-            <Link
-              href="/stories"
+            <StoriesPageLink
               className="block truncate font-header text-[7px] font-extrabold uppercase text-[color:var(--neptune-logo-red)] underline-offset-2 hover:underline sm:text-[8px] md:text-[9px]"
             >
               {article.subcategory}
-            </Link>
+            </StoriesPageLink>
           ) : null}
         </div>
         <Link href={href} className="block min-w-0">

@@ -53,7 +53,11 @@ function NavLink({
   )
 }
 
-export function Header({ isHomePage, showShop = true }: { isHomePage: boolean; showShop?: boolean }) {
+export function Header({ isHomePage, showShop = true, showStories = true }: {
+  isHomePage: boolean
+  showShop?: boolean
+  showStories?: boolean
+}) {
   const variant = useHeaderVariant()
   const [isBurgerOpen, setIsBurgerOpen] = useState(false)
   const [isSearchOpen, setIsSearchOpen] = useState(false)
@@ -155,7 +159,7 @@ export function Header({ isHomePage, showShop = true }: { isHomePage: boolean; s
               />
             </button>
             <div className="hidden lg:flex items-center gap-4 md:gap-5">
-              {DESKTOP_NAV_ITEMS.map((item) => (
+              {DESKTOP_NAV_ITEMS.filter((item) => showStories || item.href !== '/stories').map((item) => (
                 <NavLink
                   key={item.href}
                   href={item.href}
@@ -286,7 +290,9 @@ export function Header({ isHomePage, showShop = true }: { isHomePage: boolean; s
           </svg>
         </button>
         <nav className="flex min-h-full flex-col gap-3 px-6 pt-16 pb-12">
-          {BURGER_NAV_ITEMS.filter((item) => showShop || item.href !== '/the-market').map((item) => (
+          {BURGER_NAV_ITEMS.filter((item) =>
+            (showShop || item.href !== '/the-market') && (showStories || item.href !== '/stories')
+          ).map((item) => (
             <NavLink
               key={item.href}
               href={item.href}

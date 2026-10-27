@@ -10,18 +10,27 @@ export const storiesPage = defineType({
   icon: DocumentTextIcon,
   fields: [
     defineField({
+      name: 'isVisible',
+      title: 'Show Stories page',
+      type: 'boolean',
+      initialValue: true,
+      description:
+        'Turn off to hide Stories from the site navigation and disable access to the Stories listing page. Publish to apply changes. Existing pages remain visible until explicitly turned off.',
+    }),
+    defineField({
       name: 'articles',
-      title: 'Stories - articles (drag to prioritize)',
+      title: 'Stories - articles (drag to reorder)',
       type: 'array',
       of: [
         defineArrayMember({
           type: 'reference',
+          weak: true,
           to: [{ type: 'article' }],
         }),
       ],
       validation: (rule) => rule.unique(),
       description:
-        'Optional. Drag to prioritize stories on /stories. Articles not listed here are appended by publication date.',
+        'Only the articles selected here appear on /stories. Drag to set their order. Leave empty to show no articles. Publish to apply changes.',
     }),
     defineField({
       name: 'introText',

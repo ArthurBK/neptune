@@ -3,10 +3,11 @@
  * we do not filter by `article.categories` — the list is the source of truth.
  */
 export function orderedCategoryPageArticles<T extends { _id?: unknown; slug?: unknown }>(
-  list: T[] | null | undefined
+  list: Array<T | null> | null | undefined
 ): T[] {
   return (list ?? []).filter(
     (item): item is T =>
+      item !== null &&
       typeof item._id === 'string' &&
       typeof item.slug === 'string' &&
       item.slug.length > 0

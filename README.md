@@ -50,6 +50,23 @@ So that content changes in [Sanity Studio](https://neptune-psi.vercel.app/studio
 
    Save. After the next publish in Studio, the revalidate API is called and the relevant pages refresh on the next request.
 
+## Unpublishing articles
+
+Use **Unpublish** on a published article to keep it as a draft while removing it
+from the public site. Article references in categories, Stories, homepage sections,
+and related articles are weak, so they retain their ordering without blocking
+unpublishing. Republishing restores the article in those placements.
+
+The Studio's article Unpublish and Delete actions automatically upgrade existing
+references before opening the native Sanity action. They preserve native permissions,
+confirmation, and draft handling. Missing references are filtered from public lists.
+
+To audit all older references without modifying data, run
+`node --env-file=.env.local scripts/weaken-article-references.mjs`.
+The optional `--apply` mode saves a backup and uses revision-guarded patches; deploy
+the updated frontend before running it. Normal Studio use does not require this migration.
+Run `node --test tests/article-unpublish.test.mjs` to check this workflow.
+
 ## Contributors in Sanity
 
 The **Contributors** list contains both contributors and existing photographer

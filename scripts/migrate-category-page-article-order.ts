@@ -25,7 +25,7 @@ async function articleRefsForCategory(category: keyof typeof CATEGORY_FIELDS) {
     { category }
   )
 
-  return rows.map((row) => ({ _type: 'reference', _ref: row._id }))
+  return rows.map((row) => ({ _type: 'reference', _weak: true, _ref: row._id }))
 }
 
 async function run() {

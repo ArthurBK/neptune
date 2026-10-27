@@ -18,9 +18,15 @@ const PHOTOGRAPHER_CREDIT = /* groq */ `coalesce(
   select(defined(photographerName) => { "name": photographerName, "slug": null, "profileHref": null })
 )`
 
+// Keep the initial header and rendered sections aligned when an article is unpublished.
+const VISIBLE_HOME_SECTION = /* groq */ `
+  (_type != "homeArticleBlock" || defined(article->_id)) &&
+  (_type != "homeThreeArticlesBlock" || defined(heroArticle->_id) || count(articles[defined(@->_id)]) > 0)
+`
+
 // Seed the persistent header before the homepage hydrates.
 export const HOME_MENU_QUERY = defineQuery(/* groq */ `
-  *[_type == "homePage" && _id == "homePage"][0].sections[0] {
+  *[_type == "homePage" && _id == "homePage"][0].sections[${VISIBLE_HOME_SECTION}][0] {
     menuAppearance { textColor, background },
     "type": select(
       _type == "homeNewsstandBlock" && count(photos[defined(image.asset) && defined(linkUrl) && defined(ctaLabel)]) > 0 => "newsstandPhotos",
@@ -32,7 +38,7 @@ export const HOME_MENU_QUERY = defineQuery(/* groq */ `
 // Home page sections (configurable in Studio)
 export const HOME_PAGE_QUERY = `
   *[_type == "homePage" && _id == "homePage"][0] {
-    sections[] {
+    sections[${VISIBLE_HOME_SECTION}] {
       menuAppearance { textColor, background },
       _type,
       _key,
@@ -64,7 +70,7 @@ export const HOME_PAGE_QUERY = `
           coverImage,
           "author": ${AUTHOR_CREDIT}
         },
-        "articles": articles[]->{
+        "articles": articles[defined(@->_id)]->{
           _id,
           title,
           "slug": slug.current,
@@ -157,6 +163,10 @@ export const ALL_STORIES_QUERY = `
   }
 `
 
+export const STORIES_VISIBILITY_QUERY = defineQuery(/* groq */ `
+  coalesce(*[_type == "storiesPage" && _id == "storiesPage"][0].isVisible, true)
+`)
+
 export const STORIES_PAGE_QUERY = `
   *[_type == "storiesPage" && _id == "storiesPage"][0] {
     description,
@@ -164,7 +174,7 @@ export const STORIES_PAGE_QUERY = `
       ...,
       markDefs[] { ... }
     },
-    "articles": articles[]->{
+    "articles": articles[defined(@->_id)]->{
       _id,
       title,
       "slug": slug.current,
@@ -214,7 +224,7 @@ export const ARTICLE_BY_SLUG_QUERY = `
     "author": ${AUTHOR_DETAILS_CREDIT},
     "photographer": ${PHOTOGRAPHER_CREDIT},
     "affiliateProducts": affiliateProducts[]->{ _id, title, brand, price, image, affiliateUrl },
-    "relatedArticles": relatedArticles[]->{ _id, title, "slug": slug.current, "category": coalesce(category, categories[0]), categories, subcategory, coverImage, "author": ${AUTHOR_CREDIT} },
+    "relatedArticles": relatedArticles[defined(@->_id)]->{ _id, title, "slug": slug.current, "category": coalesce(category, categories[0]), categories, subcategory, coverImage, "author": ${AUTHOR_CREDIT} },
     "body": body[] {
       ...,
       _type == "pteImageBlock" => {
@@ -251,7 +261,7 @@ export const ARTICLE_BY_STORY_SLUG_QUERY = `
     "author": ${AUTHOR_DETAILS_CREDIT},
     "photographer": ${PHOTOGRAPHER_CREDIT},
     "affiliateProducts": affiliateProducts[]->{ _id, title, brand, price, image, affiliateUrl },
-    "relatedArticles": relatedArticles[]->{ _id, title, "slug": slug.current, "category": coalesce(category, categories[0]), categories, subcategory, coverImage, "author": ${AUTHOR_CREDIT} },
+    "relatedArticles": relatedArticles[defined(@->_id)]->{ _id, title, "slug": slug.current, "category": coalesce(category, categories[0]), categories, subcategory, coverImage, "author": ${AUTHOR_CREDIT} },
     "body": body[] {
       ...,
       _type == "pteImageBlock" => {
@@ -502,7 +512,7 @@ export const CATEGORY_PAGE_QUERY = `
     gardensDescription,
     fashionDescription,
     travelDescription,
-    "interiorsArticles": interiorsArticles[]->{
+    "interiorsArticles": interiorsArticles[defined(@->_id)]->{
       _id,
       title,
       "slug": slug.current,
@@ -512,7 +522,7 @@ export const CATEGORY_PAGE_QUERY = `
       coverImage,
       "author": ${AUTHOR_CREDIT}
     },
-    "artsArticles": artsArticles[]->{
+    "artsArticles": artsArticles[defined(@->_id)]->{
       _id,
       title,
       "slug": slug.current,
@@ -522,7 +532,7 @@ export const CATEGORY_PAGE_QUERY = `
       coverImage,
       "author": ${AUTHOR_CREDIT}
     },
-    "gardensArticles": gardensArticles[]->{
+    "gardensArticles": gardensArticles[defined(@->_id)]->{
       _id,
       title,
       "slug": slug.current,
@@ -532,7 +542,7 @@ export const CATEGORY_PAGE_QUERY = `
       coverImage,
       "author": ${AUTHOR_CREDIT}
     },
-    "fashionArticles": fashionArticles[]->{
+    "fashionArticles": fashionArticles[defined(@->_id)]->{
       _id,
       title,
       "slug": slug.current,
@@ -542,7 +552,7 @@ export const CATEGORY_PAGE_QUERY = `
       coverImage,
       "author": ${AUTHOR_CREDIT}
     },
-    "travelArticles": travelArticles[]->{
+    "travelArticles": travelArticles[defined(@->_id)]->{
       _id,
       title,
       "slug": slug.current,

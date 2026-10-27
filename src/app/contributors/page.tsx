@@ -71,16 +71,16 @@ export default async function ContributorsPage() {
             <div className="grid grid-cols-1 gap-x-10 gap-y-10 sm:grid-cols-2 lg:grid-cols-4 lg:gap-x-12 lg:gap-y-14">
               {entries.map((person) => (
                 <div key={`${person.href}-${person._id}`} className="text-left">
-                  <p className="font-serif text-[15px] font-normal leading-[1.65] text-black md:text-base">
+                  <p className="font-serif text-[13px] font-normal leading-[1.65] text-black md:text-sm">
                     {person.articleCount > 0 ? (
                       <Link
                         href={person.href}
-                        className="font-serif text-xl font-bold tracking-[0.06em] text-black hover:underline underline-offset-2"
+                        className="font-serif text-base font-bold tracking-[0.06em] text-black hover:underline underline-offset-2"
                       >
                         {person.name}
                       </Link>
                     ) : (
-                      <span className="font-serif text-xl font-bold tracking-[0.06em] text-black">
+                      <span className="font-serif text-base font-bold tracking-[0.06em] text-black">
                         {person.name}
                       </span>
                     )}

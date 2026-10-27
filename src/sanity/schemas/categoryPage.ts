@@ -23,6 +23,7 @@ export const categoryPage = defineType({
       of: [
         defineArrayMember({
           type: 'reference',
+          weak: true,
           to: [{ type: 'article' }],
         }),
       ],
@@ -45,6 +46,7 @@ export const categoryPage = defineType({
       of: [
         defineArrayMember({
           type: 'reference',
+          weak: true,
           to: [{ type: 'article' }],
         }),
       ],
@@ -67,6 +69,7 @@ export const categoryPage = defineType({
       of: [
         defineArrayMember({
           type: 'reference',
+          weak: true,
           to: [{ type: 'article' }],
         }),
       ],
@@ -89,6 +92,7 @@ export const categoryPage = defineType({
       of: [
         defineArrayMember({
           type: 'reference',
+          weak: true,
           to: [{ type: 'article' }],
         }),
       ],
@@ -111,6 +115,7 @@ export const categoryPage = defineType({
       of: [
         defineArrayMember({
           type: 'reference',
+          weak: true,
           to: [{ type: 'article' }],
         }),
       ],

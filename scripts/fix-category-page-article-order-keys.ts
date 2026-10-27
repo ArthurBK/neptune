@@ -25,6 +25,7 @@ function ensureKeys(items: RefItem[] | undefined): RefItem[] {
     .filter((item) => typeof item?._ref === 'string' && item._ref.length > 0)
     .map((item) => ({
       _type: 'reference',
+      _weak: true,
       _ref: item._ref!,
       _key: typeof item._key === 'string' && item._key.length > 0 ? item._key : randomUUID(),
     }))

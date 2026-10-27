@@ -467,7 +467,7 @@ export const article = defineType({
       name: 'relatedArticles',
       title: 'Related Articles',
       type: 'array',
-      of: [defineArrayMember({ type: 'reference', to: [{ type: 'article' }] })],
+      of: [defineArrayMember({ type: 'reference', weak: true, to: [{ type: 'article' }] })],
       validation: (rule) => rule.max(3),
     }),
     defineField({

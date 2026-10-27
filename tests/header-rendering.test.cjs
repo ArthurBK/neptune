@@ -21,6 +21,9 @@ function load(relativePath, mocks = {}) {
 
 const context = load('src/contexts/HeaderVariantContext.tsx')
 const appearance = load('src/lib/headerAppearance.ts')
+const storiesLinks = load('src/components/shared/StoriesPageLink.tsx', {
+  'next/link': { default: props => React.createElement('a', props), __esModule: true },
+})
 const { Header } = load('src/components/layout/Header.tsx', {
   '@/contexts/HeaderVariantContext': context,
   'next/image': { default: props => {
@@ -34,6 +37,7 @@ const { Header } = load('src/components/layout/Header.tsx', {
   './SearchModal': { SearchModal: () => null },
 })
 const { LayoutShell } = load('src/components/layout/LayoutShell.tsx', {
+  '@/components/shared/StoriesPageLink': storiesLinks,
   '@/contexts/HeaderVariantContext': context,
   '@/contexts/FooterVisibilityContext': { FooterVisibilityProvider: React.Fragment, useFooterVisibility: () => ({ isFooterSuppressed: true }) },
   '@/contexts/NewsletterModalContext': { NewsletterModalProvider: React.Fragment },
@@ -47,10 +51,10 @@ const { HomeScrollContainer } = load('src/components/home/HomeScrollContainer.ts
   './StickyHeroStack': { StickyHeroStack: () => React.createElement('div', null, 'Hero') },
 })
 
-function app(pathname, segment = null, menuAppearance) {
+function app(pathname, segment = null, menuAppearance, visibility = {}) {
   return React.createElement(PathnameContext.Provider, { value: pathname },
     React.createElement(LayoutRouterContext.Provider, { value: { parentTree: ['', { children: [segment ?? '__PAGE__', {}] }] } },
-      React.createElement(LayoutShell, { initialHomeHeaderVariant: appearance.getHeaderVariant(menuAppearance, 'video', 0) }, segment === null
+      React.createElement(LayoutShell, { ...visibility, initialHomeHeaderVariant: appearance.getHeaderVariant(menuAppearance, 'video', 0) }, segment === null
         ? React.createElement(HomeScrollContainer, { sections: [
           { type: 'video', menuAppearance, data: { videoUrl: '/test.mp4' } },
           { type: 'newsstandPhotos', data: { slides: [] } },
@@ -62,6 +66,23 @@ function app(pathname, segment = null, menuAppearance) {
 function headerMarkup(html) {
   return html.match(/<header[^>]*>/)?.[0] ?? ''
 }
+
+test('Stories visibility controls desktop and mobile menus independently of Shop', () => {
+  for (const showStories of [false, true]) {
+    for (const showShop of [false, true]) {
+      const html = renderToString(app('/about', 'about', undefined, { showStories, showShop }))
+      assert.equal((html.match(/href="\/stories"/g) ?? []).length, showStories ? 2 : 0)
+      assert.equal(html.includes('href="/the-market"'), showShop)
+      assert.ok(html.includes('href="/newsstand"'))
+    }
+  }
+})
+
+test('homepage category labels stop linking to a hidden Stories page', () => {
+  const html = renderToString(React.createElement(storiesLinks.StoriesVisibilityProvider, { value: false },
+    React.createElement(storiesLinks.StoriesPageLink, null, 'Cover story')))
+  assert.equal(html, '<span>Cover story</span>')
+})
 
 test('menu text and background can be chosen independently in initial HTML', () => {
   for (const textColor of ['black', 'white']) {

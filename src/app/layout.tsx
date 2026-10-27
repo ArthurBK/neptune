@@ -6,6 +6,7 @@ import { sanityFetch } from '@/sanity/lib/client'
 import { HOME_MENU_QUERY, SITE_SETTINGS_QUERY } from '@/sanity/lib/queries'
 import { getHeaderVariant, type HeaderAppearance } from '@/lib/headerAppearance'
 import { isMarketVisible } from '@/sanity/lib/market'
+import { isStoriesVisible } from '@/sanity/lib/stories'
 import { LayoutShell } from '@/components/layout/LayoutShell'
 
 import './globals.css'
@@ -76,10 +77,11 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode
 }>) {
-  const [settings, showShop, homeMenu] = await Promise.all([
+  const [settings, showShop, homeMenu, showStories] = await Promise.all([
     sanityFetch<{ instagramUrl?: string | null } | null>(SITE_SETTINGS_QUERY),
     isMarketVisible(),
     sanityFetch<{ type?: string; menuAppearance?: HeaderAppearance | null } | null>(HOME_MENU_QUERY),
+    isStoriesVisible(),
   ])
   const instagramUrl = settings?.instagramUrl ?? null
 
@@ -89,6 +91,7 @@ export default async function RootLayout({
         <LayoutShell
           instagramUrl={instagramUrl}
           showShop={showShop}
+          showStories={showStories}
           initialHomeHeaderVariant={getHeaderVariant(homeMenu?.menuAppearance, homeMenu?.type, 0)}
         >{children}</LayoutShell>
       </body>

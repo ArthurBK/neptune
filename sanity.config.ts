@@ -14,6 +14,7 @@ import {apiVersion, dataset, projectId} from './src/sanity/env'
 import {schema} from './src/sanity/schemas'
 import {structure} from './src/sanity/structure'
 import {contributorDeleteAction} from './src/sanity/actions/contributorDeleteAction'
+import {articleReferenceAction} from './src/sanity/actions/articleReferenceAction'
 
 export default defineConfig({
   basePath: '/studio',
@@ -31,7 +32,13 @@ export default defineConfig({
         ? actions.filter((action) => schemaType !== 'photographer' || action.action !== 'duplicate').map((action) =>
             action.action === 'delete' ? contributorDeleteAction(action) : action,
           )
-        : actions,
+        : schemaType === 'article'
+          ? actions.map((action) =>
+              action.action === 'unpublish' || action.action === 'delete'
+                ? articleReferenceAction(action)
+                : action,
+            )
+          : actions,
   },
   plugins: [
     structureTool({structure}),

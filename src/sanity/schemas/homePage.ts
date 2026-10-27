@@ -15,6 +15,7 @@ const homeArticleBlock = defineType({
       name: 'article',
       title: 'Article',
       type: 'reference',
+      weak: true,
       to: [{ type: 'article' }],
       validation: (rule) => rule.required(),
     }),
@@ -51,6 +52,7 @@ const homeThreeArticlesBlock = defineType({
       title: 'Hero article',
       type: 'reference',
       description: 'Optional larger article shown above the row of three articles.',
+      weak: true,
       to: [{ type: 'article' }],
     }),
     defineField({
@@ -61,6 +63,7 @@ const homeThreeArticlesBlock = defineType({
       of: [
         defineArrayMember({
           type: 'reference',
+          weak: true,
           to: [{ type: 'article' }],
         }),
       ],
