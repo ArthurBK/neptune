@@ -62,6 +62,14 @@ and profile URLs. It shares the contributor editing fields, but its creation
 template and duplicate action are disabled. No content migration is required.
 Run `node --test tests/contributors.test.cjs` to check profile and credit compatibility.
 
+Deleting a contributor from its document menu preserves its name in each linked
+article's `authorName` or `photographerName` field and removes the reference. The
+site shows these saved credits without a profile link. Published articles and
+drafts are updated independently in the same transaction as the profile deletion;
+revision conflicts or other strong references abort the transaction. The standard
+Sanity permissions still apply. Run `node --test tests/contributor-deletion.test.cjs`
+to check deletion and credit rendering without modifying live data.
+
 ## Newsletter (Mailchimp)
 
 The site newsletter form sends addresses to `POST /api/newsletter`, which saves

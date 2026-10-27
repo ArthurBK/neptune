@@ -301,7 +301,18 @@ export const article = defineType({
       title: 'Author',
       type: 'reference',
       to: [{ type: 'contributor' }],
-      validation: (rule) => rule.required(),
+      validation: (rule) => rule.custom((value, context) =>
+        value?._ref || (typeof context.document?.authorName === 'string' && context.document.authorName.trim())
+          ? true
+          : 'Select an author or enter an author credit.',
+      ),
+    }),
+    defineField({
+      name: 'authorName',
+      title: 'Author credit',
+      type: 'string',
+      description: 'Name displayed without a profile link when the contributor has been deleted.',
+      hidden: ({ document }) => Boolean(document?.author),
     }),
     defineField({
       name: 'photographer',
@@ -310,6 +321,13 @@ export const article = defineType({
       description: 'Select a contributor for the photography credit.',
       // The legacy type is kept so existing credits remain valid.
       to: [{ type: 'contributor' }, { type: 'photographer' }],
+    }),
+    defineField({
+      name: 'photographerName',
+      title: 'Photographer credit',
+      type: 'string',
+      description: 'Name displayed without a profile link when the contributor has been deleted.',
+      hidden: ({ document }) => Boolean(document?.photographer),
     }),
     defineField({
       name: 'publishedAt',

@@ -7,7 +7,7 @@ interface Article {
   category: string
   subcategory?: string | null
   coverImage: { asset?: { _ref: string }; alt?: string }
-  author?: { name: string; slug: string } | null
+  author?: { name: string; slug?: string | null } | null
 }
 
 interface ArticleGridProps {

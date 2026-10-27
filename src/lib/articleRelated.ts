@@ -5,7 +5,7 @@ export type RelatedArticleForCard = {
   category?: string | null
   subcategory?: string | null
   coverImage?: { asset?: { _ref: string }; alt?: string }
-  author?: { name: string; slug: string } | null
+  author?: { name: string; slug?: string | null } | null
 }
 
 /** Related articles picked in Sanity (order preserved); drops broken refs. */

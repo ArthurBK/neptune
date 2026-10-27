@@ -1,5 +1,6 @@
 import Image from 'next/image'
 import Link from 'next/link'
+import { ContributorCredit } from '@/components/editorial/ContributorCredit'
 
 import { articleTitleSingleLine } from '@/lib/articleTitle'
 import { urlFor } from '@/sanity/lib/image'
@@ -13,7 +14,7 @@ interface ArticleCardProps {
     asset?: { _ref: string }
     alt?: string
   }
-  author?: { name: string; slug: string } | null
+  author?: { name: string; slug?: string | null } | null
   size?: 'default' | 'compact' | 'featured'
   /** When true, card fills container height; image uses flex-1, no fixed aspect. */
   fillHeight?: boolean
@@ -111,12 +112,12 @@ export function ArticleCard({
                 </h3>
               </Link>
               {author && (
-                <Link
-                  href={`/contributors/${author.slug}`}
-                  className="block w-full text-left text-[#6B6B6B] hover:text-black hover:underline underline-offset-2 transition-colors text-base"
+                <ContributorCredit
+                  href={author.slug ? `/contributors/${author.slug}` : undefined}
+                  className="block w-full text-left text-[#6B6B6B] underline-offset-2 transition-colors text-base"
                 >
                   By {author.name}
-                </Link>
+                </ContributorCredit>
               )}
             </div>
           </div>
@@ -163,12 +164,12 @@ export function ArticleCard({
           </Link>
         </div>
         {author && (
-          <Link
-            href={`/contributors/${author.slug}`}
-            className="block lg:shrink-0 text-[#6B6B6B] hover:text-black hover:underline underline-offset-2 transition-colors text-sm"
+          <ContributorCredit
+            href={author.slug ? `/contributors/${author.slug}` : undefined}
+            className="block lg:shrink-0 text-[#6B6B6B] underline-offset-2 transition-colors text-sm"
           >
             By {author.name}
-          </Link>
+          </ContributorCredit>
         )}
       </article>
     )
@@ -216,12 +217,12 @@ export function ArticleCard({
         </div>
       </div>
       {author && (
-        <Link
-          href={`/contributors/${author.slug}`}
-          className={`block text-[#6B6B6B] hover:text-black hover:underline underline-offset-2 transition-colors ${isCompact ? 'text-sm' : 'text-base'}`}
+        <ContributorCredit
+          href={author.slug ? `/contributors/${author.slug}` : undefined}
+          className={`block text-[#6B6B6B] underline-offset-2 transition-colors ${isCompact ? 'text-sm' : 'text-base'}`}
         >
           By {author.name}
-        </Link>
+        </ContributorCredit>
       )}
     </article>
   )

@@ -1,4 +1,4 @@
-import Link from 'next/link'
+import { ContributorCredit } from '@/components/editorial/ContributorCredit'
 import { notFound } from 'next/navigation'
 
 import { client, sanityFetch } from '@/sanity/lib/client'
@@ -93,23 +93,23 @@ export default async function StoryArticlePage({ params }: ArticlePageProps) {
             {article.author && (
               <p>
                 Words by{' '}
-                <Link
-                  href={`/contributors/${article.author.slug}`}
-                  className="text-black hover:underline underline-offset-2 transition-colors"
+                <ContributorCredit
+                  href={article.author.slug ? `/contributors/${article.author.slug}` : undefined}
+                  className="text-black underline-offset-2 transition-colors"
                 >
                   {formatPersonName(article.author.name)}
-                </Link>
+                </ContributorCredit>
               </p>
             )}
             {article.photographer && (
               <p>
                 Photography by{' '}
-                <Link
+                <ContributorCredit
                   href={article.photographer.profileHref}
-                  className="text-black hover:underline underline-offset-2 transition-colors"
+                  className="text-black underline-offset-2 transition-colors"
                 >
                   {formatPersonName(article.photographer.name)}
-                </Link>
+                </ContributorCredit>
               </p>
             )}
             {publishedDate && (
@@ -223,8 +223,8 @@ type ArticleData = {
   linkedIssue?: string | null
   coverImage?: { asset?: { _ref: string }; alt?: string; caption?: unknown }
   body: unknown
-  author?: { name: string; slug: string } | null
-  photographer?: { name: string; slug: string; profileHref: string } | null
+  author?: { name: string; slug?: string | null } | null
+  photographer?: { name: string; slug?: string | null; profileHref?: string | null } | null
   relatedArticles?: RelatedArticleForCard[]
   affiliateProducts?: ArticleAffiliateProduct[]
 }

@@ -48,7 +48,7 @@ type ArticleCardData = {
   category: string
   subcategory?: string | null
   coverImage: { asset?: { _ref: string }; alt?: string }
-  author?: { name: string; slug: string } | null
+  author?: { name: string; slug?: string | null } | null
 }
 
 export default async function ContributorPage({ params }: ContributorPageProps) {

@@ -5,6 +5,7 @@ import type { PortableTextBlock } from '@portabletext/types'
 import { PortableText, type PortableTextComponents } from 'next-sanity'
 import Image from 'next/image'
 import Link from 'next/link'
+import { ContributorCredit } from '@/components/editorial/ContributorCredit'
 
 import { useOpenNewsletterModal } from '@/contexts/NewsletterModalContext'
 import { articleTitleSingleLine } from '@/lib/articleTitle'
@@ -20,7 +21,7 @@ export interface CarouselArticle {
   category: string
   subcategory?: string | null
   coverImage: { asset?: { _ref: string }; alt?: string }
-  author?: { name: string; slug: string } | null
+  author?: { name: string; slug?: string | null } | null
 }
 
 export interface FeaturedProduct {
@@ -945,12 +946,12 @@ function HomeArticleTile({
           </h2>
         </Link>
         {article.author ? (
-          <Link
-            href={`/contributors/${article.author.slug}`}
-            className="mt-0.5 block min-w-0 whitespace-normal break-words text-[8px] leading-tight text-[#6B6B6B] underline-offset-2 transition-colors hover:text-black hover:underline sm:text-[9px] md:text-[11px]"
+          <ContributorCredit
+            href={article.author.slug ? `/contributors/${article.author.slug}` : undefined}
+            className="mt-0.5 block min-w-0 whitespace-normal break-words text-[8px] leading-tight text-[#6B6B6B] underline-offset-2 transition-colors sm:text-[9px] md:text-[11px]"
           >
             By {article.author.name}
-          </Link>
+          </ContributorCredit>
         ) : (
           <span className="mt-0.5 block" aria-hidden="true" />
         )}

@@ -1,5 +1,23 @@
 import { defineQuery } from 'next-sanity'
 
+// A deleted person's credit stays on the article without a profile URL.
+const AUTHOR_CREDIT = /* groq */ `coalesce(
+  author->{ name, "slug": slug.current },
+  select(defined(authorName) => { "name": authorName, "slug": null })
+)`
+const AUTHOR_DETAILS_CREDIT = /* groq */ `coalesce(
+  author->{ name, "slug": slug.current, bio, portrait },
+  select(defined(authorName) => { "name": authorName, "slug": null })
+)`
+const PHOTOGRAPHER_CREDIT = /* groq */ `coalesce(
+  photographer->{
+    name,
+    "slug": slug.current,
+    "profileHref": select(_type == "contributor" => "/contributors/", "/contributors/photographer/") + slug.current
+  },
+  select(defined(photographerName) => { "name": photographerName, "slug": null, "profileHref": null })
+)`
+
 // Seed the persistent header before the homepage hydrates.
 export const HOME_MENU_QUERY = defineQuery(/* groq */ `
   *[_type == "homePage" && _id == "homePage"][0].sections[0] {
@@ -27,7 +45,7 @@ export const HOME_PAGE_QUERY = `
           subcategory,
           categories,
           coverImage,
-          "author": author->{ name, "slug": slug.current }
+          "author": ${AUTHOR_CREDIT}
         }
       },
       _type == "homeThreeArticlesBlock" => {
@@ -44,7 +62,7 @@ export const HOME_PAGE_QUERY = `
           subcategory,
           categories,
           coverImage,
-          "author": author->{ name, "slug": slug.current }
+          "author": ${AUTHOR_CREDIT}
         },
         "articles": articles[]->{
           _id,
@@ -54,7 +72,7 @@ export const HOME_PAGE_QUERY = `
           subcategory,
           categories,
           coverImage,
-          "author": author->{ name, "slug": slug.current }
+          "author": ${AUTHOR_CREDIT}
         }
       },
       _type == "homeImageBlock" => {
@@ -120,7 +138,7 @@ export const FEATURED_ARTICLES_HOME_QUERY = `
     subcategory,
     categories,
     coverImage,
-    "author": author->{ name, "slug": slug.current }
+    "author": ${AUTHOR_CREDIT}
   }
 `
 
@@ -135,7 +153,7 @@ export const ALL_STORIES_QUERY = `
     subcategory,
     coverImage,
     publishedAt,
-    "author": author->{ name, "slug": slug.current }
+    "author": ${AUTHOR_CREDIT}
   }
 `
 
@@ -155,7 +173,7 @@ export const STORIES_PAGE_QUERY = `
       subcategory,
       coverImage,
       publishedAt,
-      "author": author->{ name, "slug": slug.current }
+      "author": ${AUTHOR_CREDIT}
     },
     image{asset, alt, caption, hotspot}
   }
@@ -172,7 +190,7 @@ export const ARTICLES_BY_CATEGORY_QUERY = `
     subcategory,
     coverImage,
     publishedAt,
-    "author": author->{ name, "slug": slug.current }
+    "author": ${AUTHOR_CREDIT}
   }
 `
 
@@ -193,14 +211,10 @@ export const ARTICLE_BY_SLUG_QUERY = `
     ${ARTICLE_IN_CATEGORY_PAGE_ORDER_LIST}
   )][0] {
     ...,
-    "author": author->{ name, "slug": slug.current, bio, portrait },
-    "photographer": photographer->{
-      name,
-      "slug": slug.current,
-      "profileHref": select(_type == "contributor" => "/contributors/", "/contributors/photographer/") + slug.current
-    },
+    "author": ${AUTHOR_DETAILS_CREDIT},
+    "photographer": ${PHOTOGRAPHER_CREDIT},
     "affiliateProducts": affiliateProducts[]->{ _id, title, brand, price, image, affiliateUrl },
-    "relatedArticles": relatedArticles[]->{ _id, title, "slug": slug.current, "category": coalesce(category, categories[0]), categories, subcategory, coverImage, "author": author->{ name, "slug": slug.current } },
+    "relatedArticles": relatedArticles[]->{ _id, title, "slug": slug.current, "category": coalesce(category, categories[0]), categories, subcategory, coverImage, "author": ${AUTHOR_CREDIT} },
     "body": body[] {
       ...,
       _type == "pteImageBlock" => {
@@ -234,14 +248,10 @@ export const ARTICLE_BY_SLUG_QUERY = `
 export const ARTICLE_BY_STORY_SLUG_QUERY = `
   *[_type == "article" && slug.current == $slug] | order(publishedAt desc)[0] {
     ...,
-    "author": author->{ name, "slug": slug.current, bio, portrait },
-    "photographer": photographer->{
-      name,
-      "slug": slug.current,
-      "profileHref": select(_type == "contributor" => "/contributors/", "/contributors/photographer/") + slug.current
-    },
+    "author": ${AUTHOR_DETAILS_CREDIT},
+    "photographer": ${PHOTOGRAPHER_CREDIT},
     "affiliateProducts": affiliateProducts[]->{ _id, title, brand, price, image, affiliateUrl },
-    "relatedArticles": relatedArticles[]->{ _id, title, "slug": slug.current, "category": coalesce(category, categories[0]), categories, subcategory, coverImage, "author": author->{ name, "slug": slug.current } },
+    "relatedArticles": relatedArticles[]->{ _id, title, "slug": slug.current, "category": coalesce(category, categories[0]), categories, subcategory, coverImage, "author": ${AUTHOR_CREDIT} },
     "body": body[] {
       ...,
       _type == "pteImageBlock" => {
@@ -338,7 +348,7 @@ export const AFFILIATE_PRODUCTS_BY_CATEGORY_QUERY = `
 export const ARTICLES_SEARCH_QUERY = `
   *[_type == "article" && (
     title match $query ||
-    author->name match $query
+    coalesce(author->name, authorName) match $query
   )]
   | score(boost(title match $query, 2))
   | order(_score desc, publishedAt desc)[0...15] {
@@ -348,7 +358,7 @@ export const ARTICLES_SEARCH_QUERY = `
     "category": coalesce(category, categories[0]),
     categories,
     coverImage,
-    "author": author->{ name }
+    "author": ${AUTHOR_CREDIT}
   }
 `
 
@@ -466,7 +476,7 @@ export const ARTICLES_BY_CONTRIBUTOR_QUERY = `
     subcategory,
     coverImage,
     publishedAt,
-    "author": author->{ name, "slug": slug.current }
+    "author": ${AUTHOR_CREDIT}
   }
 `
 
@@ -480,7 +490,7 @@ export const ARTICLES_BY_PHOTOGRAPHER_QUERY = `
     subcategory,
     coverImage,
     publishedAt,
-    "author": author->{ name, "slug": slug.current }
+    "author": ${AUTHOR_CREDIT}
   }
 `
 
@@ -500,7 +510,7 @@ export const CATEGORY_PAGE_QUERY = `
       categories,
       subcategory,
       coverImage,
-      "author": author->{ name, "slug": slug.current }
+      "author": ${AUTHOR_CREDIT}
     },
     "artsArticles": artsArticles[]->{
       _id,
@@ -510,7 +520,7 @@ export const CATEGORY_PAGE_QUERY = `
       categories,
       subcategory,
       coverImage,
-      "author": author->{ name, "slug": slug.current }
+      "author": ${AUTHOR_CREDIT}
     },
     "gardensArticles": gardensArticles[]->{
       _id,
@@ -520,7 +530,7 @@ export const CATEGORY_PAGE_QUERY = `
       categories,
       subcategory,
       coverImage,
-      "author": author->{ name, "slug": slug.current }
+      "author": ${AUTHOR_CREDIT}
     },
     "fashionArticles": fashionArticles[]->{
       _id,
@@ -530,7 +540,7 @@ export const CATEGORY_PAGE_QUERY = `
       categories,
       subcategory,
       coverImage,
-      "author": author->{ name, "slug": slug.current }
+      "author": ${AUTHOR_CREDIT}
     },
     "travelArticles": travelArticles[]->{
       _id,
@@ -540,7 +550,7 @@ export const CATEGORY_PAGE_QUERY = `
       categories,
       subcategory,
       coverImage,
-      "author": author->{ name, "slug": slug.current }
+      "author": ${AUTHOR_CREDIT}
     },
     interiorsImage{asset, alt, caption, hotspot},
     artsImage{asset, alt, caption, hotspot},

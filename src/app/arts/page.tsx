@@ -111,5 +111,5 @@ type ArticleCardData = {
   categories?: string[] | null
   subcategory?: string | null
   coverImage: { asset?: { _ref: string }; alt?: string }
-  author?: { name: string; slug: string } | null
+  author?: { name: string; slug?: string | null } | null
 }
