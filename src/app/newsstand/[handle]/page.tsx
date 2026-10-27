@@ -92,7 +92,7 @@ export default async function NewsstandProductPage({ params }: ProductPageProps)
 
         {/* You May Also Like */}
         <div className="pt-2 md:pt-16 text-center">
-          <h2 className="font-serif text-2xl md:text-4xl text-[#1A1A1A] mb-8">
+          <h2 className="font-serif text-2xl md:text-4xl text-[#1A1A1A] mb-4">
             YOU MAY ALSO LIKE
           </h2>
           {relatedProducts.length > 0 ? (
