@@ -75,12 +75,12 @@ export default async function ContributorsPage() {
                     {person.articleCount > 0 ? (
                       <Link
                         href={person.href}
-                        className="font-serif text-base font-bold tracking-[0.06em] text-black hover:underline underline-offset-2"
+                        className="font-serif font-bold tracking-[0.06em] text-black hover:underline underline-offset-2"
                       >
                         {person.name}
                       </Link>
                     ) : (
-                      <span className="font-serif text-base font-bold tracking-[0.06em] text-black">
+                      <span className="font-serif font-bold tracking-[0.06em] text-black">
                         {person.name}
                       </span>
                     )}

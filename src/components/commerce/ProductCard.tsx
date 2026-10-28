@@ -122,6 +122,7 @@ export function ProductCard({
             <AddToCartButton
               variant={firstVariant}
               productTitle={title}
+              className={size === 'small' ? 'max-md:text-[10px] max-md:tracking-[0.12em] max-md:px-3 max-md:py-1.5' : undefined}
             />
           </div>
         )}
