@@ -50,6 +50,59 @@ const { HomeScrollContainer } = load('src/components/home/HomeScrollContainer.ts
   '@/contexts/HeaderVariantContext': context,
   './StickyHeroStack': { StickyHeroStack: () => React.createElement('div', null, 'Hero') },
 })
+const { StickyHeroStack } = load('src/components/home/StickyHeroStack.tsx', {
+  '@/lib/headerAppearance': appearance,
+  'next-sanity': { PortableText: () => null },
+  'next/image': { default: props => {
+    const imageProps = { ...props }
+    delete imageProps.fill
+    delete imageProps.priority
+    return React.createElement('img', imageProps)
+  }, __esModule: true },
+  'next/link': { default: props => React.createElement('a', props), __esModule: true },
+  '@/components/editorial/ContributorCredit': {},
+  '@/contexts/NewsletterModalContext': {},
+  '@/lib/articleTitle': {},
+  '@/lib/textStyleFonts': {},
+  '@/sanity/lib/image': { urlFor: () => {
+    const builder = { width: () => builder, quality: () => builder, format: () => builder, url: () => '/test-image.jpg' }
+    return builder
+  } },
+  '@/components/shared/NewsstandCta': {},
+  '@/components/shared/StoriesPageLink': {},
+  './NewsstandPhotoHero': {},
+})
+
+test('first single and split images extend behind transparent headers without a blank strip', () => {
+  for (const layout of ['single', 'split']) {
+    for (const background of ['transparent', 'white', 'auto']) {
+      for (const textColor of ['black', 'white']) {
+        const menuAppearance = { background, textColor }
+        const image = { asset: { _ref: 'test-image' } }
+        const html = renderToString(React.createElement(context.HeaderVariantProvider, {
+          initialVariant: appearance.getHeaderVariant(menuAppearance, 'image', 0),
+        },
+        React.createElement(Header, { isHomePage: true }),
+        React.createElement(StickyHeroStack, {
+          reserveHeaderSpace: true,
+          sections: [{ type: 'image', menuAppearance, data: { layout, image, leftImage: image, rightImage: image } }],
+        })))
+        const dom = new JSDOM(html)
+        const document = dom.window.document
+        const photos = [...document.querySelectorAll('img[src="/test-image.jpg"]')]
+        // Split layout renders one mobile image and the desktop pair.
+        assert.equal(photos.length, layout === 'split' ? 3 : 1)
+        assert.equal(document.querySelector('header').style.background, background === 'white' ? 'rgb(255, 255, 255)' : 'transparent')
+        for (const photo of photos) {
+          const overlay = photo.closest('.absolute.inset-0')
+          assert.equal(Boolean(overlay), background !== 'white')
+          if (overlay) assert.ok(overlay.classList.contains('h-full'))
+        }
+        dom.window.close()
+      }
+    }
+  }
+})
 
 function app(pathname, segment = null, menuAppearance, visibility = {}) {
   return React.createElement(PathnameContext.Provider, { value: pathname },

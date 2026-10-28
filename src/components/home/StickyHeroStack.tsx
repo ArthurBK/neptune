@@ -9,6 +9,7 @@ import { ContributorCredit } from '@/components/editorial/ContributorCredit'
 
 import { useOpenNewsletterModal } from '@/contexts/NewsletterModalContext'
 import { articleTitleSingleLine } from '@/lib/articleTitle'
+import { getHeaderVariant } from '@/lib/headerAppearance'
 import { getOptionalTextStyleFontClass } from '@/lib/textStyleFonts'
 import { urlFor } from '@/sanity/lib/image'
 import { NewsstandCta } from '@/components/shared/NewsstandCta'
@@ -1399,6 +1400,10 @@ export function StickyHeroStack({
   if (sections.length === 0) return null
 
   const withNavbar = !!headerSlot || reserveHeaderSpace
+  const firstSection = sections[0]
+  const firstHeaderVariant = getHeaderVariant(firstSection.menuAppearance, firstSection.type, 0)
+  const imageBehindHeader = firstSection.type === 'image'
+    && (firstHeaderVariant === 'dark' || firstHeaderVariant === 'transparent-light')
 
   return (
     <div className="w-full min-w-0">
@@ -1409,9 +1414,9 @@ export function StickyHeroStack({
             className="sticky top-0 flex flex-col w-full min-w-0 shrink-0 h-[var(--section-height,100vh)] min-h-[var(--section-height,100vh)] overflow-hidden relative"
             style={{ zIndex: 1 }}
           >
-            {sections[0]?.type === 'video' || sections[0]?.type === 'newsstandPhotos' ? (
+            {firstSection.type === 'video' || firstSection.type === 'newsstandPhotos' || imageBehindHeader ? (
               <>
-                {/* Video full screen, then menu on top */}
+                {/* Media fills the section, including the area behind the menu. */}
                 <div className="absolute inset-0 w-full h-full min-h-full">
                   {(() => {
                     const cfg = renderSectionContent(sections[0], 0)
