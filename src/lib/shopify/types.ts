@@ -101,6 +101,7 @@ export interface ShopifyCart {
   id: string
   checkoutUrl: string | null
   totalQuantity?: number
+  cost?: { totalAmount: Money }
   lines?: {
     edges: Array<{ node: CartLine }>
   }

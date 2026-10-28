@@ -175,6 +175,7 @@ export const CART_CREATE_MUTATION = `
         id
         checkoutUrl
         totalQuantity
+        cost { totalAmount { amount currencyCode } }
         lines(first: 20) {
           edges {
             node {
@@ -208,6 +209,7 @@ const CART_LINES_FRAGMENT = `
   id
   checkoutUrl
   totalQuantity
+  cost { totalAmount { amount currencyCode } }
   lines(first: 20) {
     edges {
       node {
@@ -250,6 +252,7 @@ export const CART_QUERY = `
       id
       checkoutUrl
       totalQuantity
+      cost { totalAmount { amount currencyCode } }
       lines(first: 20) {
         edges {
           node {
@@ -281,6 +284,7 @@ export const CART_LINES_UPDATE_MUTATION = `
         id
         checkoutUrl
         totalQuantity
+        cost { totalAmount { amount currencyCode } }
         lines(first: 20) {
           edges {
             node {
@@ -345,6 +349,7 @@ export const CART_LINES_REMOVE_MUTATION = `
         id
         checkoutUrl
         totalQuantity
+        cost { totalAmount { amount currencyCode } }
         lines(first: 20) {
           edges {
             node {

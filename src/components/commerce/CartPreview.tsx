@@ -11,7 +11,7 @@ import {
   getCartId,
   setCheckoutUrl,
 } from '@/lib/cart'
-import { formatPrice } from '@/lib/shopify/types'
+import { formatPrice, type Money } from '@/lib/shopify/types'
 
 type CartLine = {
   id: string
@@ -32,6 +32,7 @@ type Cart = {
   id: string
   checkoutUrl: string | null
   totalQuantity: number
+  cost?: { totalAmount: Money }
   lines: { edges: Array<{ node: CartLine }> }
 }
 
@@ -108,7 +109,7 @@ export function CartPreview({ isOpen, onClose }: CartPreviewProps) {
 
   async function updateQuantity(lineId: string, quantity: number) {
     const cartId = getCartId()
-    if (!cartId || quantity < 0) return
+    if (!cartId || quantity < 0 || updatingLineId) return
     if (quantity === 0) {
       await removeLine(lineId)
       return
@@ -140,7 +141,7 @@ export function CartPreview({ isOpen, onClose }: CartPreviewProps) {
 
   async function removeLine(lineId: string) {
     const cartId = getCartId()
-    if (!cartId) return
+    if (!cartId || updatingLineId) return
     setUpdatingLineId(lineId)
     setCart((prev) => applyCartUpdate(prev, lineId, { remove: true }))
     try {
@@ -170,6 +171,8 @@ export function CartPreview({ isOpen, onClose }: CartPreviewProps) {
 
   const lines = cart?.lines?.edges?.map((e) => e.node) ?? []
   const isEmpty = lines.length === 0
+  const total = cart?.cost?.totalAmount
+  const isUpdating = updatingLineId !== null
 
   return (
     <div
@@ -182,12 +185,12 @@ export function CartPreview({ isOpen, onClose }: CartPreviewProps) {
       tabIndex={-1}
     >
       <div
-        className="absolute right-0 top-0 h-full w-full max-w-md bg-white shadow-xl md:top-[var(--header-height)] md:h-auto md:max-h-[calc(100vh-var(--header-height))]"
+        className="absolute right-0 top-0 flex h-full w-full max-w-md flex-col bg-white shadow-xl md:top-[var(--header-height)] md:h-auto md:max-h-[calc(100dvh-var(--header-height))]"
         onClick={(e) => e.stopPropagation()}
         onKeyDown={(e) => e.stopPropagation()}
       >
-        <div className="flex h-full flex-col">
-          <div className="relative flex items-center justify-center border-b border-[#E5E5E5] px-6 py-4">
+        <div className="flex min-h-0 flex-1 flex-col">
+          <div className="relative flex shrink-0 items-center justify-center border-b border-[#E5E5E5] px-6 py-4">
             <h2 className="font-futura text-xl uppercase tracking-wide">Cart</h2>
             <button
               type="button"
@@ -202,7 +205,7 @@ export function CartPreview({ isOpen, onClose }: CartPreviewProps) {
             </button>
           </div>
 
-          <div className="flex-1 overflow-y-auto px-6 py-4">
+          <div className="min-h-0 flex-1 overflow-y-auto px-6 py-4">
             {isLoading ? (
               <p className="py-8 text-center text-[#6B6B6B]">Loading…</p>
             ) : isEmpty ? (
@@ -212,7 +215,6 @@ export function CartPreview({ isOpen, onClose }: CartPreviewProps) {
                 {lines.map((line) => {
                   const merch = line.merchandise
                   const product = merch.product
-                  const isUpdating = updatingLineId === line.id
                   return (
                     <li key={line.id} className="flex gap-4 border-b border-[#E5E5E5] pb-6 last:border-0">
                       {product.featuredImage?.url && (
@@ -269,12 +271,30 @@ export function CartPreview({ isOpen, onClose }: CartPreviewProps) {
             )}
           </div>
 
-          {!isEmpty && cart?.checkoutUrl && (
-            <div className="border-t border-[#E5E5E5] p-6">
+          {!isLoading && !isEmpty && cart?.checkoutUrl && (
+            <div className="shrink-0 border-t border-[#E5E5E5] p-6">
+              <div className="mb-4">
+                <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 font-futura text-base text-black">
+                  <span>Estimated total</span>
+                  <span role="status" aria-live="polite" aria-busy={isUpdating} className="font-medium">
+                    {isUpdating ? 'Updating…' : total
+                      ? formatPrice(total.amount, total.currencyCode)
+                      : 'Calculated at checkout'}
+                  </span>
+                </div>
+                <p className="mt-2 text-xs leading-relaxed text-[#6B6B6B]">
+                  Shipping and any additional charges are calculated at checkout.
+                </p>
+              </div>
               <Link
                 href={cart.checkoutUrl}
-                onClick={onClose}
-                className="font-header block w-full bg-black py-3 text-center text-sm font-medium uppercase tracking-[0.2em] text-white transition-opacity hover:opacity-80"
+                aria-disabled={isUpdating}
+                tabIndex={isUpdating ? -1 : undefined}
+                onClick={(event) => {
+                  if (isUpdating) event.preventDefault()
+                  else onClose()
+                }}
+                className={`font-header block w-full bg-black py-3 text-center text-sm font-medium uppercase tracking-[0.2em] text-white transition-opacity hover:opacity-80 ${isUpdating ? 'pointer-events-none opacity-50' : ''}`}
               >
                 Checkout
               </Link>
