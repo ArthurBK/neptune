@@ -4,6 +4,8 @@ import { NextResponse } from 'next/server'
 import { articleTitleSingleLine } from '@/lib/articleTitle'
 import { shopifyFetch } from '@/lib/shopify/client'
 import { client } from '@/sanity/lib/client'
+import { isContributorsVisible } from '@/sanity/lib/contributors'
+import { isStoriesVisible } from '@/sanity/lib/stories'
 import { ARTICLES_SEARCH_QUERY, CONTRIBUTORS_SEARCH_QUERY } from '@/sanity/lib/queries'
 
 const SHOPIFY_SEARCH_QUERY = `
@@ -37,18 +39,18 @@ type ContributorHit = {
   portrait?: { asset?: { _ref: string }; alt?: string } | null
 }
 
-async function fetchSearch(q: string) {
+async function fetchSearch(q: string, showStories: boolean, showContributors: boolean) {
   // match is case-insensitive; append * for prefix matching ("sar" → "sar*" matches "sarah")
   const term = q.replace(/[*\\]/g, '').trim()
   const sanityQuery = `${term}*`
 
   const [articles, contributors, shopifyData] = await Promise.all([
-    client.fetch<ArticleHit[]>(ARTICLES_SEARCH_QUERY, {
+    showStories ? client.fetch<ArticleHit[]>(ARTICLES_SEARCH_QUERY, {
       query: sanityQuery,
-    } as Record<string, string>),
-    client.fetch<ContributorHit[]>(CONTRIBUTORS_SEARCH_QUERY, {
+    } as Record<string, string>) : [],
+    showContributors ? client.fetch<ContributorHit[]>(CONTRIBUTORS_SEARCH_QUERY, {
       query: sanityQuery,
-    } as Record<string, string>),
+    } as Record<string, string>) : [],
     shopifyFetch<{
       search?: {
         nodes: Array<{
@@ -102,9 +104,15 @@ export async function GET(request: Request) {
     return NextResponse.json({ articles: [], contributors: [], products: [] })
   }
 
+  // Read visibility outside the results cache so hiding a page also hides cached hits.
+  const [showStories, showContributors] = await Promise.all([
+    isStoriesVisible(),
+    isContributorsVisible(),
+  ])
+
   const cached = unstable_cache(
-    () => fetchSearch(q),
-    ['search', q],
+    () => fetchSearch(q, showStories, showContributors),
+    ['search', q, String(showStories), String(showContributors)],
     { revalidate: 60 }
   )
 

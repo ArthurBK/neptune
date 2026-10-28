@@ -98,7 +98,7 @@ function toFeaturedProduct(node: {
 
 export default async function Home() {
   const [homePage, settings] = await Promise.all([
-    sanityFetch<{ sections?: HomePageSection[] } | null>(HOME_PAGE_QUERY),
+    sanityFetch<{ sections?: HomePageSection[]; hasConfiguredSections?: boolean } | null>(HOME_PAGE_QUERY),
     sanityFetch<{
       instagramUrl?: string | null
       newsletterHeadline?: string | null
@@ -264,8 +264,8 @@ export default async function Home() {
     }
   }
 
-  // Fallback: no config or empty — use legacy articles + first newsstand product
-  if (sections.length === 0) {
+  // Legacy fallback only before sections are configured, never when deliberately hidden.
+  if (sections.length === 0 && !homePage?.hasConfiguredSections) {
     const articles = await sanityFetch<Array<HomePageArticle>>(FEATURED_ARTICLES_HOME_QUERY)
 
     for (const a of articles ?? []) {

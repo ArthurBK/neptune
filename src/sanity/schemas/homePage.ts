@@ -3,6 +3,14 @@ import { defineArrayMember, defineField, defineType } from 'sanity'
 import { pageIntroRichTextType } from './lib/pageIntroRichText'
 import { menuAppearanceField } from './lib/menuAppearance'
 
+const sectionVisibilityField = defineField({
+  name: 'isHidden',
+  title: 'Hide section',
+  type: 'boolean',
+  initialValue: false,
+  description: 'Hide this section without deleting its content or changing its position. Turn off to show it again. Publish the Home Page to apply changes.',
+})
+
 // Home section: article reference
 const homeArticleBlock = defineType({
   name: 'homeArticleBlock',
@@ -10,6 +18,7 @@ const homeArticleBlock = defineType({
   type: 'object',
   icon: DocumentTextIcon,
   fields: [
+    sectionVisibilityField,
     menuAppearanceField,
     defineField({
       name: 'article',
@@ -21,8 +30,8 @@ const homeArticleBlock = defineType({
     }),
   ],
   preview: {
-    select: { title: 'article.title', media: 'article.coverImage' },
-    prepare: ({ title }) => ({ title: title || 'Article' }),
+    select: { title: 'article.title', media: 'article.coverImage', isHidden: 'isHidden' },
+    prepare: ({ title, media, isHidden }) => ({ title: title || 'Article', media, subtitle: isHidden ? 'Hidden' : undefined }),
   },
 })
 
@@ -33,6 +42,7 @@ const homeThreeArticlesBlock = defineType({
   type: 'object',
   icon: DocumentTextIcon,
   fields: [
+    sectionVisibilityField,
     menuAppearanceField,
     defineField({
       name: 'titleRichText',
@@ -71,15 +81,15 @@ const homeThreeArticlesBlock = defineType({
     }),
   ],
   preview: {
-    select: { title: 'title', titleRichText: 'titleRichText', heroTitle: 'heroArticle.title', articles: 'articles' },
-    prepare: ({ title, titleRichText, heroTitle, articles }) => {
+    select: { title: 'title', titleRichText: 'titleRichText', heroTitle: 'heroArticle.title', articles: 'articles', isHidden: 'isHidden' },
+    prepare: ({ title, titleRichText, heroTitle, articles, isHidden }) => {
       const count = Array.isArray(articles) ? articles.length : 0
       const richTitle = Array.isArray(titleRichText)
         ? titleRichText.map((block) => block.children?.map((child: { text?: string }) => child.text ?? '').join('') ?? '').join(' ')
         : undefined
       return {
         title: (richTitle ?? title) || `3 articles${heroTitle ? ' + hero' : ''} (${count}/3)`,
-        subtitle: heroTitle ? `Hero: ${heroTitle}` : undefined,
+        subtitle: isHidden ? 'Hidden' : heroTitle ? `Hero: ${heroTitle}` : undefined,
       }
     },
   },
@@ -92,6 +102,7 @@ const homeImageBlock = defineType({
   type: 'object',
   icon: ImageIcon,
   fields: [
+    sectionVisibilityField,
     menuAppearanceField,
     defineField({
       name: 'layout',
@@ -211,10 +222,11 @@ const homeImageBlock = defineType({
     }),
   ],
   preview: {
-    select: { title: 'title', layout: 'layout', media: 'image', splitMedia: 'leftImage' },
-    prepare: ({ title, layout, media, splitMedia }) => ({
+    select: { title: 'title', layout: 'layout', media: 'image', splitMedia: 'leftImage', isHidden: 'isHidden' },
+    prepare: ({ title, layout, media, splitMedia, isHidden }) => ({
       title: title || (layout === 'split' ? 'Image (split)' : 'Image'),
       media: layout === 'split' ? splitMedia : media,
+      subtitle: isHidden ? 'Hidden' : undefined,
     }),
   },
 })
@@ -226,6 +238,7 @@ const homeProductBlock = defineType({
   type: 'object',
   icon: ImageIcon,
   fields: [
+    sectionVisibilityField,
     menuAppearanceField,
     defineField({
       name: 'product',
@@ -236,8 +249,8 @@ const homeProductBlock = defineType({
     }),
   ],
   preview: {
-    select: { title: 'product.title', media: 'product.image' },
-    prepare: ({ title }) => ({ title: title || 'Product' }),
+    select: { title: 'product.title', media: 'product.image', isHidden: 'isHidden' },
+    prepare: ({ title, media, isHidden }) => ({ title: title || 'Product', media, subtitle: isHidden ? 'Hidden' : undefined }),
   },
 })
 
@@ -248,6 +261,7 @@ const homeVideoBlock = defineType({
   type: 'object',
   icon: ImageIcon,
   fields: [
+    sectionVisibilityField,
     menuAppearanceField,
     defineField({
       name: 'video',
@@ -260,8 +274,8 @@ const homeVideoBlock = defineType({
     }),
   ],
   preview: {
-    select: { title: 'video.asset.originalFilename' },
-    prepare: ({ title }) => ({ title: title ? `Video: ${title}` : 'Video' }),
+    select: { title: 'video.asset.originalFilename', isHidden: 'isHidden' },
+    prepare: ({ title, isHidden }) => ({ title: title ? `Video: ${title}` : 'Video', subtitle: isHidden ? 'Hidden' : undefined }),
   },
 })
 
@@ -272,6 +286,7 @@ const homeNewsstandBlock = defineType({
   type: 'object',
   icon: ImageIcon,
   fields: [
+    sectionVisibilityField,
     menuAppearanceField,
     defineField({
       name: 'photos',
@@ -393,13 +408,13 @@ const homeNewsstandBlock = defineType({
     }),
   ],
   preview: {
-    select: { photos: 'photos', productHandles: 'productHandles', media: 'photos.0.image' },
-    prepare: ({ photos, productHandles, media }) => {
+    select: { photos: 'photos', productHandles: 'productHandles', media: 'photos.0.image', isHidden: 'isHidden' },
+    prepare: ({ photos, productHandles, media, isHidden }) => {
       if (Array.isArray(photos) && photos.length > 0) {
-        return { title: `Photo Carousel (${photos.length} photos)`, media }
+        return { title: `Photo Carousel (${photos.length} photos)`, media, subtitle: isHidden ? 'Hidden' : undefined }
       }
       const count = Array.isArray(productHandles) ? productHandles.length : 0
-      return { title: 'Photo Carousel', subtitle: `${count} previous products — add photos to replace them` }
+      return { title: 'Photo Carousel', subtitle: isHidden ? 'Hidden' : `${count} previous products — add photos to replace them` }
     },
   },
 })
@@ -411,6 +426,7 @@ const homeNewsletterBlock = defineType({
   type: 'object',
   icon: ImageIcon,
   fields: [
+    sectionVisibilityField,
     menuAppearanceField,
     defineField({
       name: 'headline',
@@ -461,10 +477,11 @@ const homeNewsletterBlock = defineType({
     }),
   ],
   preview: {
-    select: { headline: 'headline', media: 'leftImage' },
-    prepare: ({ headline, media }) => ({
+    select: { headline: 'headline', media: 'leftImage', isHidden: 'isHidden' },
+    prepare: ({ headline, media, isHidden }) => ({
       title: headline ? `Newsletter: ${headline}` : 'Newsletter',
       media,
+      subtitle: isHidden ? 'Hidden' : undefined,
     }),
   },
 })
@@ -485,7 +502,7 @@ export const homePage = defineType({
       name: 'sections',
       title: 'Hero sections',
       type: 'array',
-      description: 'Drag to reorder. Each section appears as a full-screen slide on the home page.',
+      description: 'Drag to reorder. Open a section and enable "Hide section" to remove it from the website while keeping its content. Publish the Home Page to apply changes.',
       of: [
         defineArrayMember({ type: 'homeVideoBlock' }),
         defineArrayMember({ type: 'homeArticleBlock' }),

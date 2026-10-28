@@ -18,8 +18,9 @@ const PHOTOGRAPHER_CREDIT = /* groq */ `coalesce(
   select(defined(photographerName) => { "name": photographerName, "slug": null, "profileHref": null })
 )`
 
-// Keep the initial header and rendered sections aligned when an article is unpublished.
+// Keep the initial header and rendered sections aligned when sections are hidden or articles unpublished.
 const VISIBLE_HOME_SECTION = /* groq */ `
+  coalesce(isHidden, false) == false &&
   (_type != "homeArticleBlock" || defined(article->_id)) &&
   (_type != "homeThreeArticlesBlock" || defined(heroArticle->_id) || count(articles[defined(@->_id)]) > 0)
 `
@@ -38,6 +39,7 @@ export const HOME_MENU_QUERY = defineQuery(/* groq */ `
 // Home page sections (configurable in Studio)
 export const HOME_PAGE_QUERY = `
   *[_type == "homePage" && _id == "homePage"][0] {
+    "hasConfiguredSections": count(sections) > 0,
     sections[${VISIBLE_HOME_SECTION}] {
       menuAppearance { textColor, background },
       _type,

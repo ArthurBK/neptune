@@ -139,7 +139,7 @@ export function SearchModal({ isOpen, onClose }: SearchModalProps) {
             type="search"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search articles, contributors, or products..."
+            placeholder="Search..."
             className="min-w-0 flex-1 appearance-none bg-transparent text-lg text-[#1A1A1A] placeholder:text-[#6B6B6B] focus:outline-none [&::-webkit-search-cancel-button]:appearance-none [&::-webkit-search-decoration]:appearance-none"
             autoComplete="off"
           />
