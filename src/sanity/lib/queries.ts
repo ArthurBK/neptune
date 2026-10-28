@@ -414,6 +414,10 @@ export const CONTRIBUTOR_SLUGS_QUERY = `
 `
 
 // Contributors page intro content
+export const CONTRIBUTORS_VISIBILITY_QUERY = defineQuery(/* groq */ `
+  coalesce(*[_type == "contributorsPage" && _id == "contributorsPage"][0].isVisible, true)
+`)
+
 export const CONTRIBUTORS_PAGE_QUERY = `
   *[_type == "contributorsPage" && _id == "contributorsPage"][0] {
     description[] {

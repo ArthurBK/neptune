@@ -25,6 +25,7 @@ function LayoutShellInner({
   isHomePage,
   showShop,
   showStories,
+  showContributors,
 }: {
   children: React.ReactNode
   instagramUrl?: string | null
@@ -32,12 +33,13 @@ function LayoutShellInner({
   isHomePage: boolean
   showShop: boolean
   showStories: boolean
+  showContributors: boolean
 }) {
   const { isFooterSuppressed } = useFooterVisibility()
 
   return (
     <>
-      <Header isHomePage={isHomePage} showShop={showShop} showStories={showStories} />
+      <Header isHomePage={isHomePage} showShop={showShop} showStories={showStories} showContributors={showContributors} />
       <div className="flex-1 min-h-0 min-w-0 pt-(--header-height)">{children}</div>
       {!isFooterSuppressed && <Footer instagramUrl={instagramUrl} />}
       <CookieBanner locale={cookieBannerLocale} />
@@ -50,12 +52,14 @@ export function LayoutShell({
   instagramUrl,
   showShop = true,
   showStories = true,
+  showContributors = true,
   initialHomeHeaderVariant = 'dark',
 }: {
   children: React.ReactNode
   instagramUrl?: string | null
   showShop?: boolean
   showStories?: boolean
+  showContributors?: boolean
   initialHomeHeaderVariant?: HeaderVariant
 }) {
   const pathname = usePathname()
@@ -76,7 +80,7 @@ export function LayoutShell({
       <HeaderVariantProvider initialVariant={isHome ? initialHomeHeaderVariant : 'light'}>
         <FooterVisibilityProvider>
           <NewsletterModalProvider>
-            <LayoutShellInner instagramUrl={instagramUrl} cookieBannerLocale={cookieBannerLocale} isHomePage={isHome} showShop={showShop} showStories={showStories}>
+            <LayoutShellInner instagramUrl={instagramUrl} cookieBannerLocale={cookieBannerLocale} isHomePage={isHome} showShop={showShop} showStories={showStories} showContributors={showContributors}>
               {children}
             </LayoutShellInner>
           </NewsletterModalProvider>

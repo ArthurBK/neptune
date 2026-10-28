@@ -1,6 +1,9 @@
 import Link from 'next/link'
+import { notFound } from 'next/navigation'
 
 import { sanityFetch } from '@/sanity/lib/client'
+import { isStoriesVisible } from '@/sanity/lib/stories'
+import { isContributorsVisible } from '@/sanity/lib/contributors'
 import {
   CONTRIBUTORS_PAGE_QUERY,
   CONTRIBUTORS_LIST_PAGE_QUERY,
@@ -31,10 +34,13 @@ type ContributorsPageData = {
 }
 
 export default async function ContributorsPage() {
-  const [contributors, photographers, contributorsPage] = await Promise.all([
+  if (!(await isContributorsVisible())) notFound()
+
+  const [contributors, photographers, contributorsPage, showStories] = await Promise.all([
     sanityFetch<ListPerson[]>(CONTRIBUTORS_LIST_PAGE_QUERY) ?? [],
     sanityFetch<ListPerson[]>(PHOTOGRAPHERS_LIST_PAGE_QUERY) ?? [],
     sanityFetch<ContributorsPageData | null>(CONTRIBUTORS_PAGE_QUERY),
+    isStoriesVisible(),
   ])
 
   const entries = [
@@ -72,7 +78,7 @@ export default async function ContributorsPage() {
               {entries.map((person) => (
                 <div key={`${person.href}-${person._id}`} className="text-left">
                   <p className="font-serif text-[13px] font-normal leading-[1.65] text-black md:text-sm">
-                    {person.articleCount > 0 ? (
+                    {showStories && person.articleCount > 0 ? (
                       <Link
                         href={person.href}
                         className="font-serif font-bold tracking-[0.06em] text-black hover:underline underline-offset-2"

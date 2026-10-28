@@ -24,6 +24,13 @@ export async function POST(request: Request) {
       )
     }
 
+    if (!Number.isSafeInteger(quantity) || quantity < 1) {
+      return NextResponse.json(
+        { error: 'quantity must be a positive integer' },
+        { status: 400 }
+      )
+    }
+
     const lines = [{ merchandiseId: variantId, quantity }]
 
     if (cartId) {

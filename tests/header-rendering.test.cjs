@@ -84,6 +84,15 @@ test('homepage category labels stop linking to a hidden Stories page', () => {
   assert.equal(html, '<span>Cover story</span>')
 })
 
+test('Contributors visibility removes its menu entry independently of other pages', () => {
+  for (const showContributors of [undefined, true, false]) {
+    const html = renderToString(app('/about', 'about', undefined, { showContributors }))
+    assert.equal(html.includes('href="/contributors"'), showContributors !== false)
+    assert.ok(html.includes('href="/stories"'))
+    assert.ok(html.includes('href="/the-market"'))
+  }
+})
+
 test('menu text and background can be chosen independently in initial HTML', () => {
   for (const textColor of ['black', 'white']) {
     for (const background of ['white', 'transparent']) {

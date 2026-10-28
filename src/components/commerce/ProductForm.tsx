@@ -22,6 +22,7 @@ export function ProductForm({ variants, productTitle, productHandle }: ProductFo
   const [variantPrices, setVariantPrices] = useState<Record<string, { amount: string; currencyCode: string }>>({})
   const [countryCode, setCountryCode] = useState<string | null>(null)
   const [priceReady, setPriceReady] = useState(false)
+  const [quantity, setQuantity] = useState(1)
 
   const selectedVariant =
     variants.find((v) => v.id === selectedVariantId) ?? variants[0]
@@ -102,14 +103,40 @@ export function ProductForm({ variants, productTitle, productHandle }: ProductFo
         </div>
       )}
 
-      <p className={`font-futura text-sm text-[#1A1A1A] transition-opacity duration-150 ${priceReady ? 'opacity-100' : 'opacity-0'}`}>
-        {formatPriceNoDecimals(displayPrice.amount, displayPrice.currencyCode)}
-      </p>
+      <div>
+        <p className={`font-futura text-sm text-[#1A1A1A] transition-opacity duration-150 ${priceReady ? 'opacity-100' : 'opacity-0'}`}>
+          {formatPriceNoDecimals(displayPrice.amount, displayPrice.currencyCode)}
+        </p>
+        <p className="mt-1 text-xs text-[#6B6B6B]">All tax included.</p>
+      </div>
+
+      <div role="group" aria-label="Quantity" className="flex w-fit items-center border border-[#E5E5E5] text-[#1A1A1A]">
+        <button
+          type="button"
+          aria-label="Decrease quantity"
+          disabled={quantity <= 1 || !selectedVariant.availableForSale}
+          onClick={() => setQuantity((current) => Math.max(1, current - 1))}
+          className="h-10 w-10 cursor-pointer text-sm hover:bg-neutral-50 disabled:cursor-not-allowed disabled:opacity-30"
+        >
+          −
+        </button>
+        <output aria-live="polite" aria-label="Selected quantity" className="min-w-8 text-center text-sm">{quantity}</output>
+        <button
+          type="button"
+          aria-label="Increase quantity"
+          disabled={!selectedVariant.availableForSale}
+          onClick={() => setQuantity((current) => current + 1)}
+          className="h-10 w-10 cursor-pointer text-sm hover:bg-neutral-50 disabled:cursor-not-allowed disabled:opacity-30"
+        >
+          +
+        </button>
+      </div>
 
       <AddToCartButton
         variant={selectedVariant}
         productTitle={productTitle}
         countryCode={countryCode ?? undefined}
+        quantity={quantity}
         label="Add to Cart"
         className="w-full sm:w-auto text-sm"
       />

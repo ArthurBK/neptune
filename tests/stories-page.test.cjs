@@ -73,3 +73,57 @@ test('only selected stories appear in editorial order; unresolved references are
   assert.deepEqual([...html.matchAll(/<article>(.*?)<\/article>/g)].map(match => match[1]), ['second', 'first'])
   assert.doesNotMatch(html, /unselected/)
 })
+
+test('contributor names keep their biographies but only link to profiles when Stories is visible', async () => {
+  for (const visible of [false, true]) {
+    const person = { _id: 'writer', name: 'Writer', slug: 'writer', bio: 'Writes about design.', articleCount: 1 }
+    const { default: ContributorsPage } = load('src/app/contributors/page.tsx', {
+      'next/link': { default: ({ children, ...props }) => React.createElement('a', props, children) },
+      '@/sanity/lib/stories': { isStoriesVisible: async () => visible },
+      '@/sanity/lib/contributors': { isContributorsVisible: async () => true },
+      '@/sanity/lib/queries': queries,
+      '@/sanity/lib/client': {
+        sanityFetch: async query => {
+          if (query === queries.CONTRIBUTORS_LIST_PAGE_QUERY) return [person, { ...person, _id: 'inactive', slug: 'inactive', articleCount: 0 }]
+          if (query === queries.PHOTOGRAPHERS_LIST_PAGE_QUERY) return [{ ...person, _id: 'photographer', slug: 'photographer' }]
+          return null
+        },
+      },
+      '@/components/shared/NewsstandCta': { NewsstandCta: () => null },
+      '@/components/shared/PageIntroText': { hasPortableTextContent: () => false },
+    })
+    const html = renderToStaticMarkup(await ContributorsPage())
+    assert.match(html, /Writes about design\./)
+    assert.doesNotMatch(html, /href="\/contributors\/inactive"/)
+    for (const href of ['/contributors/writer', '/contributors/photographer/photographer']) {
+      assert.equal(html.includes(`href="${href}"`), visible)
+    }
+    if (!visible) assert.doesNotMatch(html, /<a\b/)
+  }
+})
+
+test('Contributors listing is visible by default and can be disabled and enabled again', async () => {
+  for (const isVisible of [undefined, false, true]) {
+    const dataset = [{ _id: 'contributorsPage', _type: 'contributorsPage', isVisible }]
+    const client = {
+      sanityFetch: async (query, params = {}) => (await evaluate(parse(query), { dataset, params })).get(),
+    }
+    const visibility = load('src/sanity/lib/contributors.ts', {
+      react: { cache: fn => fn }, './client': client, './queries': queries,
+    })
+    const { default: ContributorsPage } = load('src/app/contributors/page.tsx', {
+      'next/navigation': { notFound: () => { throw new Error('CONTRIBUTORS_NOT_FOUND') } },
+      '@/sanity/lib/contributors': visibility,
+      '@/sanity/lib/stories': { isStoriesVisible: async () => true },
+      '@/sanity/lib/queries': queries,
+      '@/sanity/lib/client': client,
+      '@/components/shared/NewsstandCta': { NewsstandCta: () => null },
+      '@/components/shared/PageIntroText': { hasPortableTextContent: () => false },
+    })
+    if (isVisible === false) {
+      await assert.rejects(ContributorsPage(), /CONTRIBUTORS_NOT_FOUND/)
+    } else {
+      assert.match(renderToStaticMarkup(await ContributorsPage()), /No contributors yet/)
+    }
+  }
+})

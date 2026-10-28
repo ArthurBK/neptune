@@ -18,6 +18,7 @@ interface AddToCartButtonProps {
   label?: string
   className?: string
   countryCode?: string
+  quantity?: number
 }
 
 /** Extract numeric ID from Shopify GID (e.g. gid://shopify/ProductVariant/123 -> 123) */
@@ -31,6 +32,7 @@ export function AddToCartButton({
   label = 'Add to Cart',
   className = '',
   countryCode,
+  quantity = 1,
 }: AddToCartButtonProps) {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -50,7 +52,7 @@ export function AddToCartButton({
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           variantId: variant.id,
-          quantity: 1,
+          quantity,
           ...(cartId && { cartId }),
           ...(selectedCountryCode && { countryCode: selectedCountryCode }),
         }),
@@ -76,7 +78,7 @@ export function AddToCartButton({
         const domain = process.env.NEXT_PUBLIC_SHOPIFY_STORE_DOMAIN ?? ''
         const cleanDomain = domain.replace(/^https?:\/\//, '').replace(/\/$/, '')
         if (numericId && cleanDomain) {
-          const cartUrl = `https://${cleanDomain}/cart/${numericId}:1`
+          const cartUrl = `https://${cleanDomain}/cart/${numericId}:${quantity}`
           window.location.href = cartUrl
           return
         }

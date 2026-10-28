@@ -53,10 +53,11 @@ function NavLink({
   )
 }
 
-export function Header({ isHomePage, showShop = true, showStories = true }: {
+export function Header({ isHomePage, showShop = true, showStories = true, showContributors = true }: {
   isHomePage: boolean
   showShop?: boolean
   showStories?: boolean
+  showContributors?: boolean
 }) {
   const variant = useHeaderVariant()
   const [isBurgerOpen, setIsBurgerOpen] = useState(false)
@@ -292,6 +293,7 @@ export function Header({ isHomePage, showShop = true, showStories = true }: {
         <nav className="flex min-h-full flex-col gap-3 px-6 pt-16 pb-12">
           {BURGER_NAV_ITEMS.filter((item) =>
             (showShop || item.href !== '/the-market') && (showStories || item.href !== '/stories')
+            && (showContributors || item.href !== '/contributors')
           ).map((item) => (
             <NavLink
               key={item.href}

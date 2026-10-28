@@ -13,6 +13,14 @@ export const contributorsPage = defineType({
   icon: DocumentTextIcon,
   fields: [
     defineField({
+      name: 'isVisible',
+      title: 'Show Contributors page',
+      type: 'boolean',
+      initialValue: true,
+      description:
+        'Turn off to hide Contributors from the site navigation and disable access to the Contributors listing page. Publish to apply changes. Existing pages remain visible until explicitly turned off.',
+    }),
+    defineField({
       name: 'description',
       title: 'Contributors - description rich text',
       ...pageIntroRichTextType,

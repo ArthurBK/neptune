@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 
 import { client, sanityFetch } from '@/sanity/lib/client'
+import { isContributorsVisible } from '@/sanity/lib/contributors'
 import { urlFor } from '@/sanity/lib/image'
 import {
   AD_BANNER_BY_PLACEMENT_QUERY,
@@ -57,7 +58,7 @@ export default async function ContributorPage({ params }: ContributorPageProps) 
   const contributor = await sanityFetch<ContributorData | null>(CONTRIBUTOR_BY_SLUG_QUERY, { slug })
   if (!contributor) notFound()
 
-  const [articlesRaw, adBanner] = await Promise.all([
+  const [articlesRaw, adBanner, showContributors] = await Promise.all([
     sanityFetch<ArticleCardData[] | null>(ARTICLES_BY_CONTRIBUTOR_QUERY, {
       contributorId: contributor._id,
     }),
@@ -65,6 +66,7 @@ export default async function ContributorPage({ params }: ContributorPageProps) 
       AD_BANNER_BY_PLACEMENT_QUERY,
       { placement: 'category-top' }
     ),
+    isContributorsVisible(),
   ])
 
   const articles = articlesRaw ?? []
@@ -159,14 +161,14 @@ export default async function ContributorPage({ params }: ContributorPageProps) 
         </section>
 
         {/* Back to contributors */}
-        <div className="mt-8 pt-8 text-center">
+        {showContributors && <div className="mt-8 pt-8 text-center">
           <Link
             href="/contributors"
             className="font-futura text-sm tracking-[0.2em] uppercase text-[#6B6B6B] hover:text-black transition-colors"
           >
             All contributors
           </Link>
-        </div>
+        </div>}
       </div>
     </main>
   )

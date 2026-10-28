@@ -118,7 +118,7 @@ export function ProductCard({
           }`}
         />
         {!compact && firstVariant?.availableForSale && (
-          <div className="mt-3 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity flex justify-center">
+          <div className="mt-3 hidden md:flex md:opacity-0 md:group-hover:opacity-100 transition-opacity justify-center">
             <AddToCartButton
               variant={firstVariant}
               productTitle={title}

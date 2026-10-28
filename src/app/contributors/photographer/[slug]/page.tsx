@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 
 import { client, sanityFetch } from '@/sanity/lib/client'
+import { isContributorsVisible } from '@/sanity/lib/contributors'
 import { urlFor } from '@/sanity/lib/image'
 import {
   AD_BANNER_BY_PLACEMENT_QUERY,
@@ -56,7 +57,7 @@ export default async function PhotographerProfilePage({ params }: PageProps) {
   const photographer = await sanityFetch<PhotographerData | null>(PHOTOGRAPHER_BY_SLUG_QUERY, { slug })
   if (!photographer) notFound()
 
-  const [articlesRaw, adBanner] = await Promise.all([
+  const [articlesRaw, adBanner, showContributors] = await Promise.all([
     sanityFetch<ArticleCardData[] | null>(ARTICLES_BY_PHOTOGRAPHER_QUERY, {
       photographerId: photographer._id,
     }),
@@ -64,6 +65,7 @@ export default async function PhotographerProfilePage({ params }: PageProps) {
       AD_BANNER_BY_PLACEMENT_QUERY,
       { placement: 'category-top' }
     ),
+    isContributorsVisible(),
   ])
   const articles = articlesRaw ?? []
 
@@ -143,14 +145,14 @@ export default async function PhotographerProfilePage({ params }: PageProps) {
           )}
         </section>
 
-        <div className="mt-8 pt-8 text-center">
+        {showContributors && <div className="mt-8 pt-8 text-center">
           <Link
             href="/contributors"
             className="font-futura text-sm uppercase tracking-[0.2em] text-[#6B6B6B] transition-colors hover:text-black"
           >
             All contributors
           </Link>
-        </div>
+        </div>}
       </div>
     </main>
   )
