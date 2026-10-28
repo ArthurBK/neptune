@@ -257,7 +257,7 @@ function PhotoCarousel({ slides, priority }: { slides: NewsstandPhotoSlide[]; pr
           href={slide.linkUrl}
           onMouseEnter={() => setIsControlHovered(true)}
           onMouseLeave={() => setIsControlHovered(false)}
-          className="max-w-full border border-white bg-white px-6 py-3 text-center font-futura text-sm font-medium tracking-[0.12em] text-black uppercase transition-colors hover:bg-black hover:text-white focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white md:px-8"
+          className="max-w-full border border-white bg-white px-6 py-3 text-center font-futura text-sm font-medium tracking-[0.12em] text-black uppercase focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white md:px-8"
         >
           {slide.ctaLabel}
         </Link>

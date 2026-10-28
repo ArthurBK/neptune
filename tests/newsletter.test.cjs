@@ -6,13 +6,13 @@ const path = require('node:path')
 const ts = require('typescript')
 const { createHash } = require('node:crypto')
 
-function load(relativePath, overrides = {}) {
+function load(relativePath, overrides = {}, mocks = {}) {
   const source = ts.transpileModule(fs.readFileSync(path.join(__dirname, '..', relativePath), 'utf8'), {
     compilerOptions: { module: ts.ModuleKind.CommonJS, jsx: ts.JsxEmit.ReactJSX, esModuleInterop: true },
   }).outputText
   const loadedModule = { exports: {} }
   new Function('require', 'module', 'exports', ...Object.keys(overrides), source)(
-    require, loadedModule, loadedModule.exports, ...Object.values(overrides),
+    (name) => name in mocks ? mocks[name] : require(name), loadedModule, loadedModule.exports, ...Object.values(overrides),
   )
   return loadedModule.exports
 }
@@ -121,6 +121,8 @@ test('form displays a save error, supports retry, and resets after reopening', a
     fetch: async () => fail
       ? Response.json({ error: 'Could not save. Try again.' }, { status: 502 })
       : Response.json({ success: true, message: 'Thank you for subscribing.' }),
+  }, {
+    'next/link': { default: props => React.createElement('a', props), __esModule: true },
   })
   function OpenButton() {
     return React.createElement('button', { id: 'open', onClick: useOpenNewsletterModal() }, 'Open')
@@ -147,6 +149,11 @@ test('form displays a save error, supports retry, and resets after reopening', a
     await React.act(async () => document.getElementById('open').click())
     assert.ok(document.querySelector('form'))
     assert.equal(document.querySelector('[role="status"]'), null)
+    const policyLink = document.querySelector('a[href="/policy"]')
+    assert.equal(policyLink.textContent, 'Terms and Privacy Policy')
+    policyLink.addEventListener('click', event => event.preventDefault())
+    await React.act(async () => policyLink.click())
+    assert.equal(document.querySelector('dialog'), null)
   } finally {
     await React.act(async () => root.unmount())
     dom.window.close()

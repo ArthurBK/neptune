@@ -1,5 +1,6 @@
 'use client'
 
+import Link from 'next/link'
 import {
   createContext,
   useCallback,
@@ -141,7 +142,15 @@ function NewsletterModalInner({ children }: { children: ReactNode }) {
             )}
 
             <p className="mt-8 text-xs text-black/80 italic text-center">
-              By submitting your email, you agree to our Terms and Privacy Policy.
+              By submitting your email, you agree to our{' '}
+              <Link
+                href="/policy"
+                onClick={closeModal}
+                className="underline underline-offset-2 hover:text-black focus-visible:outline-2 focus-visible:outline-offset-2"
+              >
+                Terms and Privacy Policy
+              </Link>
+              .
             </p>
           </dialog>
         </div>
