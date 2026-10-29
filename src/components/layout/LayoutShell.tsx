@@ -79,7 +79,7 @@ export function LayoutShell({
     <StoriesVisibilityProvider value={showStories}>
       <HeaderVariantProvider initialVariant={isHome ? initialHomeHeaderVariant : 'light'}>
         <FooterVisibilityProvider>
-          <NewsletterModalProvider>
+          <NewsletterModalProvider autoOpen={isHome}>
             <LayoutShellInner instagramUrl={instagramUrl} cookieBannerLocale={cookieBannerLocale} isHomePage={isHome} showShop={showShop} showStories={showStories} showContributors={showContributors}>
               {children}
             </LayoutShellInner>

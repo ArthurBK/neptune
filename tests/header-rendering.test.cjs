@@ -36,12 +36,13 @@ const { Header } = load('src/components/layout/Header.tsx', {
   '@/components/commerce/CartPreview': { CartPreview: () => null },
   './SearchModal': { SearchModal: () => null },
 })
+let newsletterAutoOpen
 const { LayoutShell } = load('src/components/layout/LayoutShell.tsx', {
   '@/components/shared/StoriesPageLink': storiesLinks,
   '@/contexts/HeaderVariantContext': context,
   '@/contexts/FooterVisibilityContext': { FooterVisibilityProvider: React.Fragment, useFooterVisibility: () => ({ isFooterSuppressed: true }) },
   '@/contexts/NewsletterModalContext': { NewsletterModalProvider: ({ children, autoOpen }) => {
-    assert.notEqual(autoOpen, true, 'Page loads must not automatically open the newsletter modal')
+    newsletterAutoOpen = autoOpen
     return children
   } },
   './Header': { Header },
@@ -122,6 +123,17 @@ function app(pathname, segment = null, menuAppearance, visibility = {}) {
 function headerMarkup(html) {
   return html.match(/<header[^>]*>/)?.[0] ?? ''
 }
+
+test('newsletter opens automatically only on the homepage', () => {
+  for (const pathname of ['/', '/index']) {
+    renderToString(app(pathname))
+    assert.equal(newsletterAutoOpen, true)
+  }
+  for (const segment of ['newsstand', 'stories', 'contributors', 'about']) {
+    renderToString(app(`/${segment}`, segment))
+    assert.equal(newsletterAutoOpen, false)
+  }
+})
 
 test('Stories visibility controls desktop and mobile menus independently of Shop', () => {
   for (const showStories of [false, true]) {
