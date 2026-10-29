@@ -40,7 +40,10 @@ const { LayoutShell } = load('src/components/layout/LayoutShell.tsx', {
   '@/components/shared/StoriesPageLink': storiesLinks,
   '@/contexts/HeaderVariantContext': context,
   '@/contexts/FooterVisibilityContext': { FooterVisibilityProvider: React.Fragment, useFooterVisibility: () => ({ isFooterSuppressed: true }) },
-  '@/contexts/NewsletterModalContext': { NewsletterModalProvider: ({ children }) => children },
+  '@/contexts/NewsletterModalContext': { NewsletterModalProvider: ({ children, autoOpen }) => {
+    assert.notEqual(autoOpen, true, 'Page loads must not automatically open the newsletter modal')
+    return children
+  } },
   './Header': { Header },
   './Footer': { Footer: () => null },
   './CookieBanner': { CookieBanner: () => null },

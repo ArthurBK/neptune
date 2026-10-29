@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { createCarouselWheelGesture } from '@/lib/carouselWheel'
+import { findPhotoBounds, fitPhotoBounds, type PhotoBounds } from '@/lib/photoBounds'
 
 export interface NewsstandPhotoSlide {
   _key: string
@@ -32,6 +33,45 @@ function getImageBackground(image: HTMLImageElement): string | null {
   }
 }
 
+function PhotoLink({ image, active }: { image: HTMLImageElement; active: boolean }) {
+  const [bounds, setBounds] = useState<PhotoBounds | null>(null)
+
+  useEffect(() => {
+    const container = image.parentElement
+    if (!container) return
+    let sourceBounds: PhotoBounds
+    try {
+      const canvas = document.createElement('canvas')
+      canvas.width = 600
+      canvas.height = Math.max(1, Math.round(600 * image.naturalHeight / image.naturalWidth))
+      const context = canvas.getContext('2d')
+      if (!context) return
+      context.drawImage(image, 0, 0, canvas.width, canvas.height)
+      sourceBounds = findPhotoBounds(context.getImageData(0, 0, canvas.width, canvas.height).data, canvas.width, canvas.height)
+    } catch {
+      // If cross-origin artwork cannot be read, the Discover button stays usable.
+      return
+    }
+    const update = () => {
+      const styles = getComputedStyle(image)
+      const position = styles.objectPosition.split(' ').map((value) => parseFloat(value) / 100) as [number, number]
+      const scale = parseFloat(styles.scale) || 1
+      setBounds(fitPhotoBounds(sourceBounds, image.naturalWidth, image.naturalHeight, container.clientWidth, container.clientHeight, styles.objectFit === 'cover', scale, position))
+    }
+    update()
+    const observer = new ResizeObserver(update)
+    observer.observe(container)
+    window.addEventListener('resize', update)
+    return () => {
+      observer.disconnect()
+      window.removeEventListener('resize', update)
+    }
+  }, [image])
+
+  if (!bounds) return null
+  return <Link href="/newsstand" aria-label="Browse Newsstand" tabIndex={active ? 0 : -1} draggable={false} className="absolute focus-visible:outline-2 focus-visible:-outline-offset-4 focus-visible:outline-black" style={bounds} />
+}
+
 export function NewsstandPhotoHero({
   slides,
   priority = false,
@@ -53,6 +93,7 @@ function PhotoCarousel({ slides, priority }: { slides: NewsstandPhotoSlide[]; pr
   const [{ position, animate }, setFrame] = useState({ position: multiple ? 1 : 0, animate: false })
   const [loadedSlides, setLoadedSlides] = useState<Set<number>>(() => new Set())
   const [backgrounds, setBackgrounds] = useState<Record<string, string>>({})
+  const [images, setImages] = useState<Record<number, HTMLImageElement>>({})
   const [isControlHovered, setIsControlHovered] = useState(false)
   const [isControlFocused, setIsControlFocused] = useState(false)
   const [isTouching, setIsTouching] = useState(false)
@@ -227,12 +268,8 @@ function PhotoCarousel({ slides, priority }: { slides: NewsstandPhotoSlide[]; pr
             style={{ backgroundColor: backgrounds[photo._key] }}
             aria-hidden={photoIndex !== position}
           >
-            <Link
-              href="/newsstand"
-              aria-label="Browse Newsstand"
-              tabIndex={photoIndex === position ? 0 : -1}
-              draggable={false}
-              className="absolute inset-x-0 top-[var(--header-height)] bottom-44 overflow-hidden focus-visible:outline-2 focus-visible:-outline-offset-4 focus-visible:outline-black md:inset-0"
+            <div
+              className="absolute inset-x-0 top-[var(--header-height)] bottom-44 overflow-hidden md:inset-0"
             >
               <Image
                 src={photo.imageUrl}
@@ -243,6 +280,8 @@ function PhotoCarousel({ slides, priority }: { slides: NewsstandPhotoSlide[]; pr
                 draggable={false}
                 priority={priority && photoIndex === (multiple ? 1 : 0)}
                 onLoad={(event) => {
+                  const image = event.currentTarget
+                  setImages((current) => current[photoIndex] === image ? current : { ...current, [photoIndex]: image })
                   const background = getImageBackground(event.currentTarget)
                   if (background) {
                     setBackgrounds((current) => current[photo._key] === background
@@ -255,7 +294,8 @@ function PhotoCarousel({ slides, priority }: { slides: NewsstandPhotoSlide[]; pr
                 className="scale-[2.3] object-contain md:scale-100 md:object-cover"
                 style={{ objectPosition: photo.objectPosition }}
               />
-            </Link>
+              {images[photoIndex] && <PhotoLink image={images[photoIndex]} active={photoIndex === position} />}
+            </div>
           </div>
         ))}
       </div>

@@ -1,6 +1,8 @@
 import type { Metadata } from 'next'
 import { EB_Garamond, Inter } from 'next/font/google'
 import localFont from 'next/font/local'
+import { Analytics } from '@vercel/analytics/next'
+import { SpeedInsights } from '@vercel/speed-insights/next'
 
 import { sanityFetch } from '@/sanity/lib/client'
 import { HOME_MENU_QUERY, SITE_SETTINGS_QUERY } from '@/sanity/lib/queries'
@@ -98,6 +100,8 @@ export default async function RootLayout({
           showContributors={showContributors}
           initialHomeHeaderVariant={getHeaderVariant(homeMenu?.menuAppearance, homeMenu?.type, 0)}
         >{children}</LayoutShell>
+        <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   )

@@ -163,7 +163,7 @@ test('form displays a save error, supports retry, and resets after reopening', a
   }
 })
 
-test('homepage prompt opens once per session, cancels on navigation, and remains manually accessible', async () => {
+test('opt-in prompt opens once per session, cancels on navigation, and remains manually accessible', async () => {
   const React = require('react')
   const { JSDOM } = require('jsdom')
   const dom = new JSDOM('<div id="root"></div>', { url: 'https://neptune-papers.com/' })
