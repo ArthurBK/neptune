@@ -271,30 +271,33 @@ function ScrollDownChevron({
   lightBg?: boolean
 }) {
   return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={`absolute bottom-6 left-1/2 z-20 -translate-x-1/2 flex flex-col items-center gap-1 transition-transform hover:scale-110 focus:outline-none focus-visible:ring-2 rounded-full p-2 animate-bounce-subtle ${lightBg
-        ? 'text-neutral-700 drop-shadow-[0_1px_2px_rgba(255,255,255,0.8)] focus-visible:ring-neutral-400'
-        : 'text-white/90 drop-shadow-[0_1px_3px_rgba(0,0,0,0.5)] focus-visible:ring-white/50'
-        }`}
-      aria-label="Scroll down"
-    >
-      <svg
-        width="28"
-        height="28"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        aria-hidden
+    <div className="pointer-events-none absolute inset-x-0 bottom-6 z-20 flex justify-center">
+      <button
+        type="button"
+        onClick={onClick}
+        className={`pointer-events-auto flex flex-col items-center gap-1 transition-transform hover:scale-110 focus:outline-none focus-visible:ring-2 rounded-full p-2 ${lightBg
+          ? 'text-neutral-700 drop-shadow-[0_1px_2px_rgba(255,255,255,0.8)] focus-visible:ring-neutral-400'
+          : 'text-white/90 drop-shadow-[0_1px_3px_rgba(0,0,0,0.5)] focus-visible:ring-white/50'
+          }`}
+        aria-label="Scroll down"
       >
-        <title>Scroll down</title>
-        <path d="M6 9l6 6 6-6" />
-      </svg>
-    </button>
+        <svg
+          className="animate-bounce-subtle"
+          width="28"
+          height="28"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          aria-hidden
+        >
+          <title>Scroll down</title>
+          <path d="M6 9l6 6 6-6" />
+        </svg>
+      </button>
+    </div>
   )
 }
 
