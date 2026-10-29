@@ -6,9 +6,13 @@ import {
   useCallback,
   useContext,
   useEffect,
+  useRef,
   useState,
   type ReactNode,
 } from 'react'
+
+const NEWSLETTER_PROMPT_SEEN_KEY = 'neptune_newsletter_prompt_seen'
+const AUTO_OPEN_DELAY_MS = 1500
 
 type NewsletterModalContextValue = {
   openModal: () => void
@@ -22,18 +26,45 @@ export function useOpenNewsletterModal() {
   return useContext(NewsletterModalContext).openModal
 }
 
-function NewsletterModalInner({ children }: { children: ReactNode }) {
+function NewsletterModalInner({ children, autoOpen }: { children: ReactNode; autoOpen: boolean }) {
   const [isOpen, setIsOpen] = useState(false)
   const [email, setEmail] = useState('')
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
   const [message, setMessage] = useState('')
+  const hasOpenedRef = useRef(false)
+  const dialogRef = useRef<HTMLDialogElement>(null)
 
   const openModal = useCallback(() => {
+    hasOpenedRef.current = true
+    try {
+      window.sessionStorage.setItem(NEWSLETTER_PROMPT_SEEN_KEY, 'true')
+    } catch {
+      // The in-memory flag still prevents repeats when storage is unavailable.
+    }
     setStatus((current) => current === 'loading' ? current : 'idle')
     setMessage('')
     setIsOpen(true)
   }, [])
   const closeModal = useCallback(() => setIsOpen(false), [])
+
+  useEffect(() => {
+    if (!autoOpen || isOpen || hasOpenedRef.current) return
+    const hasSeenPrompt = () => {
+      try {
+        return window.sessionStorage.getItem(NEWSLETTER_PROMPT_SEEN_KEY) === 'true'
+      } catch {
+        return false
+      }
+    }
+    if (hasSeenPrompt()) return
+    const timer = window.setTimeout(() => {
+      if (hasOpenedRef.current || hasSeenPrompt()) return
+      // Do not interrupt a cart or search dialog opened during the delay.
+      if (document.querySelector('[role="dialog"][aria-modal="true"], dialog[open]')) return
+      openModal()
+    }, AUTO_OPEN_DELAY_MS)
+    return () => window.clearTimeout(timer)
+  }, [autoOpen, isOpen, openModal])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -63,11 +94,17 @@ function NewsletterModalInner({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (!isOpen) return
+    const previousFocus = document.activeElement instanceof window.HTMLElement ? document.activeElement : null
+    // Focus the close button so mobile browsers do not open the keyboard automatically.
+    dialogRef.current?.querySelector<HTMLButtonElement>('button')?.focus()
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') closeModal()
     }
     document.addEventListener('keydown', onKeyDown)
-    return () => document.removeEventListener('keydown', onKeyDown)
+    return () => {
+      document.removeEventListener('keydown', onKeyDown)
+      if (previousFocus?.isConnected) previousFocus.focus()
+    }
   }, [isOpen, closeModal])
 
   return (
@@ -75,16 +112,33 @@ function NewsletterModalInner({ children }: { children: ReactNode }) {
       {children}
       {isOpen && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50"
+          className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/50"
           onClick={closeModal}
           onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && closeModal()}
           role="presentation"
         >
           <dialog
+            ref={dialogRef}
             open
-            className="relative w-full max-w-md bg-[#EBEBEB] p-8 md:p-12 shadow-xl border-0 m-0"
+            aria-modal="true"
+            className="relative max-h-[calc(100dvh-2rem)] w-full max-w-md overflow-y-auto bg-[#EBEBEB] p-8 md:p-12 shadow-xl border-0 m-0"
             onClick={(e) => e.stopPropagation()}
-            onKeyDown={(e) => e.key !== 'Escape' && e.stopPropagation()}
+            onKeyDown={(e) => {
+              if (e.key !== 'Escape') e.stopPropagation()
+              if (e.key !== 'Tab') return
+              const controls = Array.from(e.currentTarget.querySelectorAll<HTMLElement>(
+                'a[href], button:not([disabled]), input:not([disabled]), [tabindex="0"]'
+              ))
+              const first = controls[0]
+              const last = controls[controls.length - 1]
+              if (e.shiftKey && document.activeElement === first) {
+                e.preventDefault()
+                last?.focus()
+              } else if (!e.shiftKey && document.activeElement === last) {
+                e.preventDefault()
+                first?.focus()
+              }
+            }}
             aria-labelledby="newsletter-modal-title"
           >
             <button
@@ -159,7 +213,7 @@ function NewsletterModalInner({ children }: { children: ReactNode }) {
   )
 }
 
-export function NewsletterModalProvider({ children }: { children: ReactNode }) {
-  return <NewsletterModalInner>{children}</NewsletterModalInner>
+export function NewsletterModalProvider({ children, autoOpen = false }: { children: ReactNode; autoOpen?: boolean }) {
+  return <NewsletterModalInner autoOpen={autoOpen}>{children}</NewsletterModalInner>
 }
 

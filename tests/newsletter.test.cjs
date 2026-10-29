@@ -162,3 +162,95 @@ test('form displays a save error, supports retry, and resets after reopening', a
     delete global.IS_REACT_ACT_ENVIRONMENT
   }
 })
+
+test('homepage prompt opens once per session, cancels on navigation, and remains manually accessible', async () => {
+  const React = require('react')
+  const { JSDOM } = require('jsdom')
+  const dom = new JSDOM('<div id="root"></div>', { url: 'https://neptune-papers.com/' })
+  global.window = dom.window
+  global.document = dom.window.document
+  global.IS_REACT_ACT_ENVIRONMENT = true
+  const timers = new Map()
+  let nextTimer = 0
+  window.setTimeout = (callback, delay) => {
+    assert.equal(delay, 1500)
+    timers.set(++nextTimer, callback)
+    return nextTimer
+  }
+  window.clearTimeout = id => timers.delete(id)
+  const flushTimers = () => React.act(async () => {
+    const pending = [...timers.values()]
+    timers.clear()
+    pending.forEach(callback => callback())
+  })
+  const { NewsletterModalProvider, useOpenNewsletterModal } = load('src/contexts/NewsletterModalContext.tsx', {}, {
+    'next/link': { default: props => React.createElement('a', props), __esModule: true },
+  })
+  function OpenButton() {
+    return React.createElement('button', { id: 'open', onClick: useOpenNewsletterModal() }, 'Subscribe')
+  }
+  const { createRoot } = require('react-dom/client')
+  let root = createRoot(document.getElementById('root'))
+  const render = autoOpen => React.act(async () => root.render(
+    React.createElement(NewsletterModalProvider, { autoOpen }, React.createElement(OpenButton))
+  ))
+  const close = () => React.act(async () => document.querySelector('[aria-label="Close"]').click())
+  try {
+    await render(false)
+    assert.equal(timers.size, 0)
+    await render(true)
+    assert.equal(document.querySelector('dialog'), null)
+    assert.equal(timers.size, 1)
+    await render(false)
+    await flushTimers()
+    assert.equal(document.querySelector('dialog'), null)
+
+    await render(true)
+    document.getElementById('open').focus()
+    await flushTimers()
+    assert.ok(document.querySelector('dialog[aria-modal="true"]'))
+    assert.equal(document.activeElement.getAttribute('aria-label'), 'Close')
+    const policyLink = document.querySelector('a[href="/policy"]')
+    await React.act(async () => document.activeElement.dispatchEvent(new window.KeyboardEvent('keydown', { key: 'Tab', shiftKey: true, bubbles: true, cancelable: true })))
+    assert.equal(document.activeElement, policyLink)
+    await close()
+    assert.equal(document.activeElement.id, 'open')
+    await render(false)
+    await render(true)
+    await flushTimers()
+    assert.equal(document.querySelector('dialog'), null)
+
+    // A page reload keeps sessionStorage and must not show the prompt again.
+    await React.act(async () => root.unmount())
+    root = createRoot(document.getElementById('root'))
+    await render(true)
+    await flushTimers()
+    assert.equal(document.querySelector('dialog'), null)
+    await React.act(async () => document.getElementById('open').click())
+    assert.ok(document.querySelector('dialog'))
+    await close()
+
+    // A new session is eligible again; other open dialogs take priority.
+    window.sessionStorage.clear()
+    await React.act(async () => root.unmount())
+    root = createRoot(document.getElementById('root'))
+    const cart = document.createElement('div')
+    cart.setAttribute('role', 'dialog')
+    cart.setAttribute('aria-modal', 'true')
+    document.body.appendChild(cart)
+    await render(true)
+    await flushTimers()
+    assert.equal(document.querySelector('dialog'), null)
+    cart.remove()
+    await render(false)
+    await render(true)
+    await flushTimers()
+    assert.ok(document.querySelector('dialog'))
+  } finally {
+    await React.act(async () => root.unmount())
+    dom.window.close()
+    delete global.window
+    delete global.document
+    delete global.IS_REACT_ACT_ENVIRONMENT
+  }
+})
