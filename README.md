@@ -31,7 +31,7 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 
 ## Sanity on-demand revalidation
 
-So that content changes in [Sanity Studio](https://neptune-psi.vercel.app/studio) appear immediately on the live site (e.g. [Interiors](https://neptune-psi.vercel.app/interiors)) instead of after the next ISR revalidate window:
+So that content changes in [Sanity Studio](https://neptune-papers.com/studio) appear immediately on the live site (e.g. [Stories](https://neptune-papers.com/stories)) instead of after the next ISR revalidate window:
 
 1. **Vercel env**  
    In your Vercel project: **Settings → Environment Variables**. Add:
@@ -40,7 +40,7 @@ So that content changes in [Sanity Studio](https://neptune-psi.vercel.app/studio
 
 2. **Sanity webhook**  
    In [sanity.io/manage](https://www.sanity.io/manage) → your project → **API** → **Webhooks** → **Create webhook**:
-   - **URL:** `https://neptune-psi.vercel.app/api/revalidate` (or your production URL + `/api/revalidate`)
+   - **URL:** `https://neptune-papers.com/api/revalidate`
    - **HTTP method:** POST
    - **Secret:** the same value as `SANITY_REVALIDATE_SECRET`
    - **Trigger on:** Create, Update, Delete

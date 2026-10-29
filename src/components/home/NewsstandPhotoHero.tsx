@@ -227,13 +227,20 @@ function PhotoCarousel({ slides, priority }: { slides: NewsstandPhotoSlide[]; pr
             style={{ backgroundColor: backgrounds[photo._key] }}
             aria-hidden={photoIndex !== position}
           >
-            <div className="absolute inset-x-0 top-[var(--header-height)] bottom-44 overflow-hidden md:inset-0">
+            <Link
+              href="/newsstand"
+              aria-label="Browse Newsstand"
+              tabIndex={photoIndex === position ? 0 : -1}
+              draggable={false}
+              className="absolute inset-x-0 top-[var(--header-height)] bottom-44 overflow-hidden focus-visible:outline-2 focus-visible:-outline-offset-4 focus-visible:outline-black md:inset-0"
+            >
               <Image
                 src={photo.imageUrl}
                 alt={photo.alt}
                 fill
                 sizes="(max-width: 767px) 230vw, 100vw"
                 loading="eager"
+                draggable={false}
                 priority={priority && photoIndex === (multiple ? 1 : 0)}
                 onLoad={(event) => {
                   const background = getImageBackground(event.currentTarget)
@@ -248,7 +255,7 @@ function PhotoCarousel({ slides, priority }: { slides: NewsstandPhotoSlide[]; pr
                 className="scale-[2.3] object-contain md:scale-100 md:object-cover"
                 style={{ objectPosition: photo.objectPosition }}
               />
-            </div>
+            </Link>
           </div>
         ))}
       </div>

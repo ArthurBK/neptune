@@ -1,6 +1,16 @@
 'use client'
 
-import CookieConsent, { getCookieConsentValue, resetCookieConsentValue } from 'react-cookie-consent'
+import { useState, useSyncExternalStore } from 'react'
+import CookieConsent from 'react-cookie-consent'
+import {
+  COOKIE_CONSENT_NAME,
+  COOKIE_CONSENT_DAYS,
+  consentCookieOptions,
+  getCookieConsentValue,
+  resetCookieConsentValue,
+  saveCookieConsent,
+  subscribeToCookieConsent,
+} from '@/lib/cookieConsent'
 
 const cookieBannerCopy = {
   en: {
@@ -25,20 +35,28 @@ type CookieBannerProps = {
 
 export function CookieBanner({ locale = 'en' }: CookieBannerProps) {
   const copy = cookieBannerCopy[locale]
+  const consent = useSyncExternalStore(subscribeToCookieConsent, getCookieConsentValue, () => null)
+  const [dismissed, setDismissed] = useState(false)
+
+  // Wait for the browser's saved preference before showing the banner.
+  if (consent !== undefined || dismissed) return null
 
   return (
     <CookieConsent
       location="bottom"
-      cookieName="neptune_cookie_consent"
-      expires={365}
+      cookieName={COOKIE_CONSENT_NAME}
+      expires={COOKIE_CONSENT_DAYS}
+      extraCookieOptions={consentCookieOptions()}
       enableDeclineButton
       declineButtonText={copy.decline}
       buttonText={copy.accept}
       onAccept={() => {
-        // Analytics or tracking can be enabled here
+        saveCookieConsent('true')
+        setDismissed(true)
       }}
       onDecline={() => {
-        // Analytics or tracking should remain disabled
+        saveCookieConsent('false')
+        setDismissed(true)
       }}
       style={{
         background: '#ffffff',

@@ -13,6 +13,12 @@ const nextConfig: NextConfig = {
     const categories = ['interiors', 'gardens', 'arts', 'fashion', 'travel']
 
     return [
+      ...['neptune-psi.vercel.app', 'www.neptune-papers.com'].map((host) => ({
+        source: '/:path*',
+        has: [{ type: 'host' as const, value: host }],
+        destination: 'https://neptune-papers.com/:path*',
+        permanent: true,
+      })),
       ...categories.map((category) => ({
         source: `/${category}`,
         destination: '/stories',

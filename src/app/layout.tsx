@@ -69,6 +69,7 @@ const gillSans = localFont({
 })
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://neptune-papers.com'),
   title: 'Neptune',
   description: 'Luxury editorial magazine',
 }
