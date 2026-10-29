@@ -2,7 +2,8 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 
-import { client, sanityFetch } from '@/sanity/lib/client'
+import { client } from '@/sanity/lib/client'
+import { articleFetch as sanityFetch } from '@/sanity/lib/live'
 import { isContributorsVisible } from '@/sanity/lib/contributors'
 import { urlFor } from '@/sanity/lib/image'
 import {
@@ -59,7 +60,7 @@ export default async function PhotographerProfilePage({ params }: PageProps) {
 
   const [articlesRaw, adBanner, showContributors] = await Promise.all([
     sanityFetch<ArticleCardData[] | null>(ARTICLES_BY_PHOTOGRAPHER_QUERY, {
-      photographerId: photographer._id,
+      photographerId: photographer._id.replace(/^drafts\./, ''),
     }),
     sanityFetch<{ image: { asset?: { _ref: string } }; linkUrl?: string | null; title?: string | null } | null>(
       AD_BANNER_BY_PLACEMENT_QUERY,

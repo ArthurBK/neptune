@@ -17,7 +17,7 @@ const live = defineLive({
 
 export const SanityLive = live.SanityLive
 
-/** Only article pages opt into draft-aware fetching; public lists stay published-only. */
+/** Article and contributor profile pages follow Draft Mode; public lists stay published-only. */
 export async function articleFetch<T>(query: string, params: Record<string, unknown> = {}): Promise<T> {
   if ((await draftMode()).isEnabled) requireReadToken()
   const { data } = await live.sanityFetch({ query, params, stega: false })

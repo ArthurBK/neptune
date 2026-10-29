@@ -177,3 +177,53 @@ test('article fetching uses published content normally and authenticated drafts 
   configured = false
   await assert.rejects(articleFetch('query'), /Missing Viewer token/)
 })
+
+test('contributor and photographer profiles include draft contributions only while previewing', async () => {
+  const React = require('react')
+  const { renderToStaticMarkup } = require('react-dom/server')
+  const { parse, evaluate } = require('groq-js')
+  const queries = load('src/sanity/lib/queries.ts', { 'next-sanity': { defineQuery: query => query } })
+  for (const [file, personType, credit] of [
+    ['src/app/contributors/[slug]/page.tsx', 'contributor', 'author'],
+    ['src/app/contributors/photographer/[slug]/page.tsx', 'photographer', 'photographer'],
+  ]) {
+    let preview = false
+    const person = { _id: 'christina', _type: personType, slug: { current: 'christina' }, name: 'Christina Holevas' }
+    const article = (id, title, personId = person._id) => ({
+      _id: id, _type: 'article', title, slug: { current: id }, [credit]: { _ref: personId },
+    })
+    const published = [person, article('julianne-moore', 'Julianne Moore')]
+    const drafts = [article('lisa-eisner', 'Lisa Eisner'), article('unrelated', 'Unrelated draft', 'someone-else')]
+    const fetchContent = async (query, params = {}) => {
+      const data = await (await evaluate(parse(query), { dataset: preview ? [...published, ...drafts] : published, params })).get()
+      // Also exercise a profile returned with a drafts-prefixed identity.
+      if (preview && data?._id === person._id) return { ...data, _id: `drafts.${person._id}` }
+      return data
+    }
+    const { default: Page, generateStaticParams } = load(file, {
+      'next/image': { default: () => null, __esModule: true },
+      'next/link': { default: props => React.createElement('a', props), __esModule: true },
+      'next/navigation': { notFound: () => { throw new Error('NOT_FOUND') } },
+      '@/sanity/lib/client': { client: { fetch: () => [{ slug: 'christina' }] } },
+      '@/sanity/lib/live': { articleFetch: fetchContent },
+      '@/sanity/lib/contributors': { isContributorsVisible: async () => true },
+      '@/sanity/lib/queries': queries,
+      '@/sanity/lib/image': { urlFor: () => { throw new Error('Unexpected image') } },
+      '@/components/shared/AdBanner': { AdBanner: () => null },
+      '@/components/editorial/ArticleCard': { ArticleCard: ({ title, slug }) => React.createElement('a', { href: `/stories/${slug}` }, title) },
+      '@/components/shared/PageIntroText': { hasPortableTextContent: () => false, PageIntroText: () => null },
+    })
+    const render = async () => renderToStaticMarkup(await Page({ params: Promise.resolve({ slug: 'christina' }) }))
+    assert.match(await render(), /Julianne Moore/)
+    assert.doesNotMatch(await render(), /Lisa Eisner/)
+    preview = true
+    const html = await render()
+    assert.match(html, /href="\/stories\/lisa-eisner">Lisa Eisner/)
+    assert.match(html, /Julianne Moore/)
+    assert.doesNotMatch(html, /Unrelated draft/)
+    assert.equal((html.match(/>Lisa Eisner</g) ?? []).length, 1)
+    assert.deepEqual(await generateStaticParams(), [{ slug: 'christina' }])
+    preview = false
+    assert.doesNotMatch(await render(), /Lisa Eisner/)
+  }
+})

@@ -68,7 +68,9 @@ any exact Vercel deployment origins used for previews).
 The Studio uses Sanity's secret-validated `/api/draft-mode/enable` endpoint.
 Only authenticated Draft Mode sessions receive the Viewer token and draft data.
 Public requests and static slug generation use published content. Article reads
-use `defineLive`; public lists retain their existing published-only queries.
+use `defineLive`, as do contributor profiles so their articles include drafts while
+previewing. Public visitors still see only published articles; directory and search
+lists retain their existing published-only queries.
 `SanityLive` and `VisualEditing` connect the preview to the Studio. Stega text
 encoding is disabled to preserve existing typography and rendering; this preview
 does not add click-to-edit overlays. Preview responses are marked `noindex`, and
