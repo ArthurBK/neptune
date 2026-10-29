@@ -1,5 +1,6 @@
 import { shopifyFetch } from "./client"
 import { ALL_PRODUCTS_QUERY, NEWSSTAND_PRODUCTS_QUERY } from "./queries"
+import { sortNewsstandProducts } from "./productOrder"
 import type {
   AllProductsResponse,
   NewsstandProductsResponse,
@@ -88,10 +89,5 @@ function mergeProducts(
     productsByHandle.set(product.handle, product)
   }
 
-  return Array.from(productsByHandle.values()).sort((a, b) => {
-    const createdA = a.createdAt ? Date.parse(a.createdAt) : 0
-    const createdB = b.createdAt ? Date.parse(b.createdAt) : 0
-
-    return createdB - createdA
-  })
+  return sortNewsstandProducts(Array.from(productsByHandle.values()))
 }
