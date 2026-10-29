@@ -1,7 +1,8 @@
 import { ContributorCredit } from '@/components/editorial/ContributorCredit'
 import { notFound } from 'next/navigation'
 
-import { client, sanityFetch } from '@/sanity/lib/client'
+import { client } from '@/sanity/lib/client'
+import { articleFetch as sanityFetch } from '@/sanity/lib/live'
 import { urlFor } from '@/sanity/lib/image'
 import {
   AD_BANNER_BY_PLACEMENT_QUERY,

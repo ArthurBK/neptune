@@ -1,5 +1,13 @@
 @import "tailwindcss";
 
+@font-face {
+  font-family: "Pinyon Script";
+  src: url("/fonts/Pinyon_Script/PinyonScript-Regular.ttf") format("truetype");
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
+
 :root {
   --background: #ffffff;
   --foreground: #1a1a1a;
@@ -19,6 +27,7 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-cormorant), ui-serif, Georgia, serif;
   --font-serif: var(--font-cormorant), ui-serif, Georgia, serif;
+  --font-newsletter: "Pinyon Script", "Snell Roundhand", cursive;
   --font-accent: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
   --font-eb-garamond: var(--font-eb-garamond-source), "EB Garamond", Garamond, Georgia, serif;
   --font-header: "Helvetica Neue", Helvetica, Arial, sans-serif;

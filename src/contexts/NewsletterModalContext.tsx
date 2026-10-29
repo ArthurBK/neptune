@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 import {
   createContext,
   useCallback,
@@ -121,7 +122,7 @@ function NewsletterModalInner({ children, autoOpen }: { children: ReactNode; aut
             ref={dialogRef}
             open
             aria-modal="true"
-            className="relative max-h-[calc(100dvh-2rem)] w-full max-w-md overflow-y-auto bg-[#EBEBEB] p-8 md:p-12 shadow-xl border-0 m-0"
+            className="relative max-h-[calc(100dvh-2rem)] w-full max-w-md overflow-y-auto bg-[#EBEBEB] px-6 py-6 md:px-12 shadow-xl border-0 m-0"
             onClick={(e) => e.stopPropagation()}
             onKeyDown={(e) => {
               if (e.key !== 'Escape') e.stopPropagation()
@@ -155,17 +156,30 @@ function NewsletterModalInner({ children, autoOpen }: { children: ReactNode; aut
 
             <h2
               id="newsletter-modal-title"
-              className="text-base md:text-lg font-header font-bold text-black tracking-wide text-center"
+              className="flex flex-col items-center text-black"
             >
-              Enter your email:
+              <Image
+                src="/neptune_logo_dark.svg"
+                alt="NEPTUNE"
+                width={4647}
+                height={760}
+                className="h-auto w-[55%] max-w-[12rem]"
+              />
+              <span className="font-newsletter text-3xl font-normal leading-none md:text-4xl">
+                newsletter
+              </span>
             </h2>
+
+            <p className="mt-8 text-base md:text-lg font-header font-normal uppercase text-black text-center">
+              Enter your email:
+            </p>
 
             {status === 'success' ? (
               <p role="status" className="mt-6 text-center text-black">
                 {message}
               </p>
             ) : (
-              <form onSubmit={handleSubmit} className="mt-8">
+              <form onSubmit={handleSubmit} className="mt-10 md:mt-12">
                 <input
                   type="email"
                   name="email"
@@ -178,7 +192,7 @@ function NewsletterModalInner({ children, autoOpen }: { children: ReactNode; aut
                   placeholder="your@email.com"
                   required
                   disabled={status === 'loading'}
-                  className="w-full py-3 border-b-2 border-black bg-transparent text-black placeholder:text-black/70 focus:outline-none focus:border-black disabled:opacity-60"
+                  className="w-full py-3 border-b-2 border-black bg-transparent font-serif text-lg font-light text-black placeholder:text-black/70 focus:outline-none focus:border-black disabled:opacity-60"
                 />
                 {status === 'error' && (
                   <p id="newsletter-error" role="alert" className="mt-4 text-sm text-red-700">
@@ -188,14 +202,14 @@ function NewsletterModalInner({ children, autoOpen }: { children: ReactNode; aut
                 <button
                   type="submit"
                   disabled={status === 'loading'}
-                  className="mt-8 block mx-auto cursor-pointer bg-transparent font-header font-bold text-base tracking-[0.2em] uppercase text-black transition-colors hover:underline disabled:opacity-60 disabled:cursor-not-allowed"
+                  className="mt-8 block mx-auto cursor-pointer bg-transparent font-header font-bold text-lg uppercase text-black transition-colors hover:underline disabled:opacity-60 disabled:cursor-not-allowed"
                 >
-                  {status === 'loading' ? 'Subscribing…' : 'Subscribe'}
+                  {status === 'loading' ? 'Subscribing…' : 'Subscribe now'}
                 </button>
               </form>
             )}
 
-            <p className="mt-8 text-xs text-black/80 italic text-center">
+            <p className="mt-10 font-serif text-xs text-black/80 italic text-center">
               By submitting your email, you agree to our{' '}
               <Link
                 href="/policy"

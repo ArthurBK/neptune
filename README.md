@@ -50,6 +50,32 @@ So that content changes in [Sanity Studio](https://neptune-papers.com/studio) ap
 
    Save. After the next publish in Studio, the revalidate API is called and the relevant pages refresh on the next request.
 
+## Article preview
+
+In **Studio → Articles**, open an article, generate its slug, and click **Preview**
+(also available in the document menu and the location banner). No publication is
+required. The **Preview** tool shows the real `/stories/[slug]` page alongside the
+editor, with desktop/mobile sizes and live updates. It also works when the Stories
+listing is hidden. Use **Exit preview** to return to published content; a draft-only
+article will then correctly return 404. Preview link sharing is disabled.
+
+Set `SANITY_API_READ_TOKEN` to a dedicated Sanity **Viewer** token in `.env.local`
+and the Vercel environments that need previews. Restart/redeploy after changing it.
+Never use a `NEXT_PUBLIC_` prefix or a write token. Add `https://neptune-papers.com`
+and `http://localhost:3000` as Sanity CORS origins with credentials enabled (and
+any exact Vercel deployment origins used for previews).
+
+The Studio uses Sanity's secret-validated `/api/draft-mode/enable` endpoint.
+Only authenticated Draft Mode sessions receive the Viewer token and draft data.
+Public requests and static slug generation use published content. Article reads
+use `defineLive`; public lists retain their existing published-only queries.
+`SanityLive` and `VisualEditing` connect the preview to the Studio. Stega text
+encoding is disabled to preserve existing typography and rendering; this preview
+does not add click-to-edit overlays. Preview responses are marked `noindex`, and
+automatic newsletter prompts are suppressed while previewing.
+
+Run `node --test tests/article-preview.test.cjs tests/header-rendering.test.cjs`.
+
 ## Unpublishing articles
 
 Use **Unpublish** on a published article to keep it as a draft while removing it

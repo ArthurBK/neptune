@@ -7,6 +7,7 @@
 import {visionTool} from '@sanity/vision'
 import {defineConfig} from 'sanity'
 import {structureTool} from 'sanity/structure'
+import {presentationTool} from 'sanity/presentation'
 import {media} from 'sanity-plugin-media'
 
 // Go to https://www.sanity.io/docs/api-versioning to learn how API versioning works
@@ -15,6 +16,8 @@ import {schema} from './src/sanity/schemas'
 import {structure} from './src/sanity/structure'
 import {contributorDeleteAction} from './src/sanity/actions/contributorDeleteAction'
 import {articleReferenceAction} from './src/sanity/actions/articleReferenceAction'
+import {articlePreviewAction} from './src/sanity/actions/articlePreviewAction'
+import {resolve} from './src/sanity/presentation/resolve'
 
 export default defineConfig({
   basePath: '/studio',
@@ -33,15 +36,24 @@ export default defineConfig({
             action.action === 'delete' ? contributorDeleteAction(action) : action,
           )
         : schemaType === 'article'
-          ? actions.map((action) =>
+          ? [...actions.map((action) =>
               action.action === 'unpublish' || action.action === 'delete'
                 ? articleReferenceAction(action)
                 : action,
-            )
+            ), articlePreviewAction]
           : actions,
   },
   plugins: [
     structureTool({structure}),
+    presentationTool({
+      title: 'Preview',
+      resolve,
+      previewUrl: {
+        // Embedded Studio: use the current origin in production and local development.
+        initial: '/',
+        previewMode: { enable: '/api/draft-mode/enable', shareAccess: false },
+      },
+    }),
     // Media: browse assets, bulk upload, select multiple at once
     media(),
     // Vision is for querying with GROQ from inside the Studio

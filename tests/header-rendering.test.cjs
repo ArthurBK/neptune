@@ -135,6 +135,11 @@ test('newsletter opens automatically only on the homepage', () => {
   }
 })
 
+test('newsletter never interrupts an editor previewing the homepage', () => {
+  renderToString(app('/', null, undefined, { isPreview: true }))
+  assert.equal(newsletterAutoOpen, false)
+})
+
 test('Stories visibility controls desktop and mobile menus independently of Shop', () => {
   for (const showStories of [false, true]) {
     for (const showShop of [false, true]) {

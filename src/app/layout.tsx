@@ -3,6 +3,10 @@ import { EB_Garamond, Inter } from 'next/font/google'
 import localFont from 'next/font/local'
 import { Analytics } from '@vercel/analytics/next'
 import { SpeedInsights } from '@vercel/speed-insights/next'
+import { draftMode } from 'next/headers'
+import { VisualEditing } from 'next-sanity/visual-editing'
+import { SanityLive } from '@/sanity/lib/live'
+import { ArticlePreviewBanner } from '@/components/editorial/ArticlePreviewBanner'
 
 import { sanityFetch } from '@/sanity/lib/client'
 import { HOME_MENU_QUERY, SITE_SETTINGS_QUERY } from '@/sanity/lib/queries'
@@ -70,10 +74,13 @@ const gillSans = localFont({
   display: 'swap',
 })
 
-export const metadata: Metadata = {
-  metadataBase: new URL('https://neptune-papers.com'),
-  title: 'Neptune',
-  description: 'Luxury editorial magazine',
+export async function generateMetadata(): Promise<Metadata> {
+  return {
+    metadataBase: new URL('https://neptune-papers.com'),
+    title: 'Neptune',
+    description: 'Luxury editorial magazine',
+    ...((await draftMode()).isEnabled ? { robots: { index: false, follow: false } } : {}),
+  }
 }
 
 export default async function RootLayout({
@@ -81,6 +88,7 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode
 }>) {
+  const { isEnabled: isPreview } = await draftMode()
   const [settings, showShop, homeMenu, showStories, showContributors] = await Promise.all([
     sanityFetch<{ instagramUrl?: string | null } | null>(SITE_SETTINGS_QUERY),
     isMarketVisible(),
@@ -98,8 +106,11 @@ export default async function RootLayout({
           showShop={showShop}
           showStories={showStories}
           showContributors={showContributors}
+          isPreview={isPreview}
           initialHomeHeaderVariant={getHeaderVariant(homeMenu?.menuAppearance, homeMenu?.type, 0)}
         >{children}</LayoutShell>
+        <SanityLive />
+        {isPreview && <><ArticlePreviewBanner /><VisualEditing /></>}
         <Analytics />
         <SpeedInsights />
       </body>

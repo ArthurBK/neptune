@@ -53,6 +53,7 @@ export function LayoutShell({
   showShop = true,
   showStories = true,
   showContributors = true,
+  isPreview = false,
   initialHomeHeaderVariant = 'dark',
 }: {
   children: React.ReactNode
@@ -60,6 +61,7 @@ export function LayoutShell({
   showShop?: boolean
   showStories?: boolean
   showContributors?: boolean
+  isPreview?: boolean
   initialHomeHeaderVariant?: HeaderVariant
 }) {
   const pathname = usePathname()
@@ -79,7 +81,7 @@ export function LayoutShell({
     <StoriesVisibilityProvider value={showStories}>
       <HeaderVariantProvider initialVariant={isHome ? initialHomeHeaderVariant : 'light'}>
         <FooterVisibilityProvider>
-          <NewsletterModalProvider autoOpen={isHome}>
+          <NewsletterModalProvider autoOpen={isHome && !isPreview}>
             <LayoutShellInner instagramUrl={instagramUrl} cookieBannerLocale={cookieBannerLocale} isHomePage={isHome} showShop={showShop} showStories={showStories} showContributors={showContributors}>
               {children}
             </LayoutShellInner>
