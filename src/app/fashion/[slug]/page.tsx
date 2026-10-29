@@ -89,7 +89,7 @@ export default async function FashionArticlePage({ params }: ArticlePageProps) {
           )}
           <h1
             className={`mx-auto max-w-3xl whitespace-pre-line leading-tight tracking-tight ${typography.fontFamilyClass} ${typography.titleSizeClass}`}
-            style={{ color: typography.textColor ?? '#000000' }}
+            style={{ color: typography.titleColor ?? '#000000' }}
           >
             {article.title}
           </h1>

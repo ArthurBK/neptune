@@ -3,6 +3,7 @@ import { getTextStyleFontClass, type TextStyleFontFamily } from '@/lib/textStyle
 type ArticleTypography = {
   fontFamily?: TextStyleFontFamily | null
   textColor?: string | null
+  titleColor?: string | null
   titleSize?: 'sm' | 'md' | 'lg' | null
   bodySize?: 'sm' | 'md' | 'lg' | null
 }
@@ -36,6 +37,7 @@ export function resolveArticleTypography(typography: ArticleTypography | null | 
     titleSizeClass: TITLE_SIZE_CLASSES[titleSize] ?? TITLE_SIZE_CLASSES.md,
     bodySizeClass: BODY_SIZE_CLASSES[bodySize] ?? BODY_SIZE_CLASSES.md,
     textColor,
+    titleColor: normalizedHexColor(typography?.titleColor) ?? textColor,
   }
 }
 

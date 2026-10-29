@@ -240,6 +240,64 @@ export const article = defineType({
       validation: (rule) => rule.required(),
     }),
     defineField({
+      name: 'typography',
+      title: 'Title and text style',
+      type: 'object',
+      options: { collapsible: true, collapsed: false },
+      description: 'Style the title on the article page. Preview changes with the Preview button.',
+      fields: [
+        defineField({
+          name: 'titleSize',
+          title: 'Title size',
+          type: 'string',
+          options: { list: ARTICLE_TEXT_SIZES },
+          initialValue: 'md',
+        }),
+        defineField({
+          name: 'titleColor',
+          title: 'Title color',
+          type: 'string',
+          description: 'Applies only to the article title. Leave empty to use the text color below.',
+          components: { input: HexColorInput },
+          validation: (rule) =>
+            rule.custom((value) => {
+              if (!value) return true
+              if (typeof value !== 'string') return 'Must be a string'
+              const isHex = /^#(?:[0-9a-fA-F]{3}){1,2}$/.test(value.trim())
+              return isHex ? true : 'Use a valid hex color like #1A1A1A'
+            }),
+        }),
+        defineField({
+          name: 'fontFamily',
+          title: 'Font family',
+          type: 'string',
+          options: { list: TEXT_STYLE_FONT_FAMILIES },
+          initialValue: 'serif',
+        }),
+        defineField({
+          name: 'textColor',
+          title: 'Text color (hex)',
+          type: 'string',
+          description: 'Optional. Example: #1A1A1A',
+          components: { input: HexColorInput },
+          validation: (rule) =>
+            rule.custom((value) => {
+              if (!value) return true
+              if (typeof value !== 'string') return 'Must be a string'
+              const isHex = /^#(?:[0-9a-fA-F]{3}){1,2}$/.test(value.trim())
+              return isHex ? true : 'Use a valid hex color like #1A1A1A'
+            }),
+        }),
+        defineField({
+          name: 'bodySize',
+          title: 'Body size',
+          type: 'string',
+          options: { list: ARTICLE_TEXT_SIZES },
+          initialValue: 'md',
+        }),
+      ],
+    }),
+    defineField({
       name: 'slug',
       title: 'Slug',
       type: 'slug',
@@ -333,49 +391,6 @@ export const article = defineType({
       name: 'publishedAt',
       title: 'Published At',
       type: 'datetime',
-    }),
-    defineField({
-      name: 'typography',
-      title: 'Typography',
-      type: 'object',
-      options: { collapsible: true, collapsed: true },
-      fields: [
-        defineField({
-          name: 'fontFamily',
-          title: 'Font family',
-          type: 'string',
-          options: { list: TEXT_STYLE_FONT_FAMILIES },
-          initialValue: 'serif',
-        }),
-        defineField({
-          name: 'textColor',
-          title: 'Text color (hex)',
-          type: 'string',
-          description: 'Optional. Example: #1A1A1A',
-          components: { input: HexColorInput },
-          validation: (rule) =>
-            rule.custom((value) => {
-              if (!value) return true
-              if (typeof value !== 'string') return 'Must be a string'
-              const isHex = /^#(?:[0-9a-fA-F]{3}){1,2}$/.test(value.trim())
-              return isHex ? true : 'Use a valid hex color like #1A1A1A'
-            }),
-        }),
-        defineField({
-          name: 'titleSize',
-          title: 'Title size',
-          type: 'string',
-          options: { list: ARTICLE_TEXT_SIZES },
-          initialValue: 'md',
-        }),
-        defineField({
-          name: 'bodySize',
-          title: 'Body size',
-          type: 'string',
-          options: { list: ARTICLE_TEXT_SIZES },
-          initialValue: 'md',
-        }),
-      ],
     }),
     defineField({
       name: 'body',
