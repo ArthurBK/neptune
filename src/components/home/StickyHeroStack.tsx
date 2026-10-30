@@ -760,7 +760,7 @@ function ArticleSplitContent({
         {/* Left: image */}
         <div className="flex-[1.45] md:flex-1 min-w-0 min-h-[56vh] md:min-h-0 relative md:aspect-[16/9]">
           {imageUrl ? (
-            <Link href={href} className="block h-full w-full md:absolute md:inset-0">
+            <Link href={href} className="block h-full w-full md:absolute md:inset-y-[12%] md:right-0 md:left-[20%] md:h-auto md:w-auto">
               <div className="flex h-full w-full items-center justify-center md:hidden">
                 <img
                   src={imageUrl}
@@ -775,7 +775,7 @@ function ArticleSplitContent({
                 alt={alt}
                 fill
                 className="hidden object-contain object-right md:block"
-                sizes="50vw"
+                sizes="40vw"
                 priority={priority}
               />
             </Link>
