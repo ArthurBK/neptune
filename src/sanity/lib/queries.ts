@@ -45,6 +45,7 @@ export const HOME_PAGE_QUERY = `
       _type,
       _key,
       _type == "homeArticleBlock" => {
+        image,
         "article": article->{
           _id,
           title,

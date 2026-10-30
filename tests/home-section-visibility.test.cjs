@@ -76,3 +76,17 @@ test('an all-hidden homepage never fetches or renders legacy fallback content', 
   assert.deepEqual(container.props.sections, [])
   assert.deepEqual(calls, [queries.HOME_PAGE_QUERY, queries.SITE_SETTINGS_QUERY])
 })
+
+test('the homepage article image keeps its dedicated crop and hotspot', async () => {
+  const image = {
+    _type: 'image', asset: { _type: 'reference', _ref: 'square-image' }, alt: 'Homepage framing',
+    crop: { left: 0.1, right: 0, top: 0, bottom: 0.1 },
+    hotspot: { x: 0.6, y: 0.4, width: 0.2, height: 0.3 },
+  }
+  const result = await queryHome(queries.HOME_PAGE_QUERY, {
+    _id: 'homePage', _type: 'homePage', sections: [{
+      _key: 'article', _type: 'homeArticleBlock', article: { _ref: 'article' }, image,
+    }],
+  })
+  assert.deepEqual(result.sections[0].image, image)
+})

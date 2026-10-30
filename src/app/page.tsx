@@ -128,7 +128,7 @@ export default async function Home() {
             slug: block.article.slug,
             category: block.article.category,
             subcategory: block.article.subcategory ?? null,
-            coverImage: block.article.coverImage,
+            coverImage: block.image?.asset?._ref ? block.image : block.article.coverImage,
             author: block.article.author,
           },
         })

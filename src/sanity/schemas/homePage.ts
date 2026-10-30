@@ -28,10 +28,18 @@ const homeArticleBlock = defineType({
       to: [{ type: 'article' }],
       validation: (rule) => rule.required(),
     }),
+    defineField({
+      name: 'image',
+      title: 'Article image — square (1:1)',
+      type: 'image',
+      description: 'This section always displays a square image. Optionally choose a dedicated image and adjust its crop and hotspot using the square preview. If empty, the article cover is cropped to a square. The article page is unchanged.',
+      options: { hotspot: { previews: [{ title: 'Square (1:1)', aspectRatio: 1 }] } },
+      fields: [defineField({ name: 'alt', title: 'Alt text', type: 'string' })],
+    }),
   ],
   preview: {
-    select: { title: 'article.title', media: 'article.coverImage', isHidden: 'isHidden' },
-    prepare: ({ title, media, isHidden }) => ({ title: title || 'Article', media, subtitle: isHidden ? 'Hidden' : undefined }),
+    select: { title: 'article.title', media: 'image', coverImage: 'article.coverImage', isHidden: 'isHidden' },
+    prepare: ({ title, media, coverImage, isHidden }) => ({ title: title || 'Article', media: media?.asset ? media : coverImage, subtitle: isHidden ? 'Hidden' : 'Square image (1:1)' }),
   },
 })
 
