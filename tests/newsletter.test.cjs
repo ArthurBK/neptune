@@ -117,11 +117,13 @@ test('form displays a save error, supports retry, and resets after reopening', a
   global.IS_REACT_ACT_ENVIRONMENT = true
   const { createRoot } = require('react-dom/client')
   let fail = true
+  let signupEvents = 0
   const { NewsletterModalProvider, useOpenNewsletterModal } = load('src/contexts/NewsletterModalContext.tsx', {
     fetch: async () => fail
       ? Response.json({ error: 'Could not save. Try again.' }, { status: 502 })
       : Response.json({ success: true, message: 'Thank you for subscribing.' }),
   }, {
+    '@/lib/googleAnalytics': { trackNewsletterSignup: () => signupEvents++ },
     'next/link': { default: props => React.createElement('a', props), __esModule: true },
   })
   function OpenButton() {
@@ -141,9 +143,11 @@ test('form displays a save error, supports retry, and resets after reopening', a
     })
     await submit()
     assert.match(document.querySelector('[role="alert"]').textContent, /Could not save/)
+    assert.equal(signupEvents, 0)
     assert.equal(document.querySelector('input').value, 'person@example.com')
     fail = false
     await submit()
+    assert.equal(signupEvents, 1)
     assert.match(document.querySelector('[role="status"]').textContent, /Thank you/)
     await React.act(async () => document.querySelector('[aria-label="Close"]').click())
     await React.act(async () => document.getElementById('open').click())
@@ -184,6 +188,7 @@ test('opt-in prompt opens once per session, cancels on navigation, and remains m
     pending.forEach(callback => callback())
   })
   const { NewsletterModalProvider, useOpenNewsletterModal } = load('src/contexts/NewsletterModalContext.tsx', {}, {
+    '@/lib/googleAnalytics': { trackNewsletterSignup: () => {} },
     'next/link': { default: props => React.createElement('a', props), __esModule: true },
   })
   function OpenButton() {

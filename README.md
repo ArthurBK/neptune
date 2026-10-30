@@ -115,6 +115,41 @@ revision conflicts or other strong references abort the transaction. The standar
 Sanity permissions still apply. Run `node --test tests/contributor-deletion.test.cjs`
 to check deletion and credit rendering without modifying live data.
 
+## Google Analytics 4
+
+The public site uses measurement ID `G-YHCN71B9JT` directly with `gtag.js` (no GTM
+container is installed). Collection is limited to production on
+`neptune-papers.com`, after accepting the existing cookie banner. Studio, API
+routes, local development, Vercel previews and Sanity Draft Mode are excluded.
+Visitors can reset their choice on `/cookies`; this disables collection, clears
+GA cookies and reloads without the Google script. Advertising signals are disabled.
+
+**GA4 setup required:** in Admin → Data streams → Neptune web stream → Enhanced
+measurement settings → Page views → Advanced settings, turn off **Page changes
+based on browser history events**. The site sends page views itself for Next.js
+navigation; leaving Google's automatic history tracking enabled duplicates them.
+Keep the other enhanced measurements enabled. Do not install a second copy of
+this Google tag through GTM. See Google's [pageview guide](https://developers.google.com/analytics/devguides/collection/ga4/views).
+
+Events:
+- `page_view`: one per rendered route visit, with the article title and ID when
+  applicable. GA4 supplies the standard engagement metrics.
+- `article_scroll`: once at each 25/50/75/90% threshold of the article body per
+  route visit. It measures content reached, not proof that it was read.
+- `newsletter_signup`: only after a successful form response. This counts accepted
+  signup requests, including existing subscribers and pending confirmations;
+  Mailchimp remains the source of truth for new confirmed subscribers. Email
+  addresses are never attached to analytics events.
+
+In GA4, register `article_id`, `article_title`, and `percent_scrolled` as event-scoped
+custom dimensions if needed for explorations; article titles and paths are already
+available in Pages and screens. Optionally mark `newsletter_signup` as a key event.
+Validate production with a consenting visit in Realtime and with Google Tag
+Assistant; also verify that refusal produces no Google requests. Automated tests
+stub Google and do not send test traffic to the production property.
+
+Run `node --test tests/google-analytics.test.cjs tests/cookie-consent.test.cjs tests/newsletter.test.cjs`.
+
 ## Newsletter (Mailchimp)
 
 The site newsletter form sends addresses to `POST /api/newsletter`, which saves

@@ -3,6 +3,7 @@ import { EB_Garamond, Inter } from 'next/font/google'
 import localFont from 'next/font/local'
 import { Analytics } from '@vercel/analytics/next'
 import { SpeedInsights } from '@vercel/speed-insights/next'
+import { GoogleAnalytics } from '@/components/analytics/GoogleAnalytics'
 import { draftMode } from 'next/headers'
 import { VisualEditing } from 'next-sanity/visual-editing'
 import { SanityLive } from '@/sanity/lib/live'
@@ -112,6 +113,7 @@ export default async function RootLayout({
         <SanityLive />
         {isPreview && <><ArticlePreviewBanner /><VisualEditing /></>}
         <Analytics />
+        <GoogleAnalytics isPreview={isPreview} production={process.env.NODE_ENV === 'production' && process.env.VERCEL_ENV !== 'preview'} />
         <SpeedInsights />
       </body>
     </html>

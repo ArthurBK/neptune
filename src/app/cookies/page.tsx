@@ -1,3 +1,5 @@
+import { CookiePreferences } from '@/components/analytics/CookiePreferences'
+
 export const revalidate = 3600
 
 export default async function CookiesPage() {
@@ -56,7 +58,11 @@ export default async function CookiesPage() {
               Third-Party Cookies
             </h2>
             <p className="text-sm md:text-[15px] text-black leading-relaxed font-[Helvetica,Arial,sans-serif]">
-              Some cookies may be set by trusted third-party services we use for analytics,
+              With your consent, Google Analytics uses cookies such as _ga to measure page views,
+              engagement, article scrolling, and successful newsletter signup requests. We do not
+              send your newsletter email address to Google Analytics. Google Analytics cookies are
+              configured to expire after one year, renewed when you visit with consent.
+              Other cookies may be set by trusted third-party services we use for
               embedded content, or website operations. These providers are responsible for their own
               cookie and privacy practices.
             </p>
@@ -70,6 +76,11 @@ export default async function CookiesPage() {
               You can control and delete cookies through your browser settings. Please note that
               disabling certain cookies may affect how parts of the website function.
             </p>
+            <p className="text-sm md:text-[15px] text-black leading-relaxed font-[Helvetica,Arial,sans-serif]">
+              You can change your choice below. Resetting your preference stops Google Analytics
+              and removes its cookies until you accept again.
+            </p>
+            <CookiePreferences />
           </div>
 
           <div className="space-y-2">

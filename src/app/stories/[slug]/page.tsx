@@ -76,7 +76,7 @@ export default async function StoryArticlePage({ params }: ArticlePageProps) {
 
   return (
     <main>
-      <article>
+      <article data-analytics-article-id={article._id} data-analytics-article-title={article.title} data-analytics-article-path={`/stories/${encodeURIComponent(slug)}`}>
         {/* Hero - title above (black), image below */}
         <header className="px-6 md:px-12 lg:px-16 pt-8 md:pt-10 pb-8 md:pb-10 text-center text-black">
           {article.subcategory && (
@@ -144,7 +144,7 @@ export default async function StoryArticlePage({ params }: ArticlePageProps) {
         )}
 
         {/* Article body - text -> 3 images row -> text -> full-width hero -> repeat */}
-        <div className="pt-2 pb-4">
+        <div className="pt-2 pb-4" data-analytics-reading-body>
           <ArticleBody
             value={article.body}
             fontFamilyClass={typography.fontFamilyClass}

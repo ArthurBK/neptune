@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import Image from 'next/image'
+import { trackNewsletterSignup } from '@/lib/googleAnalytics'
 import {
   createContext,
   useCallback,
@@ -80,6 +81,7 @@ function NewsletterModalInner({ children, autoOpen }: { children: ReactNode; aut
       })
       const data = await res.json()
       if (res.ok && data.success) {
+        trackNewsletterSignup()
         setStatus('success')
         setMessage(data.message || 'Thank you for subscribing.')
         setEmail('')
