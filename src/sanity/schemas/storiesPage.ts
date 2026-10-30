@@ -30,7 +30,7 @@ export const storiesPage = defineType({
       ],
       validation: (rule) => rule.unique(),
       description:
-        'Only the articles selected here appear on /stories. Drag to set their order. Leave empty to show no articles. Publish to apply changes.',
+        'Only the articles selected here appear on /stories and public contributor profiles. Drag to set their order on /stories. Leave empty to show no articles. Publish to apply changes.',
     }),
     defineField({
       name: 'introText',

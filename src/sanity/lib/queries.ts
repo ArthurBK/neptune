@@ -480,8 +480,16 @@ export const PHOTOGRAPHER_SLUGS_QUERY = `
 
 // Contributions include writing and photography, without matching legacy people
 // that happen to share the same slug.
+// Public profiles follow the Stories selection; authenticated previews include drafts.
+const CONTRIBUTION_VISIBLE_IN_STORIES = `
+  defined(slug.current) && slug.current != "" && (
+    $isPreview == true ||
+    _id in *[_type == "storiesPage" && _id == "storiesPage"][0].articles[]._ref
+  )
+`
+
 export const ARTICLES_BY_CONTRIBUTOR_QUERY = `
-  *[_type == "article" && (
+  *[_type == "article" && ${CONTRIBUTION_VISIBLE_IN_STORIES} && (
     author._ref == $contributorId || photographer._ref == $contributorId
   )] | order(publishedAt desc) {
     _id,
@@ -497,7 +505,7 @@ export const ARTICLES_BY_CONTRIBUTOR_QUERY = `
 `
 
 export const ARTICLES_BY_PHOTOGRAPHER_QUERY = `
-  *[_type == "article" && photographer._ref == $photographerId] | order(publishedAt desc) {
+  *[_type == "article" && ${CONTRIBUTION_VISIBLE_IN_STORIES} && photographer._ref == $photographerId] | order(publishedAt desc) {
     _id,
     title,
     "slug": slug.current,

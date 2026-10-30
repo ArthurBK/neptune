@@ -1,6 +1,7 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
+import { draftMode } from 'next/headers'
 
 import { client } from '@/sanity/lib/client'
 import { articleFetch as sanityFetch } from '@/sanity/lib/live'
@@ -55,6 +56,7 @@ type ArticleCardData = {
 
 export default async function ContributorPage({ params }: ContributorPageProps) {
   const { slug } = await params
+  const { isEnabled: isPreview } = await draftMode()
 
   const contributor = await sanityFetch<ContributorData | null>(CONTRIBUTOR_BY_SLUG_QUERY, { slug })
   if (!contributor) notFound()
@@ -62,6 +64,7 @@ export default async function ContributorPage({ params }: ContributorPageProps) 
   const [articlesRaw, adBanner, showContributors] = await Promise.all([
     sanityFetch<ArticleCardData[] | null>(ARTICLES_BY_CONTRIBUTOR_QUERY, {
       contributorId: contributor._id.replace(/^drafts\./, ''),
+      isPreview,
     }),
     sanityFetch<{ image: { asset?: { _ref: string } }; linkUrl?: string | null; title?: string | null } | null>(
       AD_BANNER_BY_PLACEMENT_QUERY,

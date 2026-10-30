@@ -24,10 +24,11 @@ const dataset = [
   { _id: 'photos', _type: 'article', slug: { current: 'photos' }, photographer: { _ref: 'new-person' } },
   { _id: 'both', _type: 'article', slug: { current: 'both' }, author: { _ref: 'new-person' }, photographer: { _ref: 'new-person' } },
   { _id: 'legacy-photos', _type: 'article', slug: { current: 'legacy-photos' }, photographer: { _ref: 'legacy-person' } },
+  { _id: 'storiesPage', _type: 'storiesPage', articles: ['writing', 'photos', 'both', 'legacy-photos'].map(_ref => ({ _type: 'reference', _ref })) },
 ]
 
 async function query(name, params = {}) {
-  return (await evaluate(parse(queries[name]), { dataset, params })).get()
+  return (await evaluate(parse(queries[name]), { dataset, params: { isPreview: false, ...params } })).get()
 }
 
 test('a contributor profile includes writing and photography once, using exact references', async () => {
@@ -65,4 +66,25 @@ test('the public directory includes each document once and retains rich biograph
   assert.equal(current.length + legacy.length, 3)
   assert.deepEqual(legacy[0].bioRichText, richBio)
   assert.equal(current.find((person) => person._id === 'new-person').articleCount, 3)
+})
+
+test('public profiles exclude published articles outside Stories and respect an empty selection', async () => {
+  for (const [name, params] of [
+    ['ARTICLES_BY_CONTRIBUTOR_QUERY', { contributorId: 'christina' }],
+    ['ARTICLES_BY_PHOTOGRAPHER_QUERY', { photographerId: 'christina' }],
+  ]) {
+    const articles = ['lisa', 'julianne'].map(id => ({
+      _id: id, _type: 'article', slug: { current: id },
+      author: { _ref: 'christina' }, photographer: { _ref: 'christina' },
+    }))
+    const run = async (selection, isPreview = false) => (await evaluate(parse(queries[name]), {
+      dataset: [...articles, ...(selection === null ? [] : [{
+        _id: 'storiesPage', _type: 'storiesPage', articles: selection.map(_ref => ({ _ref })),
+      }])], params: { ...params, isPreview },
+    })).get()
+    assert.deepEqual((await run(['lisa', 'unpublished-or-deleted'])).map(a => a._id), ['lisa'])
+    assert.deepEqual(await run([]), [])
+    assert.deepEqual(await run(null), [])
+    assert.deepEqual((await run(['lisa'], true)).map(a => a._id).sort(), ['julianne', 'lisa'])
+  }
 })

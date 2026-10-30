@@ -192,7 +192,9 @@ test('contributor and photographer profiles include draft contributions only whi
     const article = (id, title, personId = person._id) => ({
       _id: id, _type: 'article', title, slug: { current: id }, [credit]: { _ref: personId },
     })
-    const published = [person, article('julianne-moore', 'Julianne Moore')]
+    const published = [person, article('julianne-moore', 'Julianne Moore'), article('selected', 'Selected story'), {
+      _id: 'storiesPage', _type: 'storiesPage', articles: [{ _ref: 'selected' }],
+    }]
     const drafts = [article('lisa-eisner', 'Lisa Eisner'), article('unrelated', 'Unrelated draft', 'someone-else')]
     const fetchContent = async (query, params = {}) => {
       const data = await (await evaluate(parse(query), { dataset: preview ? [...published, ...drafts] : published, params })).get()
@@ -204,6 +206,7 @@ test('contributor and photographer profiles include draft contributions only whi
       'next/image': { default: () => null, __esModule: true },
       'next/link': { default: props => React.createElement('a', props), __esModule: true },
       'next/navigation': { notFound: () => { throw new Error('NOT_FOUND') } },
+      'next/headers': { draftMode: async () => ({ isEnabled: preview }) },
       '@/sanity/lib/client': { client: { fetch: () => [{ slug: 'christina' }] } },
       '@/sanity/lib/live': { articleFetch: fetchContent },
       '@/sanity/lib/contributors': { isContributorsVisible: async () => true },
@@ -214,7 +217,8 @@ test('contributor and photographer profiles include draft contributions only whi
       '@/components/shared/PageIntroText': { hasPortableTextContent: () => false, PageIntroText: () => null },
     })
     const render = async () => renderToStaticMarkup(await Page({ params: Promise.resolve({ slug: 'christina' }) }))
-    assert.match(await render(), /Julianne Moore/)
+    assert.match(await render(), /Selected story/)
+    assert.doesNotMatch(await render(), /Julianne Moore/)
     assert.doesNotMatch(await render(), /Lisa Eisner/)
     preview = true
     const html = await render()
@@ -225,5 +229,6 @@ test('contributor and photographer profiles include draft contributions only whi
     assert.deepEqual(await generateStaticParams(), [{ slug: 'christina' }])
     preview = false
     assert.doesNotMatch(await render(), /Lisa Eisner/)
+    assert.doesNotMatch(await render(), /Julianne Moore/)
   }
 })

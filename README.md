@@ -69,7 +69,8 @@ The Studio uses Sanity's secret-validated `/api/draft-mode/enable` endpoint.
 Only authenticated Draft Mode sessions receive the Viewer token and draft data.
 Public requests and static slug generation use published content. Article reads
 use `defineLive`, as do contributor profiles so their articles include drafts while
-previewing. Public visitors still see only published articles; directory and search
+previewing. Public contributor profiles show only published articles selected in
+Stories (an empty selection shows no articles); directory and search
 lists retain their existing published-only queries.
 `SanityLive` and `VisualEditing` connect the preview to the Studio. Stega text
 encoding is disabled to preserve existing typography and rendering; this preview
