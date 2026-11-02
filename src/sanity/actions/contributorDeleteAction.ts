@@ -31,7 +31,7 @@ export function contributorDeleteAction(
       dialog: confirmOpen && {
         type: 'confirm',
         tone: 'critical',
-        message: 'Delete this contributor? Articles will remain, with the name kept as plain text in writing and photography credits. Links to this profile will be removed.',
+        message: 'Delete this contributor? Articles will remain, with the name kept as plain text in writing, photography and styling credits. Links to this profile will be removed.',
         confirmButtonText: 'Delete contributor',
         onCancel: () => setConfirmOpen(false),
         onConfirm: async () => {

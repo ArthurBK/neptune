@@ -59,6 +59,34 @@ test('article credits link new contributors and legacy photographers to their re
   assert.equal(legacy.photographer.profileHref, '/contributors/photographer/alex')
 })
 
+test('article queries resolve stylist profiles, prefer selected contributors and preserve plain-text credits', async () => {
+  for (const name of ['ARTICLE_BY_STORY_SLUG_QUERY', 'ARTICLE_BY_SLUG_QUERY']) {
+    for (const fields of [{}, { stylistName: 'Saved Stylist' }, { stylist: { _ref: 'new-person' }, stylistName: 'Previous Stylist' }]) {
+      const article = { _id: 'styling', _type: 'article', category: 'fashion', slug: { current: 'styling' }, ...fields }
+      const result = await (await evaluate(parse(queries[name]), {
+        dataset: [...dataset, article], params: { slug: 'styling', category: 'fashion' },
+      })).get()
+      assert.deepEqual(result.stylist, fields.stylist
+        ? { name: 'Alex', slug: 'alex' }
+        : fields.stylistName ? { name: 'Saved Stylist', slug: null } : null)
+    }
+  }
+})
+
+test('stylist profile lists selected styling contributions once, including people with several roles', async () => {
+  const styling = { _id: 'styling', _type: 'article', slug: { current: 'styling' }, stylist: { _ref: 'new-person' } }
+  const people = dataset.filter(doc => doc._type !== 'storiesPage')
+  const both = people.find(doc => doc._id === 'both')
+  const result = await (await evaluate(parse(queries.ARTICLES_BY_CONTRIBUTOR_QUERY), {
+    dataset: [
+      ...people.filter(doc => doc._id !== 'both'), { ...both, stylist: { _ref: 'new-person' } }, styling,
+      { ...styling, _id: 'unselected' },
+      { _id: 'storiesPage', _type: 'storiesPage', articles: ['styling', 'both'].map(_ref => ({ _ref })) },
+    ], params: { contributorId: 'new-person', isPreview: false },
+  })).get()
+  assert.deepEqual(result.map(article => article._id).sort(), ['both', 'styling'])
+})
+
 test('the public directory includes each document once and retains rich biographies', async () => {
   const current = await query('CONTRIBUTORS_LIST_PAGE_QUERY')
   const legacy = await query('PHOTOGRAPHERS_LIST_PAGE_QUERY')

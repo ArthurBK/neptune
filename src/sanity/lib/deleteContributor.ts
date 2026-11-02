@@ -7,6 +7,7 @@ type CreditDocument = {
   name?: string
   author?: { _ref?: string }
   photographer?: { _ref?: string }
+  stylist?: { _ref?: string }
 }
 
 /** Preserve published and draft article credits atomically before deleting a person. */
@@ -14,8 +15,8 @@ export async function deleteContributor(client: SanityClient, documentId: string
   const id = documentId.replace(/^drafts\./, '')
   const ids = [id, `drafts.${id}`]
   const documents = await client.fetch<CreditDocument[]>(
-    `*[_id in $ids || (_type == "article" && (author._ref in $ids || photographer._ref in $ids))] {
-      _id, _rev, _type, name, author, photographer
+    `*[_id in $ids || (_type == "article" && (author._ref in $ids || photographer._ref in $ids || stylist._ref in $ids))] {
+      _id, _rev, _type, name, author, photographer, stylist
     }`,
     { ids },
     { perspective: 'raw' },
@@ -33,7 +34,7 @@ export async function deleteContributor(client: SanityClient, documentId: string
   for (const article of documents.filter((document) => document._type === 'article')) {
     const set: Record<string, string> = {}
     const unset: string[] = []
-    for (const field of ['author', 'photographer'] as const) {
+    for (const field of ['author', 'photographer', 'stylist'] as const) {
       const ref = article[field]?._ref
       if (!ref || !ids.includes(ref)) continue
       const name = people.find((person) => person._id === ref)?.name ?? publishedName ?? people[0].name

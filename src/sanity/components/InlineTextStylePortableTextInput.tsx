@@ -1,14 +1,13 @@
+import { alignedStyle, blockTextAlignment, type TextAlignment } from '@/lib/textAlignment'
 import { useCallback, useRef, useState, type CSSProperties, type MouseEvent } from 'react'
-import { PortableTextInput, type PortableTextInputProps } from 'sanity'
+import { PortableTextInput, set, type PortableTextInputProps } from 'sanity'
 import { PortableTextEditor, type PortableTextObject } from '@portabletext/editor'
-import type { BlockSchemaType, SpanSchemaType } from '@sanity/types'
-import { LinkIcon, LinkRemovedIcon, OlistIcon, UlistIcon, ResetIcon } from '@sanity/icons'
+import type { BlockSchemaType } from '@sanity/types'
+import { ResetIcon } from '@sanity/icons'
 
 import { TEXT_STYLE_FONT_FAMILIES, type TextStyleFontFamily } from '@/lib/textStyleFonts'
 
 const TEXT_STYLE_MARK = 'textStyle'
-const AFFILIATE_PRODUCT_MARK = 'affiliateProductEmbed'
-const LINK_MARK = 'link'
 
 const COLOR_PRESETS = [
   { title: 'Black', value: '#1A1A1A' },
@@ -18,56 +17,9 @@ const COLOR_PRESETS = [
   { title: 'White', value: '#FFFFFF' },
 ] as const
 
-const BLOCK_LABELS: Record<string, string> = {
-  normal: 'P',
-  h1: 'H1',
-  h2: 'H2',
-  h3: 'H3',
-  h4: 'H4',
-  h5: 'H5',
-  h6: 'H6',
-  blockquote: 'Quote',
-  pullQuote: 'Pull',
-}
-
-const DECORATOR_LABELS: Record<string, string> = {
-  strong: 'B',
-  em: 'I',
-  underline: 'U',
-  'strike-through': 'S',
-  code: 'Code',
-  captionSizeSm: 'A',
-  captionSizeMd: 'A',
-  captionSizeLg: 'A',
-}
-
-const DECORATOR_PREVIEWS: Record<string, CSSProperties> = {
-  strong: { fontWeight: 800, fontSize: 15 },
-  em: { fontStyle: 'italic', fontFamily: 'Georgia, serif', fontSize: 17 },
-  underline: { textDecoration: 'underline', textUnderlineOffset: 3, fontSize: 15 },
-  'strike-through': { textDecoration: 'line-through', fontSize: 15 },
-  code: { fontFamily: 'monospace' },
-  captionSizeSm: { fontSize: 11 },
-  captionSizeMd: { fontSize: 15 },
-  captionSizeLg: { fontSize: 19 },
-}
-
-const BLOCK_OBJECT_LABELS: Record<string, string> = {
-  pteImageBlock: 'Image',
-  pteImageGridBlock: 'Grid',
-  pteVideoBlock: 'Video',
-  adBannerEmbedBlock: 'Ad',
-}
-
 const MIN_FONT_SIZE = 6
 const MAX_FONT_SIZE = 50
 const DEFAULT_COLOR = '#1A1A1A'
-
-type SchemaAction = {
-  title: string
-  value: string
-  label: string
-}
 
 type TextStyleValue = {
   _type: typeof TEXT_STYLE_MARK
@@ -77,68 +29,25 @@ type TextStyleValue = {
 }
 
 type ToolbarState = {
-  activeBlockStyle: string
-  activeMarks: string[]
-  activeListStyle?: string
   textStyle: Partial<TextStyleValue>
-  affiliateProductActive: boolean
-  linkActive: boolean
+  alignment?: string
+  hasTextSelection: boolean
 }
 
-const defaultToolbarState: ToolbarState = {
-  activeBlockStyle: 'normal',
-  activeMarks: [],
-  textStyle: {},
-  affiliateProductActive: false,
-  linkActive: false,
-}
+const defaultToolbarState: ToolbarState = { textStyle: {}, hasTextSelection: false }
 
-function toSchemaActions(
-  values: unknown,
-  fallback: SchemaAction[],
-  labels: Record<string, string>,
-): SchemaAction[] {
-  if (!Array.isArray(values) || values.length === 0) return fallback
-
-  return values
-    .map((item) => {
-      if (!item || typeof item !== 'object') return null
-      const value = (item as { value?: unknown }).value
-      if (typeof value !== 'string') return null
-      const title = (item as { title?: unknown }).title
-      return {
-        value,
-        title: typeof title === 'string' ? title : value,
-        label: labels[value] ?? value,
-      }
-    })
-    .filter((item): item is SchemaAction => item !== null)
-}
-
-function getBlockSchema(props: PortableTextInputProps) {
-  const block = props.schemaType.of?.find((member) => member.name === 'block') as BlockSchemaType | undefined
-  if (!block) return undefined
-  // Studio passes compiled schema types: marks live on the child span,
-  // not on the raw block.marks definition used in schema source files.
-  const span = block.fields[0].type.of.find((member) => member.name === 'span') as SpanSchemaType | undefined
-  return {
-    styles: block.fields[1].type.options?.list,
-    marks: { decorators: span?.decorators, annotations: span?.annotations },
-  }
-}
-
-function hasAnnotation(props: PortableTextInputProps, name: string) {
-  return Boolean(getBlockSchema(props)?.marks?.annotations?.some((annotation) => annotation.name === name))
-}
-
-function getBlockObjectActions(props: PortableTextInputProps): SchemaAction[] {
-  return (props.schemaType.of || [])
-    .filter((member) => member.name && member.name !== 'block')
-    .map((member) => ({
-      value: member.name,
-      title: member.title || member.name,
-      label: BLOCK_OBJECT_LABELS[member.name] || member.title || member.name,
-    }))
+function selectedTextBlocks(editor: PortableTextEditor) {
+  const selection = PortableTextEditor.getSelection(editor)
+  const blocks = PortableTextEditor.getValue(editor) || []
+  if (!selection) return []
+  const anchor = selection.anchor.path[0]
+  const focus = selection.focus.path[0]
+  if (typeof anchor !== 'object' || typeof focus !== 'object' || !('_key' in anchor) || !('_key' in focus)) return []
+  const start = blocks.findIndex(block => block._key === anchor._key)
+  const end = blocks.findIndex(block => block._key === focus._key)
+  if (start < 0 || end < 0) return []
+  return blocks.slice(Math.min(start, end), Math.max(start, end) + 1)
+    .filter(block => block._type === 'block')
 }
 
 function isTextStyleAnnotation(
@@ -209,65 +118,37 @@ function fieldStyle(width: number): CSSProperties {
   }
 }
 
-function separatorStyle(): CSSProperties {
-  return {
-    background: '#D8D2C8',
-    height: 24,
-    width: 1,
-  }
+function ToolbarSeparator() {
+  return <span aria-hidden="true" style={{ width: 1, height: 24, background: '#D8D2C8', margin: '0 4px', flexShrink: 0 }} />
 }
 
 export function InlineTextStylePortableTextInput(props: PortableTextInputProps) {
   const editorRef = useRef<PortableTextEditor | null>(null)
   const [toolbarState, setToolbarState] = useState<ToolbarState>(defaultToolbarState)
 
-  const blockSchema = getBlockSchema(props)
-  const blockStyles = toSchemaActions(blockSchema?.styles, [{ title: 'Normal', value: 'normal', label: 'P' }], BLOCK_LABELS)
-  const decorators = toSchemaActions(
-    blockSchema?.marks?.decorators,
-    [
-      { title: 'Strong', value: 'strong', label: 'B' },
-      { title: 'Emphasis', value: 'em', label: 'I' },
-      { title: 'Underline', value: 'underline', label: 'U' },
-    ],
-    DECORATOR_LABELS,
-  )
-  const showAffiliateProduct = hasAnnotation(props, AFFILIATE_PRODUCT_MARK)
-  const showLink = hasAnnotation(props, LINK_MARK)
-  const blockObjects = getBlockObjectActions(props)
+  const blockSchema = props.schemaType.of?.find(member => member.name === 'block') as BlockSchemaType | undefined
+  const supportsAlignment = blockSchema?.fields[1].type.options?.list?.some(style => typeof style === 'object' && 'value' in style && style.value === 'normal-center')
 
-  const syncToolbarState = useCallback(
-    (editor: PortableTextEditor) => {
-      const activeAnnotations = PortableTextEditor.activeAnnotations(editor)
-      const textStyle = activeAnnotations.find(isTextStyleAnnotation) || defaultToolbarState.textStyle
-
-      setToolbarState({
-        activeBlockStyle:
-          blockStyles.find((style) => PortableTextEditor.hasBlockStyle(editor, style.value))?.value || 'normal',
-        activeMarks: decorators
-          .filter((decorator) => PortableTextEditor.isMarkActive(editor, decorator.value))
-          .map((decorator) => decorator.value),
-        activeListStyle: ['bullet', 'number'].find((listStyle) =>
-          PortableTextEditor.hasListStyle(editor, listStyle),
-        ),
-        textStyle,
-        affiliateProductActive: PortableTextEditor.isAnnotationActive(editor, AFFILIATE_PRODUCT_MARK),
-        linkActive: PortableTextEditor.isAnnotationActive(editor, LINK_MARK),
-      })
-    },
-    [blockStyles, decorators],
-  )
+  const syncToolbarState = useCallback((editor: PortableTextEditor) => {
+    const blocks = selectedTextBlocks(editor)
+    const alignment = blockTextAlignment(blocks[0])
+    setToolbarState({
+      textStyle: PortableTextEditor.activeAnnotations(editor).find(isTextStyleAnnotation) || {},
+      alignment: blocks.every(block => blockTextAlignment(block) === alignment) ? alignment as string | undefined : undefined,
+      hasTextSelection: blocks.length > 0,
+    })
+  }, [])
 
   const runEditorAction = useCallback(
     (action: (editor: PortableTextEditor) => void) => {
       const editor = editorRef.current
-      if (!editor) return
+      if (!editor || props.readOnly) return
 
       PortableTextEditor.focus(editor)
       action(editor)
       window.requestAnimationFrame(() => syncToolbarState(editor))
     },
-    [syncToolbarState],
+    [syncToolbarState, props.readOnly],
   )
 
   const applyTextStyle = useCallback(
@@ -292,15 +173,11 @@ export function InlineTextStylePortableTextInput(props: PortableTextInputProps) 
     })
   }, [runEditorAction])
 
-  const editLink = () => runEditorAction((editor) => {
-    const link = PortableTextEditor.activeAnnotations(editor).find((annotation) => annotation._type === LINK_MARK)
-    const block = PortableTextEditor.focusBlock(editor)
-    if (link && block) {
-      props.onItemOpen([...props.path, { _key: block._key }, 'markDefs', { _key: link._key }])
-      return
-    }
-    const paths = PortableTextEditor.addAnnotation(editor, { name: LINK_MARK }, { blank: false })
-    if (paths?.markDefPath) props.onItemOpen([...props.path, ...paths.markDefPath])
+  const applyAlignment = (alignment: TextAlignment) => runEditorAction(editor => {
+    const blocks = selectedTextBlocks(editor)
+    if (!blocks.length) return
+    props.onChange(blocks.map(block => set(alignedStyle('style' in block ? block.style : 'normal', alignment), [{ _key: block._key }, 'style'])))
+    setToolbarState(state => ({ ...state, alignment }))
   })
 
   const preventEditorBlur = (event: MouseEvent) => {
@@ -327,159 +204,33 @@ export function InlineTextStylePortableTextInput(props: PortableTextInputProps) 
           zIndex: 2,
         }}
       >
-        {blockStyles.map((style) => (
-          <button
-            key={style.value}
-            aria-label={style.title}
-            aria-pressed={toolbarState.activeBlockStyle === style.value}
-            onClick={() =>
-              runEditorAction((editor) => PortableTextEditor.toggleBlockStyle(editor, style.value))
-            }
-            onMouseDown={preventEditorBlur}
-            style={controlButtonStyle(toolbarState.activeBlockStyle === style.value)}
-            title={style.title}
-            type="button"
-          >
-            <span style={{ fontWeight: style.value.startsWith('h') ? 700 : 500 }}>{style.label}</span>
-          </button>
-        ))}
-
-        <span style={separatorStyle()} />
-
-        {decorators.map((decorator) => (
-          <button
-            key={decorator.value}
-            aria-label={decorator.title}
-            aria-pressed={toolbarState.activeMarks.includes(decorator.value)}
-            onClick={() =>
-              runEditorAction((editor) => PortableTextEditor.toggleMark(editor, decorator.value))
-            }
-            onMouseDown={preventEditorBlur}
-            style={controlButtonStyle(toolbarState.activeMarks.includes(decorator.value))}
-            title={decorator.title}
-            type="button"
-          >
-            <span style={DECORATOR_PREVIEWS[decorator.value]}>{decorator.label}</span>
-          </button>
-        ))}
-
-        {showLink && (
+        {supportsAlignment && (
           <>
-            <button
-              type="button"
-              aria-label="Add or edit link"
-              aria-pressed={toolbarState.linkActive}
-              disabled={props.readOnly}
-              title="Select text to add a link, or click linked text to edit it"
-              onMouseDown={preventEditorBlur}
-              onClick={editLink}
-              style={controlButtonStyle(toolbarState.linkActive)}
-            >
-              <LinkIcon aria-hidden style={{ fontSize: 18 }} />
-              Link
-            </button>
-            <button
-              type="button"
-              aria-label="Remove link"
-              disabled={props.readOnly || !toolbarState.linkActive}
-              title="Remove link"
-              onMouseDown={preventEditorBlur}
-              onClick={() => runEditorAction((editor) => PortableTextEditor.removeAnnotation(editor, { name: LINK_MARK }))}
-              style={{ ...controlButtonStyle(), opacity: toolbarState.linkActive ? 1 : 0.5 }}
-            >
-              <LinkRemovedIcon aria-hidden style={{ fontSize: 18 }} />
-              Unlink
-            </button>
-          </>
-        )}
-
-        <button
-          aria-label="Bullet list"
-          aria-pressed={toolbarState.activeListStyle === 'bullet'}
-          onClick={() => runEditorAction((editor) => PortableTextEditor.toggleList(editor, 'bullet'))}
-          onMouseDown={preventEditorBlur}
-          style={controlButtonStyle(toolbarState.activeListStyle === 'bullet')}
-          title="Bullet list"
-          type="button"
-        >
-          <UlistIcon aria-hidden style={{ fontSize: 20 }} />
-        </button>
-        <button
-          aria-label="Numbered list"
-          aria-pressed={toolbarState.activeListStyle === 'number'}
-          onClick={() => runEditorAction((editor) => PortableTextEditor.toggleList(editor, 'number'))}
-          onMouseDown={preventEditorBlur}
-          style={controlButtonStyle(toolbarState.activeListStyle === 'number')}
-          title="Numbered list"
-          type="button"
-        >
-          <OlistIcon aria-hidden style={{ fontSize: 20 }} />
-        </button>
-
-        {blockObjects.length > 0 ? (
-          <>
-            <span style={separatorStyle()} />
-            {blockObjects.map((blockObject) => (
-              <button
-                key={blockObject.value}
-                aria-label={blockObject.title}
-                onClick={() =>
-                  runEditorAction((editor) =>
-                    PortableTextEditor.insertBlock(editor, { name: blockObject.value }, {}),
-                  )
-                }
-                onMouseDown={preventEditorBlur}
-                style={controlButtonStyle()}
-                title={blockObject.title}
-                type="button"
-              >
-                {blockObject.label}
+          <div role="group" aria-label="Paragraph alignment" style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+            {(['left', 'center', 'right'] as const).map(alignment => (
+              <button key={alignment} type="button" aria-label={`Align ${alignment}`}
+                title={`Align paragraph ${alignment}`} aria-pressed={toolbarState.alignment === alignment}
+                disabled={props.readOnly || !toolbarState.hasTextSelection}
+                onMouseDown={preventEditorBlur} onClick={() => applyAlignment(alignment)}
+                style={controlButtonStyle(toolbarState.alignment === alignment)}>
+                <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true">
+                  {[3, 6, 9, 12].map((y, index) => {
+                    const short = index % 2 === 1
+                    const x = !short || alignment === 'left' ? 1 : alignment === 'center' ? 4 : 7
+                    return <path key={y} d={`M${x} ${y}h${short ? 8 : 14}`} stroke="currentColor" strokeWidth="1.5" />
+                  })}
+                </svg>
               </button>
             ))}
+          </div>
+          <ToolbarSeparator />
           </>
-        ) : null}
-
-        {showAffiliateProduct ? (
-          <>
-            <span style={separatorStyle()} />
-            <button
-              aria-label="Affiliate product"
-              onClick={() =>
-                runEditorAction((editor) =>
-                  PortableTextEditor.addAnnotation(editor, { name: AFFILIATE_PRODUCT_MARK }),
-                )
-              }
-              onMouseDown={preventEditorBlur}
-              style={controlButtonStyle(toolbarState.affiliateProductActive)}
-              title="Affiliate product"
-              type="button"
-            >
-              Product
-            </button>
-            <button
-              aria-label="Remove affiliate product"
-              onClick={() =>
-                runEditorAction((editor) =>
-                  PortableTextEditor.removeAnnotation(editor, { name: AFFILIATE_PRODUCT_MARK }),
-                )
-              }
-              onMouseDown={preventEditorBlur}
-              style={controlButtonStyle()}
-              title="Remove affiliate product"
-              type="button"
-            >
-              Unproduct
-            </button>
-          </>
-        ) : null}
-
-        <span style={separatorStyle()} />
-
+        )}
         {COLOR_PRESETS.map((color) => {
-          const isLight = color.value === '#FFFFFF' || color.value === '#E8E1D8'
           return (
             <button
               key={color.value}
+              disabled={props.readOnly}
               aria-label={color.title}
               aria-pressed={toolbarState.textStyle.textColor === color.value}
               onClick={() => applyTextStyle({ textColor: color.value })}
@@ -487,7 +238,6 @@ export function InlineTextStylePortableTextInput(props: PortableTextInputProps) 
               style={{
                 ...controlButtonStyle(toolbarState.textStyle.textColor === color.value),
                 background: color.value,
-                color: isLight ? '#1A1A1A' : '#FFFFFF',
                 minWidth: 32,
                 padding: 0,
                 outline: toolbarState.textStyle.textColor === color.value ? '2px solid #2563EB' : undefined,
@@ -496,12 +246,13 @@ export function InlineTextStylePortableTextInput(props: PortableTextInputProps) 
               title={color.title}
               type="button"
             >
-              A
+              <span className="sr-only">{color.title}</span>
             </button>
           )
         })}
 
         <input
+          disabled={props.readOnly}
           aria-label="Custom text color"
           onChange={(event) => applyTextStyle({ textColor: event.currentTarget.value })}
           style={{
@@ -517,13 +268,16 @@ export function InlineTextStylePortableTextInput(props: PortableTextInputProps) 
           value={toolbarState.textStyle.textColor || DEFAULT_COLOR}
         />
 
+        <ToolbarSeparator />
+        <span style={{ fontSize: 12 }}>Size (px)</span>
         <input
+          disabled={props.readOnly}
           aria-label="Font size in pixels"
           min={MIN_FONT_SIZE}
           max={MAX_FONT_SIZE}
           onChange={(event) => {
             const fontSize = Number(event.currentTarget.value)
-            if (Number.isFinite(fontSize)) applyTextStyle({ fontSize })
+            applyTextStyle({ fontSize: event.currentTarget.value === '' ? undefined : fontSize })
           }}
           placeholder="px"
           style={fieldStyle(58)}
@@ -533,6 +287,7 @@ export function InlineTextStylePortableTextInput(props: PortableTextInputProps) 
         />
 
         <select
+          disabled={props.readOnly}
           aria-label="Font family"
           onChange={(event) =>
             applyTextStyle({
@@ -546,7 +301,7 @@ export function InlineTextStylePortableTextInput(props: PortableTextInputProps) 
           title="Font family"
           value={toolbarState.textStyle.fontFamily || ''}
         >
-          <option value="">Font</option>
+          <option value="">Default font</option>
           {TEXT_STYLE_FONT_FAMILIES.map((font) => (
             <option key={font.value} value={font.value}>
               {font.title}
@@ -554,7 +309,9 @@ export function InlineTextStylePortableTextInput(props: PortableTextInputProps) 
           ))}
         </select>
 
+        <ToolbarSeparator />
         <button
+          disabled={props.readOnly}
           aria-label="Reset text style"
           onClick={resetTextStyle}
           onMouseDown={preventEditorBlur}
@@ -563,15 +320,15 @@ export function InlineTextStylePortableTextInput(props: PortableTextInputProps) 
           type="button"
         >
           <ResetIcon aria-hidden style={{ fontSize: 18 }} />
-          Reset
+          Reset text style
         </button>
       </div>
 
       <PortableTextInput
         {...props}
         editorRef={editorRef}
-        // Keep Sanity's link editing and fullscreen controls for linked text.
-        hideToolbar={!hasAnnotation(props, 'link')}
+        // Standard formatting, links, lists and media are provided only by Sanity.
+        hideToolbar={false}
         onEditorChange={(change, editor) => {
           props.onEditorChange?.(change, editor)
           syncToolbarState(editor)

@@ -18,6 +18,11 @@ const PHOTOGRAPHER_CREDIT = /* groq */ `coalesce(
   select(defined(photographerName) => { "name": photographerName, "slug": null, "profileHref": null })
 )`
 
+const STYLIST_CREDIT = /* groq */ `coalesce(
+  stylist->{ name, "slug": slug.current },
+  select(defined(stylistName) => { "name": stylistName, "slug": null })
+)`
+
 // Keep the initial header and rendered sections aligned when sections are hidden or articles unpublished.
 const VISIBLE_HOME_SECTION = /* groq */ `
   coalesce(isHidden, false) == false &&
@@ -226,6 +231,7 @@ export const ARTICLE_BY_SLUG_QUERY = `
     ...,
     "author": ${AUTHOR_DETAILS_CREDIT},
     "photographer": ${PHOTOGRAPHER_CREDIT},
+    "stylist": ${STYLIST_CREDIT},
     "affiliateProducts": affiliateProducts[]->{ _id, title, brand, price, image, affiliateUrl },
     "relatedArticles": relatedArticles[defined(@->_id)]->{ _id, title, "slug": slug.current, "category": coalesce(category, categories[0]), categories, subcategory, coverImage, "author": ${AUTHOR_CREDIT} },
     "body": body[] {
@@ -263,6 +269,7 @@ export const ARTICLE_BY_STORY_SLUG_QUERY = `
     ...,
     "author": ${AUTHOR_DETAILS_CREDIT},
     "photographer": ${PHOTOGRAPHER_CREDIT},
+    "stylist": ${STYLIST_CREDIT},
     "affiliateProducts": affiliateProducts[]->{ _id, title, brand, price, image, affiliateUrl },
     "relatedArticles": relatedArticles[defined(@->_id)]->{ _id, title, "slug": slug.current, "category": coalesce(category, categories[0]), categories, subcategory, coverImage, "author": ${AUTHOR_CREDIT} },
     "body": body[] {
@@ -479,7 +486,7 @@ export const PHOTOGRAPHER_SLUGS_QUERY = `
   *[_type == "photographer"] { "slug": slug.current }
 `
 
-// Contributions include writing and photography, without matching legacy people
+// Contributions include writing, photography and styling, without matching legacy people
 // that happen to share the same slug.
 // Public profiles follow the Stories selection; authenticated previews include drafts.
 const CONTRIBUTION_VISIBLE_IN_STORIES = `
@@ -491,7 +498,7 @@ const CONTRIBUTION_VISIBLE_IN_STORIES = `
 
 export const ARTICLES_BY_CONTRIBUTOR_QUERY = `
   *[_type == "article" && ${CONTRIBUTION_VISIBLE_IN_STORIES} && (
-    author._ref == $contributorId || photographer._ref == $contributorId
+    author._ref == $contributorId || photographer._ref == $contributorId || stylist._ref == $contributorId
   )] | order(publishedAt desc) {
     _id,
     title,

@@ -1,3 +1,5 @@
+import { alignedTextStyles } from '@/lib/textAlignment'
+import { AlignedTextBlock } from '../components/AlignedTextBlock'
 import { DocumentTextIcon, ImageIcon, VideoIcon } from '@sanity/icons'
 import { defineArrayMember, defineField, defineType } from 'sanity'
 import { captionRichTextType } from './lib/captionRichText'
@@ -389,6 +391,20 @@ export const article = defineType({
       hidden: ({ document }) => Boolean(document?.photographer),
     }),
     defineField({
+      name: 'stylist',
+      title: 'Stylist',
+      type: 'reference',
+      description: 'Select a contributor for the “Styled by” credit.',
+      to: [{ type: 'contributor' }],
+    }),
+    defineField({
+      name: 'stylistName',
+      title: 'Stylist credit',
+      type: 'string',
+      description: 'Name displayed without a profile link when no stylist profile is selected.',
+      hidden: ({ document }) => Boolean(document?.stylist),
+    }),
+    defineField({
       name: 'publishedAt',
       title: 'Published At',
       type: 'datetime',
@@ -401,13 +417,14 @@ export const article = defineType({
       of: [
         {
           type: 'block',
-          styles: [
+          components: { block: AlignedTextBlock },
+          styles: alignedTextStyles([
             { title: 'Normal', value: 'normal' },
             { title: 'H2', value: 'h2' },
             { title: 'H3', value: 'h3' },
             { title: 'Blockquote', value: 'blockquote' },
             { title: 'Pull Quote', value: 'pullQuote' },
-          ],
+          ]),
           marks: {
             decorators: [
               { title: 'Strong', value: 'strong' },

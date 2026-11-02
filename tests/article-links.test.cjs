@@ -13,9 +13,10 @@ function load(file, mocks = {}) {
     compilerOptions: { module: ts.ModuleKind.CommonJS, jsx: ts.JsxEmit.ReactJSX, esModuleInterop: true },
   }).outputText
   const mod = { exports: {} }
-  new Function('require', 'module', 'exports', code)(name => name in mocks ? mocks[name] : require(name), mod, mod.exports)
+  new Function('require', 'module', 'exports', code)(name => name in mocks ? mocks[name] : name === '@/lib/textAlignment' ? alignment : require(name), mod, mod.exports)
   return mod.exports
 }
+const alignment = load('src/lib/textAlignment.ts')
 const fonts = load('src/lib/textStyleFonts.ts')
 const links = load('src/components/shared/PortableTextLink.tsx')
 const styles = load('src/components/shared/PortableTextStyle.tsx', { '@/lib/textStyleFonts': fonts })
@@ -67,13 +68,14 @@ test('article and caption schemas expose the native link editing toolbar', () =>
     sanity: { PortableTextInput: props => { toolbarHidden = props.hideToolbar; return null } },
     '@portabletext/editor': {}, '@/lib/textStyleFonts': fonts,
   })
+  const alignedBlock = load('src/sanity/components/AlignedTextBlock.tsx')
   const annotation = load('src/sanity/schemas/lib/linkAnnotation.ts', { sanity, '@sanity/icons': {} })
   const caption = load('src/sanity/schemas/lib/captionRichText.ts', {
-    sanity, '../../components/InlineTextStylePortableTextInput': input,
+    sanity, '../../components/AlignedTextBlock': alignedBlock, '../../components/InlineTextStylePortableTextInput': input,
     './textStyleAnnotation': { textStyleAnnotation: { name: 'textStyle', type: 'object', fields: [{ name: 'textColor', type: 'string' }] } }, './linkAnnotation': annotation,
   })
   const { article } = load('src/sanity/schemas/article.ts', {
-    sanity, '@sanity/icons': {}, './lib/captionRichText': caption, './lib/linkAnnotation': annotation,
+    sanity, '../components/AlignedTextBlock': alignedBlock, '@sanity/icons': {}, './lib/captionRichText': caption, './lib/linkAnnotation': annotation,
     '../../lib/textStyleFonts': fonts, '../components/FontSizeCounterInput': {}, '../components/HexColorInput': {},
     '../components/InlineTextStylePortableTextInput': input,
   })
@@ -86,66 +88,68 @@ test('article and caption schemas expose the native link editing toolbar', () =>
       name: 'test', types: [{ name: 'testBody', type: 'array', of: [block] }, { name: 'affiliateProduct', type: 'document', fields: [{ name: 'title', type: 'string' }] }],
     }).get('testBody')
     const html = renderToStaticMarkup(React.createElement(input.InlineTextStylePortableTextInput, { schemaType }))
-    assert.match(html, /aria-label="Add or edit link"/)
-    assert.match(html, /aria-label="Remove link"/)
+    assert.doesNotMatch(html, /aria-label="Add or edit link"/)
+    assert.doesNotMatch(html, /aria-label="Remove link"/)
+    assert.match(html, /aria-label="Align center"/)
+    assert.ok(schemaType.of[0].fields[1].type.options.list.some(style => style.value === 'normal-center'))
+    const problems = require('@sanity/schema/_internal').groupProblems(require('@sanity/schema/_internal').validateSchema([{ name: 'test', type: 'array', of: [block] }, { name: 'affiliateProduct', type: 'document', fields: [{ name: 'title', type: 'string' }] }]).getTypes())
+    assert.equal(problems.filter(group => group.problems.some(problem => problem.severity === 'error')).length, 0)
     assert.equal(toolbarHidden, false)
   }
 })
 
-test('Link opens the selected annotation form, edits existing links, and Unlink removes them', async () => {
+test('alignment patches only selected text blocks, including reversed selections and nested captions', async () => {
   const dom = new JSDOM('<div id="root"></div>', { url: 'http://localhost' })
   global.window = dom.window
   global.document = dom.window.document
   global.IS_REACT_ACT_ENVIRONMENT = true
   window.requestAnimationFrame = callback => { callback(); return 1 }
   const { createRoot } = require('react-dom/client')
-  let annotations = []
-  let additions = 0
-  const opened = []
+  const blocks = [{ _type: 'block', _key: 'first' }, { _type: 'pteImageBlock', _key: 'image' }, { _type: 'block', _key: 'last', style: 'h2' }]
+  let selection = { anchor: { path: [{ _key: 'last' }] }, focus: { path: [{ _key: 'first' }] } }
+  const patches = []
   const editor = {}
   const editorAPI = {
-    focus: () => {}, activeAnnotations: () => annotations,
-    focusBlock: () => ({ _key: 'paragraph' }),
-    hasBlockStyle: (_, style) => style === 'normal', isMarkActive: () => false,
-    hasListStyle: () => false,
-    isAnnotationActive: (_, type) => annotations.some(a => a._type === type),
-    addAnnotation: (_, type, value) => {
-      assert.equal(type.name, 'link')
-      additions++
-      annotations = [{ _key: 'link-id', _type: type.name, ...value }]
-      return { markDefPath: [{ _key: 'paragraph' }, 'markDefs', { _key: 'link-id' }] }
-    },
-    removeAnnotation: (_, type) => { annotations = annotations.filter(a => a._type !== type.name) },
+    focus: () => {}, activeAnnotations: () => [],
+    getValue: () => blocks, getSelection: () => selection,
   }
   const { InlineTextStylePortableTextInput } = load('src/sanity/components/InlineTextStylePortableTextInput.tsx', {
-    sanity: { PortableTextInput: props => {
+    sanity: { set: require('sanity').set, PortableTextInput: props => {
       React.useEffect(() => { props.editorRef.current = editor; props.onEditorChange({}, editor) }, [])
       return null
     } }, '@portabletext/editor': { PortableTextEditor: editorAPI }, '@/lib/textStyleFonts': fonts,
   })
   const schemaType = require('@sanity/schema').Schema.compile({ name: 'test', types: [{
-    name: 'content', type: 'array', of: [{ type: 'block', marks: { annotations: [{
-      name: 'link', type: 'object', fields: [{ name: 'href', type: 'url' }],
-    }] } }],
+    name: 'content', type: 'array', of: [{ type: 'block', styles: alignment.alignedTextStyles([{title: 'Normal', value: 'normal'}, {title: 'Heading', value: 'h2'}]) }],
   }] }).get('content')
   const root = createRoot(document.getElementById('root'))
+  const render = async (path, readOnly = false) => React.act(async () => root.render(React.createElement(InlineTextStylePortableTextInput, {
+    schemaType, path, readOnly, onChange: value => patches.push(...value),
+  })))
   try {
-    for (const path of [['body'], ['body', { _key: 'image' }, 'caption']]) {
-      await React.act(async () => root.render(React.createElement(InlineTextStylePortableTextInput, { schemaType, path, onItemOpen: value => opened.push(value) })))
-      const link = document.querySelector('[aria-label="Add or edit link"]')
-      const down = new window.MouseEvent('mousedown', { bubbles: true, cancelable: true })
-      link.dispatchEvent(down)
-      assert.equal(down.defaultPrevented, true)
-      const before = additions
-      await React.act(async () => link.click())
-      assert.equal(additions, before + 1)
-      assert.deepEqual(opened.at(-1), [...path, { _key: 'paragraph' }, 'markDefs', { _key: 'link-id' }])
-      await React.act(async () => link.click())
-      assert.equal(additions, before + 1, 'Editing must reuse the existing annotation')
-      assert.deepEqual(opened.at(-1), [...path, { _key: 'paragraph' }, 'markDefs', { _key: 'link-id' }])
-      await React.act(async () => document.querySelector('[aria-label="Remove link"]').click())
-      assert.deepEqual(annotations, [])
-    }
+    await render(['body'])
+    const button = document.querySelector('[aria-label="Align center"]')
+    const down = new window.MouseEvent('mousedown', { bubbles: true, cancelable: true })
+    button.dispatchEvent(down)
+    assert.equal(down.defaultPrevented, true, 'Clicking the toolbar preserves the text selection')
+    await React.act(async () => button.click())
+    assert.deepEqual(patches.map(patch => [patch.path, patch.value]), [
+      [[{ _key: 'first' }, 'style'], 'normal-center'], [[{ _key: 'last' }, 'style'], 'h2-center'],
+    ])
+    patches.length = 0
+    selection = { anchor: { path: [{ _key: 'first' }] }, focus: { path: [{ _key: 'first' }] } }
+    await render(['body', { _key: 'image' }, 'caption'])
+    await React.act(async () => document.querySelector('[aria-label="Align right"]').click())
+    assert.equal(patches.length, 1)
+    assert.deepEqual(patches[0].path, [{ _key: 'first' }, 'style'], 'Patches stay relative to the caption field')
+    assert.equal(patches[0].value, 'normal-right')
+    await render(['body'], true)
+    assert.equal(document.querySelector('[aria-label="Align center"]').disabled, true)
+    patches.length = 0
+    selection = null
+    await render(['body'])
+    await React.act(async () => document.querySelector('[aria-label="Align center"]').click())
+    assert.equal(patches.length, 0, 'No selection must not update the whole article')
   } finally {
     await React.act(async () => root.unmount())
     dom.window.close()
@@ -154,3 +158,17 @@ test('Link opens the selected annotation form, edits existing links, and Unlink 
     delete global.IS_REACT_ACT_ENVIRONMENT
   }
 })
+
+for (const [name, Component, styles] of [['body', ArticleBody, ['normal', 'h2', 'h3', 'blockquote', 'pullQuote']], ['caption', captions.SanityCaption, ['normal']]]) {
+  test(`${name} renders saved paragraph alignment and keeps existing content unchanged`, () => {
+    for (const style of styles) {
+      for (const textAlign of ['left', 'center', 'right', undefined, 'invalid']) {
+        const blocks = value('/newsstand').map(block => ({ ...block, style: textAlign && textAlign !== 'invalid' ? `${style}-${textAlign}` : style }))
+        const doc = new JSDOM(renderToStaticMarkup(React.createElement(Component, { value: blocks }))).window.document
+        const el = doc.querySelector('[style*="text-align"]')
+        assert.equal(el?.style.textAlign, alignment.textAlignment(textAlign))
+        assert.equal(doc.querySelector('a').getAttribute('href'), '/newsstand')
+      }
+    }
+  })
+}

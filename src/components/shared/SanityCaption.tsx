@@ -1,3 +1,4 @@
+import { blockTextAlignment } from '@/lib/textAlignment'
 import { PortableText, type PortableTextComponents } from 'next-sanity'
 import type { TypedObject } from '@portabletext/types'
 import { PortableTextStyle } from './PortableTextStyle'
@@ -5,7 +6,10 @@ import { PortableTextLink } from './PortableTextLink'
 
 const captionComponents: PortableTextComponents = {
   block: {
-    normal: ({ children }) => <span className="block">{children}</span>,
+    ...Object.fromEntries(['normal', 'normal-left', 'normal-center', 'normal-right'].map(style => [style,
+      ({ children, value }: import('@portabletext/react').PortableTextComponentProps<import('@portabletext/types').PortableTextBlock>) =>
+        <span className="block" style={{ textAlign: blockTextAlignment(value) }}>{children}</span>,
+    ])),
   },
   marks: {
     link: PortableTextLink,

@@ -23,6 +23,10 @@ function load(file, mocks = {}) {
 const { deleteContributor } = load('src/sanity/lib/deleteContributor.ts')
 const queries = load('src/sanity/lib/queries.ts', { 'next-sanity': { defineQuery: (query) => query } })
 const { ContributorCredit } = load('src/components/editorial/ContributorCredit.tsx')
+const { StylistCredit } = load('src/components/editorial/StylistCredit.tsx', {
+  './ContributorCredit': { ContributorCredit },
+  '@/lib/personName': load('src/lib/personName.ts'),
+})
 const { ArticleCard } = load('src/components/editorial/ArticleCard.tsx', {
   '@/components/editorial/ContributorCredit': { ContributorCredit },
   '@/lib/articleTitle': { articleTitleSingleLine: (title) => title },
@@ -165,4 +169,35 @@ test('saved credits render as plain text while the article and active contributo
     assert.match(html, /href="\/stories\/story"/)
     assert.doesNotMatch(html, /href="\/contributors\//)
   }
+})
+
+test('styling credits survive contributor deletion in published and draft articles', async () => {
+  const initial = fixtures()
+  initial.push(
+    { _id: 'styled', _rev: 's1', _type: 'article', slug: { current: 'styled' }, stylist: reference('person') },
+    { _id: 'drafts.styled', _rev: 's2', _type: 'article', stylist: reference('drafts.person'), author: reference('other-person') },
+  )
+  initial.find(doc => doc._id === 'article').stylist = reference('person')
+  const { client, state } = storage(initial)
+  assert.deepEqual(await deleteContributor(client, 'person'), { articleCount: 5 })
+  assert.equal(state.documents.find(doc => doc._id === 'styled').stylistName, 'Published Name')
+  assert.equal(state.documents.find(doc => doc._id === 'styled').stylist, undefined)
+  assert.equal(state.documents.find(doc => doc._id === 'drafts.styled').stylistName, 'Unpublished Rename')
+  assert.deepEqual(state.documents.find(doc => doc._id === 'drafts.styled').author, reference('other-person'))
+  assert.equal(state.documents.find(doc => doc._id === 'article').stylistName, 'Published Name')
+  const article = await query(queries.ARTICLE_BY_STORY_SLUG_QUERY, state.documents, { slug: 'styled' })
+  assert.deepEqual(article.stylist, { name: 'Published Name', slug: null })
+})
+
+test('Styled by renders a linked profile or a saved name, and disappears when empty', () => {
+  const render = stylist => renderToStaticMarkup(React.createElement(StylistCredit, { stylist }))
+  for (const stylist of [undefined, null, { name: '' }, { name: '  ' }]) assert.equal(render(stylist), '')
+  const linked = render({ name: 'JANE DOE', slug: 'jane-doe' })
+  assert.match(linked, /Styled by /)
+  assert.match(linked, /href="\/contributors\/jane-doe"/)
+  assert.match(linked, />Jane Doe<\/a>/)
+  const saved = render({ name: 'Jane Doe', slug: null })
+  assert.match(saved, /Styled by /)
+  assert.match(saved, />Jane Doe<\/span>/)
+  assert.doesNotMatch(saved, /<a\b/)
 })

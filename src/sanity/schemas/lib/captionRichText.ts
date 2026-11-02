@@ -1,3 +1,5 @@
+import { alignedTextStyles } from '@/lib/textAlignment'
+import { AlignedTextBlock } from '../../components/AlignedTextBlock'
 import { defineArrayMember } from 'sanity'
 import { InlineTextStylePortableTextInput } from '../../components/InlineTextStylePortableTextInput'
 import { textStyleAnnotation } from './textStyleAnnotation'
@@ -9,7 +11,8 @@ export const captionRichTextType = {
   of: [
     defineArrayMember({
       type: 'block',
-      styles: [{ title: 'Normal', value: 'normal' }],
+      components: { block: AlignedTextBlock },
+      styles: alignedTextStyles([{ title: 'Normal', value: 'normal' }]),
       marks: {
         decorators: [
           { title: 'Strong', value: 'strong' },

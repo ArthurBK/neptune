@@ -1,3 +1,4 @@
+import { baseTextStyle, blockTextAlignment } from '@/lib/textAlignment'
 import { PortableText, type PortableTextComponents } from 'next-sanity'
 import Image from 'next/image'
 
@@ -122,48 +123,48 @@ function createComponents(
     return /^#(?:[0-9a-fA-F]{3}){1,2}$/.test(trimmed) ? trimmed : undefined
   }
 
-  return {
+  const components: PortableTextComponents = {
     block: {
-      normal: ({ children }) => {
+      normal: ({ children, value }) => {
         const isFirst = isFirstParagraph.current
         if (isFirst) isFirstParagraph.current = false
         return (
           <TextWrapper className={isFirst ? 'mt-10 mb-8' : 'mb-4'}>
             <p
               className={`${typography.fontFamilyClass} ${typography.bodySizeClass} leading-[1.85]`}
-              style={{ color: typography.textColor ?? '#1A1A1A' }}
+              style={{ textAlign: blockTextAlignment(value), color: typography.textColor ?? '#1A1A1A' }}
             >
               {children}
             </p>
           </TextWrapper>
         )
       },
-      h2: ({ children }) => (
+      h2: ({ children, value }) => (
         <TextWrapper className="mt-8 mb-3">
           <h2
             className={`${typography.fontFamilyClass} text-3xl md:text-4xl leading-tight`}
-            style={{ color: typography.textColor ?? '#1A1A1A' }}
+            style={{ textAlign: blockTextAlignment(value), color: typography.textColor ?? '#1A1A1A' }}
           >
             {children}
           </h2>
         </TextWrapper>
       ),
-      h3: ({ children }) => (
+      h3: ({ children, value }) => (
         <TextWrapper className="mt-6 mb-2">
           <h3
             className={`${typography.fontFamilyClass} text-2xl md:text-3xl leading-tight`}
-            style={{ color: typography.textColor ?? '#1A1A1A' }}
+            style={{ textAlign: blockTextAlignment(value), color: typography.textColor ?? '#1A1A1A' }}
           >
             {children}
           </h3>
         </TextWrapper>
       ),
-      blockquote: ({ children }) => (
+      blockquote: ({ children, value }) => (
         <TextWrapper className="my-6">
           <blockquote
             className={`${typography.fontFamilyClass} border-l-2 pl-8 text-2xl md:text-3xl leading-relaxed`}
             style={{
-              color: typography.textColor ?? '#1A1A1A',
+              textAlign: blockTextAlignment(value), color: typography.textColor ?? '#1A1A1A',
               borderColor: typography.textColor ?? '#1A1A1A',
             }}
           >
@@ -171,17 +172,18 @@ function createComponents(
           </blockquote>
         </TextWrapper>
       ),
-      pullQuote: ({ children }) => (
+      pullQuote: ({ children, value }) => (
         <div className="w-full my-8">
           <blockquote
             className={`${typography.fontFamilyClass} text-4xl md:text-5xl text-center leading-snug`}
-            style={{ color: typography.textColor ?? '#1A1A1A' }}
+            style={{ textAlign: blockTextAlignment(value), color: typography.textColor ?? '#1A1A1A' }}
           >
             {children}
           </blockquote>
         </div>
       ),
     },
+    listItem: ({ children, value }) => <li style={{ textAlign: blockTextAlignment(value) }}>{children}</li>,
     marks: {
       link: PortableTextLink,
       strong: ({ children }) => <strong className="font-medium">{children}</strong>,
@@ -472,6 +474,14 @@ function createComponents(
       },
     },
   }
+  const blocks = components.block as Record<string, import('@portabletext/react').PortableTextBlockComponent>
+  for (const style of ['normal', 'h2', 'h3', 'blockquote', 'pullQuote']) {
+    for (const alignment of ['left', 'center', 'right']) {
+      blocks[`${style}-${alignment}`] = blocks[baseTextStyle(style)]
+    }
+  }
+  return components
+
 }
 
 interface ArticleBodyProps {
@@ -479,6 +489,7 @@ interface ArticleBodyProps {
   fontFamilyClass?: string
   bodySizeClass?: string
   textColor?: string
+
 }
 
 export function ArticleBody({

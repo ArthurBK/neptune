@@ -1,4 +1,5 @@
 import { ContributorCredit } from '@/components/editorial/ContributorCredit'
+import { StylistCredit, type StylistCreditData } from '@/components/editorial/StylistCredit'
 import { notFound } from 'next/navigation'
 
 import { client } from '@/sanity/lib/client'
@@ -113,6 +114,7 @@ export default async function StoryArticlePage({ params }: ArticlePageProps) {
                 </ContributorCredit>
               </p>
             )}
+            <StylistCredit stylist={article.stylist} />
             {publishedDate && (
               <p className="font-futura text-xs tracking-[0.08em] uppercase text-black/70 mt-1">
                 {publishedDate}
@@ -226,6 +228,7 @@ type ArticleData = {
   body: unknown
   author?: { name: string; slug?: string | null } | null
   photographer?: { name: string; slug?: string | null; profileHref?: string | null } | null
+  stylist?: StylistCreditData | null
   relatedArticles?: RelatedArticleForCard[]
   affiliateProducts?: ArticleAffiliateProduct[]
 }
