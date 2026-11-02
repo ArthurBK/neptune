@@ -1,8 +1,8 @@
 import { alignedStyle, blockTextAlignment, type TextAlignment } from '@/lib/textAlignment'
 import { useCallback, useRef, useState, type CSSProperties, type MouseEvent } from 'react'
-import { PortableTextInput, set, type PortableTextInputProps } from 'sanity'
+import { PortableTextInput, set, unset, type PortableTextInputProps } from 'sanity'
 import { PortableTextEditor, type PortableTextObject } from '@portabletext/editor'
-import type { BlockSchemaType } from '@sanity/types'
+import type { BlockSchemaType, Path } from '@sanity/types'
 import { ResetIcon } from '@sanity/icons'
 
 import { TEXT_STYLE_FONT_FAMILIES, type TextStyleFontFamily } from '@/lib/textStyleFonts'
@@ -32,9 +32,27 @@ type ToolbarState = {
   textStyle: Partial<TextStyleValue>
   alignment?: string
   hasTextSelection: boolean
+  links: SelectedLink[]
 }
 
-const defaultToolbarState: ToolbarState = { textStyle: {}, hasTextSelection: false }
+type SelectedLink = { blockKey: string; key: string; href: string }
+
+const defaultToolbarState: ToolbarState = { textStyle: {}, hasTextSelection: false, links: [] }
+
+function selectedLinks(editor: PortableTextEditor): SelectedLink[] {
+  const selection = PortableTextEditor.getSelection(editor)
+  if (!selection) return []
+  const collapsed = JSON.stringify(selection.anchor) === JSON.stringify(selection.focus)
+  return (PortableTextEditor.getFragment(editor) || []).flatMap(block => {
+    if (block._type !== 'block' || !('children' in block) || !Array.isArray(block.children) || !('markDefs' in block) || !Array.isArray(block.markDefs)) return []
+    const marks = new Set(block.children.flatMap(child =>
+      child._type === 'span' && (collapsed || child.text?.length > 0) ? child.marks || [] : [],
+    ))
+    return block.markDefs.filter(mark => mark._type === 'link' && marks.has(mark._key)).map(mark => ({
+      blockKey: block._key, key: mark._key, href: typeof mark.href === 'string' ? mark.href : '',
+    }))
+  })
+}
 
 function selectedTextBlocks(editor: PortableTextEditor) {
   const selection = PortableTextEditor.getSelection(editor)
@@ -124,6 +142,7 @@ function ToolbarSeparator() {
 
 export function InlineTextStylePortableTextInput(props: PortableTextInputProps) {
   const editorRef = useRef<PortableTextEditor | null>(null)
+  const openLinkRef = useRef<SelectedLink | null>(null)
   const [toolbarState, setToolbarState] = useState<ToolbarState>(defaultToolbarState)
 
   const blockSchema = props.schemaType.of?.find(member => member.name === 'block') as BlockSchemaType | undefined
@@ -136,6 +155,7 @@ export function InlineTextStylePortableTextInput(props: PortableTextInputProps) 
       textStyle: PortableTextEditor.activeAnnotations(editor).find(isTextStyleAnnotation) || {},
       alignment: blocks.every(block => blockTextAlignment(block) === alignment) ? alignment as string | undefined : undefined,
       hasTextSelection: blocks.length > 0,
+      links: selectedLinks(editor),
     })
   }, [])
 
@@ -182,6 +202,53 @@ export function InlineTextStylePortableTextInput(props: PortableTextInputProps) 
 
   const preventEditorBlur = (event: MouseEvent) => {
     event.preventDefault()
+  }
+
+  const editLink = (link: SelectedLink) => {
+    openItem([...props.path, { _key: link.blockKey }, 'markDefs', { _key: link.key }])
+  }
+
+  const removeLink = (link: SelectedLink) => runEditorAction(editor => {
+    const block = PortableTextEditor.getValue(editor)?.find(block => block._key === link.blockKey)
+    if (!block || !('children' in block) || !Array.isArray(block.children)) return
+    // Remove only this annotation, preserving the text and all its other marks.
+    props.onChange([
+      unset([{ _key: link.blockKey }, 'markDefs', { _key: link.key }]),
+      ...block.children.filter(child => child._type === 'span' && child.marks?.includes(link.key)).map(child =>
+        set(child.marks.filter((mark: string) => mark !== link.key), [{ _key: link.blockKey }, 'children', { _key: child._key }, 'marks']),
+      ),
+    ])
+  })
+
+  const openItem = (path: Path) => {
+    const [block, collection, mark] = path.slice(props.path.length)
+    const editor = editorRef.current
+    if (editor && collection === 'markDefs' && typeof block === 'object' && '_key' in block && typeof mark === 'object' && '_key' in mark) {
+      const value = PortableTextEditor.getValue(editor)?.find(value => value._key === block._key)
+      const annotation = value && 'markDefs' in value && Array.isArray(value.markDefs)
+        ? value.markDefs.find(annotation => annotation._key === mark._key && annotation._type === 'link') : undefined
+      openLinkRef.current = annotation ? { blockKey: block._key, key: mark._key, href: '' } : null
+    } else {
+      openLinkRef.current = null
+    }
+    props.onItemOpen(path)
+  }
+
+  const closeItem = () => {
+    const link = openLinkRef.current
+    openLinkRef.current = null
+    const editor = editorRef.current
+    if (link && editor && !props.readOnly) {
+      // The form value includes the latest URL input, even before the editor mirrors its patch.
+      const block = (props.value || PortableTextEditor.getValue(editor))?.find(block => block._key === link.blockKey)
+      const annotation = block && 'markDefs' in block && Array.isArray(block.markDefs)
+        ? block.markDefs.find(annotation => annotation._key === link.key && annotation._type === 'link') : undefined
+      // Wait for the dialog to close: a new link starts empty while its URL is being typed.
+      if (annotation && (annotation.href == null || (typeof annotation.href === 'string' && !annotation.href.trim()))) {
+        removeLink(link)
+      }
+    }
+    props.onItemClose()
   }
 
   return (
@@ -322,11 +389,27 @@ export function InlineTextStylePortableTextInput(props: PortableTextInputProps) 
           <ResetIcon aria-hidden style={{ fontSize: 18 }} />
           Reset text style
         </button>
+        {toolbarState.links.map(link => (
+          <div key={`${link.blockKey}-${link.key}`} role="group" aria-label="Selected link"
+            style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 8, width: '100%', borderTop: '1px solid #D8D2C8', paddingTop: 8 }}>
+            <span style={{ fontSize: 12, color: '#2563eb', overflowWrap: 'anywhere', flex: '1 1 180px' }}>
+              {link.href || 'Missing URL'}
+            </span>
+            <button type="button" onMouseDown={preventEditorBlur} onClick={() => editLink(link)} style={controlButtonStyle()}>
+              {props.readOnly ? 'View link' : 'Edit link'}
+            </button>
+            <button type="button" disabled={props.readOnly} onMouseDown={preventEditorBlur} onClick={() => removeLink(link)} style={controlButtonStyle()}>
+              Remove link
+            </button>
+          </div>
+        ))}
       </div>
 
       <PortableTextInput
         {...props}
         editorRef={editorRef}
+        onItemOpen={openItem}
+        onItemClose={closeItem}
         // Standard formatting, links, lists and media are provided only by Sanity.
         hideToolbar={false}
         onEditorChange={(change, editor) => {

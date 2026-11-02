@@ -1,5 +1,6 @@
 import { alignedTextStyles } from '@/lib/textAlignment'
 import { AlignedTextBlock } from '../components/AlignedTextBlock'
+import { BlockWithValidation, ItemWithValidation } from '../components/ItemWithValidation'
 import { DocumentTextIcon, ImageIcon, VideoIcon } from '@sanity/icons'
 import { defineArrayMember, defineField, defineType } from 'sanity'
 import { captionRichTextType } from './lib/captionRichText'
@@ -85,6 +86,7 @@ const pteImageBlock = defineType({
 // Portable Text block: image grid (n images)
 const pteImageGridBlock = defineType({
   name: 'pteImageGridBlock',
+  components: { block: BlockWithValidation },
   title: 'Image Grid',
   type: 'object',
   icon: ImageIcon,
@@ -97,13 +99,14 @@ const pteImageGridBlock = defineType({
       of: [
         defineArrayMember({
           type: 'image',
+          components: { item: ItemWithValidation },
           options: { hotspot: true },
           fields: [
             defineField({
               name: 'alt',
               title: 'Alt text',
               type: 'string',
-              validation: (rule) => rule.required(),
+              validation: (rule) => rule.required().error('Add alt text describing this image.'),
             }),
             defineField({
               name: 'caption',
@@ -130,7 +133,7 @@ const pteImageGridBlock = defineType({
           ],
         }),
       ],
-      validation: (rule) => rule.required().min(1),
+      validation: (rule) => rule.required().min(1).error('Add at least one image to this grid.'),
     }),
   ],
   preview: {
