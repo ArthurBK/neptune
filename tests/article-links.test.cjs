@@ -70,7 +70,7 @@ test('article and caption schemas expose the native link editing toolbar', () =>
   const annotation = load('src/sanity/schemas/lib/linkAnnotation.ts', { sanity, '@sanity/icons': {} })
   const caption = load('src/sanity/schemas/lib/captionRichText.ts', {
     sanity, '../../components/InlineTextStylePortableTextInput': input,
-    './textStyleAnnotation': { textStyleAnnotation: { name: 'textStyle' } }, './linkAnnotation': annotation,
+    './textStyleAnnotation': { textStyleAnnotation: { name: 'textStyle', type: 'object', fields: [{ name: 'textColor', type: 'string' }] } }, './linkAnnotation': annotation,
   })
   const { article } = load('src/sanity/schemas/article.ts', {
     sanity, '@sanity/icons': {}, './lib/captionRichText': caption, './lib/linkAnnotation': annotation,
@@ -82,9 +82,75 @@ test('article and caption schemas expose the native link editing toolbar', () =>
     const link = block.marks.annotations.find(mark => mark.name === 'link')
     assert.ok(link.fields.some(f => f.name === 'href'))
     assert.ok(link.fields.some(f => f.name === 'blank'))
-    renderToStaticMarkup(React.createElement(input.InlineTextStylePortableTextInput, {
-      schemaType: { of: [{ ...block, name: 'block' }] },
-    }))
+    const schemaType = require('@sanity/schema').Schema.compile({
+      name: 'test', types: [{ name: 'testBody', type: 'array', of: [block] }, { name: 'affiliateProduct', type: 'document', fields: [{ name: 'title', type: 'string' }] }],
+    }).get('testBody')
+    const html = renderToStaticMarkup(React.createElement(input.InlineTextStylePortableTextInput, { schemaType }))
+    assert.match(html, /aria-label="Add or edit link"/)
+    assert.match(html, /aria-label="Remove link"/)
     assert.equal(toolbarHidden, false)
+  }
+})
+
+test('Link opens the selected annotation form, edits existing links, and Unlink removes them', async () => {
+  const dom = new JSDOM('<div id="root"></div>', { url: 'http://localhost' })
+  global.window = dom.window
+  global.document = dom.window.document
+  global.IS_REACT_ACT_ENVIRONMENT = true
+  window.requestAnimationFrame = callback => { callback(); return 1 }
+  const { createRoot } = require('react-dom/client')
+  let annotations = []
+  let additions = 0
+  const opened = []
+  const editor = {}
+  const editorAPI = {
+    focus: () => {}, activeAnnotations: () => annotations,
+    focusBlock: () => ({ _key: 'paragraph' }),
+    hasBlockStyle: (_, style) => style === 'normal', isMarkActive: () => false,
+    hasListStyle: () => false,
+    isAnnotationActive: (_, type) => annotations.some(a => a._type === type),
+    addAnnotation: (_, type, value) => {
+      assert.equal(type.name, 'link')
+      additions++
+      annotations = [{ _key: 'link-id', _type: type.name, ...value }]
+      return { markDefPath: [{ _key: 'paragraph' }, 'markDefs', { _key: 'link-id' }] }
+    },
+    removeAnnotation: (_, type) => { annotations = annotations.filter(a => a._type !== type.name) },
+  }
+  const { InlineTextStylePortableTextInput } = load('src/sanity/components/InlineTextStylePortableTextInput.tsx', {
+    sanity: { PortableTextInput: props => {
+      React.useEffect(() => { props.editorRef.current = editor; props.onEditorChange({}, editor) }, [])
+      return null
+    } }, '@portabletext/editor': { PortableTextEditor: editorAPI }, '@/lib/textStyleFonts': fonts,
+  })
+  const schemaType = require('@sanity/schema').Schema.compile({ name: 'test', types: [{
+    name: 'content', type: 'array', of: [{ type: 'block', marks: { annotations: [{
+      name: 'link', type: 'object', fields: [{ name: 'href', type: 'url' }],
+    }] } }],
+  }] }).get('content')
+  const root = createRoot(document.getElementById('root'))
+  try {
+    for (const path of [['body'], ['body', { _key: 'image' }, 'caption']]) {
+      await React.act(async () => root.render(React.createElement(InlineTextStylePortableTextInput, { schemaType, path, onItemOpen: value => opened.push(value) })))
+      const link = document.querySelector('[aria-label="Add or edit link"]')
+      const down = new window.MouseEvent('mousedown', { bubbles: true, cancelable: true })
+      link.dispatchEvent(down)
+      assert.equal(down.defaultPrevented, true)
+      const before = additions
+      await React.act(async () => link.click())
+      assert.equal(additions, before + 1)
+      assert.deepEqual(opened.at(-1), [...path, { _key: 'paragraph' }, 'markDefs', { _key: 'link-id' }])
+      await React.act(async () => link.click())
+      assert.equal(additions, before + 1, 'Editing must reuse the existing annotation')
+      assert.deepEqual(opened.at(-1), [...path, { _key: 'paragraph' }, 'markDefs', { _key: 'link-id' }])
+      await React.act(async () => document.querySelector('[aria-label="Remove link"]').click())
+      assert.deepEqual(annotations, [])
+    }
+  } finally {
+    await React.act(async () => root.unmount())
+    dom.window.close()
+    delete global.window
+    delete global.document
+    delete global.IS_REACT_ACT_ENVIRONMENT
   }
 })

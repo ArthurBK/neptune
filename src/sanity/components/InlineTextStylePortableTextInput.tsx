@@ -1,11 +1,14 @@
 import { useCallback, useRef, useState, type CSSProperties, type MouseEvent } from 'react'
 import { PortableTextInput, type PortableTextInputProps } from 'sanity'
 import { PortableTextEditor, type PortableTextObject } from '@portabletext/editor'
+import type { BlockSchemaType, SpanSchemaType } from '@sanity/types'
+import { LinkIcon, LinkRemovedIcon, OlistIcon, UlistIcon, ResetIcon } from '@sanity/icons'
 
 import { TEXT_STYLE_FONT_FAMILIES, type TextStyleFontFamily } from '@/lib/textStyleFonts'
 
 const TEXT_STYLE_MARK = 'textStyle'
 const AFFILIATE_PRODUCT_MARK = 'affiliateProductEmbed'
+const LINK_MARK = 'link'
 
 const COLOR_PRESETS = [
   { title: 'Black', value: '#1A1A1A' },
@@ -33,6 +36,20 @@ const DECORATOR_LABELS: Record<string, string> = {
   underline: 'U',
   'strike-through': 'S',
   code: 'Code',
+  captionSizeSm: 'A',
+  captionSizeMd: 'A',
+  captionSizeLg: 'A',
+}
+
+const DECORATOR_PREVIEWS: Record<string, CSSProperties> = {
+  strong: { fontWeight: 800, fontSize: 15 },
+  em: { fontStyle: 'italic', fontFamily: 'Georgia, serif', fontSize: 17 },
+  underline: { textDecoration: 'underline', textUnderlineOffset: 3, fontSize: 15 },
+  'strike-through': { textDecoration: 'line-through', fontSize: 15 },
+  code: { fontFamily: 'monospace' },
+  captionSizeSm: { fontSize: 11 },
+  captionSizeMd: { fontSize: 15 },
+  captionSizeLg: { fontSize: 19 },
 }
 
 const BLOCK_OBJECT_LABELS: Record<string, string> = {
@@ -65,6 +82,7 @@ type ToolbarState = {
   activeListStyle?: string
   textStyle: Partial<TextStyleValue>
   affiliateProductActive: boolean
+  linkActive: boolean
 }
 
 const defaultToolbarState: ToolbarState = {
@@ -72,6 +90,7 @@ const defaultToolbarState: ToolbarState = {
   activeMarks: [],
   textStyle: {},
   affiliateProductActive: false,
+  linkActive: false,
 }
 
 function toSchemaActions(
@@ -97,16 +116,15 @@ function toSchemaActions(
 }
 
 function getBlockSchema(props: PortableTextInputProps) {
-  const blockMember = props.schemaType.of?.find((member) => member.name === 'block')
-  return blockMember as
-    | {
-        styles?: Array<{ title?: string; value?: string }>
-        marks?: {
-          decorators?: Array<{ title?: string; value?: string }>
-          annotations?: Array<{ name?: string; title?: string }>
-        }
-      }
-    | undefined
+  const block = props.schemaType.of?.find((member) => member.name === 'block') as BlockSchemaType | undefined
+  if (!block) return undefined
+  // Studio passes compiled schema types: marks live on the child span,
+  // not on the raw block.marks definition used in schema source files.
+  const span = block.fields[0].type.of.find((member) => member.name === 'span') as SpanSchemaType | undefined
+  return {
+    styles: block.fields[1].type.options?.list,
+    marks: { decorators: span?.decorators, annotations: span?.annotations },
+  }
 }
 
 function hasAnnotation(props: PortableTextInputProps, name: string) {
@@ -162,13 +180,14 @@ function controlButtonStyle(active?: boolean): CSSProperties {
     alignItems: 'center',
     background: active ? '#1A1A1A' : '#FFFFFF',
     border: '1px solid #D8D2C8',
-    borderRadius: 0,
+    borderRadius: 4,
     color: active ? '#FFFFFF' : '#1A1A1A',
     cursor: 'pointer',
     display: 'inline-flex',
     fontFamily: 'inherit',
     fontSize: 12,
     fontWeight: 500,
+    gap: 4,
     height: 32,
     justifyContent: 'center',
     minWidth: 32,
@@ -180,7 +199,7 @@ function fieldStyle(width: number): CSSProperties {
   return {
     background: '#FFFFFF',
     border: '1px solid #D8D2C8',
-    borderRadius: 0,
+    borderRadius: 4,
     color: '#1A1A1A',
     fontFamily: 'inherit',
     fontSize: 12,
@@ -214,6 +233,7 @@ export function InlineTextStylePortableTextInput(props: PortableTextInputProps) 
     DECORATOR_LABELS,
   )
   const showAffiliateProduct = hasAnnotation(props, AFFILIATE_PRODUCT_MARK)
+  const showLink = hasAnnotation(props, LINK_MARK)
   const blockObjects = getBlockObjectActions(props)
 
   const syncToolbarState = useCallback(
@@ -232,6 +252,7 @@ export function InlineTextStylePortableTextInput(props: PortableTextInputProps) 
         ),
         textStyle,
         affiliateProductActive: PortableTextEditor.isAnnotationActive(editor, AFFILIATE_PRODUCT_MARK),
+        linkActive: PortableTextEditor.isAnnotationActive(editor, LINK_MARK),
       })
     },
     [blockStyles, decorators],
@@ -271,6 +292,17 @@ export function InlineTextStylePortableTextInput(props: PortableTextInputProps) 
     })
   }, [runEditorAction])
 
+  const editLink = () => runEditorAction((editor) => {
+    const link = PortableTextEditor.activeAnnotations(editor).find((annotation) => annotation._type === LINK_MARK)
+    const block = PortableTextEditor.focusBlock(editor)
+    if (link && block) {
+      props.onItemOpen([...props.path, { _key: block._key }, 'markDefs', { _key: link._key }])
+      return
+    }
+    const paths = PortableTextEditor.addAnnotation(editor, { name: LINK_MARK }, { blank: false })
+    if (paths?.markDefPath) props.onItemOpen([...props.path, ...paths.markDefPath])
+  })
+
   const preventEditorBlur = (event: MouseEvent) => {
     event.preventDefault()
   }
@@ -283,6 +315,7 @@ export function InlineTextStylePortableTextInput(props: PortableTextInputProps) 
           alignItems: 'center',
           background: '#FFFFFF',
           border: '1px solid #D8D2C8',
+          borderRadius: 6,
           boxShadow: '0 6px 20px rgba(26, 26, 26, 0.08)',
           display: 'flex',
           flexWrap: 'wrap',
@@ -298,6 +331,7 @@ export function InlineTextStylePortableTextInput(props: PortableTextInputProps) 
           <button
             key={style.value}
             aria-label={style.title}
+            aria-pressed={toolbarState.activeBlockStyle === style.value}
             onClick={() =>
               runEditorAction((editor) => PortableTextEditor.toggleBlockStyle(editor, style.value))
             }
@@ -306,7 +340,7 @@ export function InlineTextStylePortableTextInput(props: PortableTextInputProps) 
             title={style.title}
             type="button"
           >
-            {style.label}
+            <span style={{ fontWeight: style.value.startsWith('h') ? 700 : 500 }}>{style.label}</span>
           </button>
         ))}
 
@@ -316,6 +350,7 @@ export function InlineTextStylePortableTextInput(props: PortableTextInputProps) 
           <button
             key={decorator.value}
             aria-label={decorator.title}
+            aria-pressed={toolbarState.activeMarks.includes(decorator.value)}
             onClick={() =>
               runEditorAction((editor) => PortableTextEditor.toggleMark(editor, decorator.value))
             }
@@ -324,29 +359,61 @@ export function InlineTextStylePortableTextInput(props: PortableTextInputProps) 
             title={decorator.title}
             type="button"
           >
-            {decorator.label}
+            <span style={DECORATOR_PREVIEWS[decorator.value]}>{decorator.label}</span>
           </button>
         ))}
 
+        {showLink && (
+          <>
+            <button
+              type="button"
+              aria-label="Add or edit link"
+              aria-pressed={toolbarState.linkActive}
+              disabled={props.readOnly}
+              title="Select text to add a link, or click linked text to edit it"
+              onMouseDown={preventEditorBlur}
+              onClick={editLink}
+              style={controlButtonStyle(toolbarState.linkActive)}
+            >
+              <LinkIcon aria-hidden style={{ fontSize: 18 }} />
+              Link
+            </button>
+            <button
+              type="button"
+              aria-label="Remove link"
+              disabled={props.readOnly || !toolbarState.linkActive}
+              title="Remove link"
+              onMouseDown={preventEditorBlur}
+              onClick={() => runEditorAction((editor) => PortableTextEditor.removeAnnotation(editor, { name: LINK_MARK }))}
+              style={{ ...controlButtonStyle(), opacity: toolbarState.linkActive ? 1 : 0.5 }}
+            >
+              <LinkRemovedIcon aria-hidden style={{ fontSize: 18 }} />
+              Unlink
+            </button>
+          </>
+        )}
+
         <button
           aria-label="Bullet list"
+          aria-pressed={toolbarState.activeListStyle === 'bullet'}
           onClick={() => runEditorAction((editor) => PortableTextEditor.toggleList(editor, 'bullet'))}
           onMouseDown={preventEditorBlur}
           style={controlButtonStyle(toolbarState.activeListStyle === 'bullet')}
           title="Bullet list"
           type="button"
         >
-          List
+          <UlistIcon aria-hidden style={{ fontSize: 20 }} />
         </button>
         <button
           aria-label="Numbered list"
+          aria-pressed={toolbarState.activeListStyle === 'number'}
           onClick={() => runEditorAction((editor) => PortableTextEditor.toggleList(editor, 'number'))}
           onMouseDown={preventEditorBlur}
           style={controlButtonStyle(toolbarState.activeListStyle === 'number')}
           title="Numbered list"
           type="button"
         >
-          1.
+          <OlistIcon aria-hidden style={{ fontSize: 20 }} />
         </button>
 
         {blockObjects.length > 0 ? (
@@ -414,6 +481,7 @@ export function InlineTextStylePortableTextInput(props: PortableTextInputProps) 
             <button
               key={color.value}
               aria-label={color.title}
+              aria-pressed={toolbarState.textStyle.textColor === color.value}
               onClick={() => applyTextStyle({ textColor: color.value })}
               onMouseDown={preventEditorBlur}
               style={{
@@ -422,6 +490,8 @@ export function InlineTextStylePortableTextInput(props: PortableTextInputProps) 
                 color: isLight ? '#1A1A1A' : '#FFFFFF',
                 minWidth: 32,
                 padding: 0,
+                outline: toolbarState.textStyle.textColor === color.value ? '2px solid #2563EB' : undefined,
+                outlineOffset: 1,
               }}
               title={color.title}
               type="button"
@@ -492,6 +562,7 @@ export function InlineTextStylePortableTextInput(props: PortableTextInputProps) 
           title="Reset text style"
           type="button"
         >
+          <ResetIcon aria-hidden style={{ fontSize: 18 }} />
           Reset
         </button>
       </div>
