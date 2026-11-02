@@ -3,6 +3,7 @@ import Image from 'next/image'
 
 import { urlFor } from '@/sanity/lib/image'
 import { SanityCaption, hasCaptionContent } from '@/components/shared/SanityCaption'
+import { PortableTextLink } from '@/components/shared/PortableTextLink'
 import { ImageGridLightbox } from '@/components/editorial/ImageGridLightbox'
 import { ClickableSingleImage } from '@/components/editorial/ClickableSingleImage'
 import { getOptionalTextStyleFontClass } from '@/lib/textStyleFonts'
@@ -182,6 +183,7 @@ function createComponents(
       ),
     },
     marks: {
+      link: PortableTextLink,
       strong: ({ children }) => <strong className="font-medium">{children}</strong>,
       em: ({ children }) => <em className="italic">{children}</em>,
       underline: ({ children }) => <u>{children}</u>,

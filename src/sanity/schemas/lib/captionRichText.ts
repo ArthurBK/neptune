@@ -1,6 +1,7 @@
 import { defineArrayMember } from 'sanity'
 import { InlineTextStylePortableTextInput } from '../../components/InlineTextStylePortableTextInput'
 import { textStyleAnnotation } from './textStyleAnnotation'
+import { linkAnnotation } from './linkAnnotation'
 
 export const captionRichTextType = {
   type: 'array',
@@ -17,7 +18,7 @@ export const captionRichTextType = {
           { title: 'Size: Medium', value: 'captionSizeMd' },
           { title: 'Size: Large', value: 'captionSizeLg' },
         ],
-        annotations: [textStyleAnnotation],
+        annotations: [linkAnnotation, textStyleAnnotation],
       },
     }),
   ],

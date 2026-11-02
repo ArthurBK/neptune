@@ -1,12 +1,14 @@
 import { PortableText, type PortableTextComponents } from 'next-sanity'
 import type { TypedObject } from '@portabletext/types'
 import { PortableTextStyle } from './PortableTextStyle'
+import { PortableTextLink } from './PortableTextLink'
 
 const captionComponents: PortableTextComponents = {
   block: {
     normal: ({ children }) => <span className="block">{children}</span>,
   },
   marks: {
+    link: PortableTextLink,
     textStyle: PortableTextStyle,
     strong: ({ children }) => <strong className="font-semibold">{children}</strong>,
     em: ({ children }) => <em className="italic">{children}</em>,

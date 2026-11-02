@@ -1,6 +1,7 @@
 import { DocumentTextIcon, ImageIcon, VideoIcon } from '@sanity/icons'
 import { defineArrayMember, defineField, defineType } from 'sanity'
 import { captionRichTextType } from './lib/captionRichText'
+import { linkAnnotation } from './lib/linkAnnotation'
 import { TEXT_STYLE_FONT_FAMILIES } from '../../lib/textStyleFonts'
 import { FontSizeCounterInput } from '../components/FontSizeCounterInput'
 import { HexColorInput } from '../components/HexColorInput'
@@ -414,6 +415,7 @@ export const article = defineType({
               { title: 'Underline', value: 'underline' },
             ],
             annotations: [
+              linkAnnotation,
               {
                 name: 'affiliateProductEmbed',
                 type: 'object',
