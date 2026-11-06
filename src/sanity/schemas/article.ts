@@ -365,17 +365,13 @@ export const article = defineType({
       title: 'Author',
       type: 'reference',
       to: [{ type: 'contributor' }],
-      validation: (rule) => rule.custom((value, context) =>
-        value?._ref || (typeof context.document?.authorName === 'string' && context.document.authorName.trim())
-          ? true
-          : 'Select an author or enter an author credit.',
-      ),
+      description: 'Optional contributor for the “Words by” credit. Leave both author fields empty to hide the credit.',
     }),
     defineField({
       name: 'authorName',
       title: 'Author credit',
       type: 'string',
-      description: 'Name displayed without a profile link when the contributor has been deleted.',
+      description: 'Optional name displayed without a profile link when no author profile is selected.',
       hidden: ({ document }) => Boolean(document?.author),
     }),
     defineField({
