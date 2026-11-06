@@ -1,3 +1,4 @@
+import { WordsByCredit } from '@/components/editorial/WordsByCredit'
 import { ContributorCredit } from '@/components/editorial/ContributorCredit'
 import { StylistCredit, type StylistCreditData } from '@/components/editorial/StylistCredit'
 import { notFound } from 'next/navigation'
@@ -95,17 +96,7 @@ export default async function GardensArticlePage({ params }: ArticlePageProps) {
             {article.title}
           </h1>
           <div className="mt-4 flex flex-col items-center gap-1 text-sm text-black/80">
-            {article.author && (
-              <p>
-                Words by{' '}
-                <ContributorCredit
-                  href={article.author.slug ? `/contributors/${article.author.slug}` : undefined}
-                  className="text-black underline-offset-2 transition-colors"
-                >
-                  {formatPersonName(article.author.name)}
-                </ContributorCredit>
-              </p>
-            )}
+            <WordsByCredit author={article.author} />
             {article.photographer && (
               <p>
                 Photography by{' '}

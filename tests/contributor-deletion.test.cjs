@@ -23,6 +23,10 @@ function load(file, mocks = {}) {
 const { deleteContributor } = load('src/sanity/lib/deleteContributor.ts')
 const queries = load('src/sanity/lib/queries.ts', { 'next-sanity': { defineQuery: (query) => query } })
 const { ContributorCredit } = load('src/components/editorial/ContributorCredit.tsx')
+const { WordsByCredit } = load('src/components/editorial/WordsByCredit.tsx', {
+  './ContributorCredit': { ContributorCredit },
+  '@/lib/personName': load('src/lib/personName.ts'),
+})
 const { StylistCredit } = load('src/components/editorial/StylistCredit.tsx', {
   './ContributorCredit': { ContributorCredit },
   '@/lib/personName': load('src/lib/personName.ts'),
@@ -187,6 +191,21 @@ test('styling credits survive contributor deletion in published and draft articl
   assert.equal(state.documents.find(doc => doc._id === 'article').stylistName, 'Published Name')
   const article = await query(queries.ARTICLE_BY_STORY_SLUG_QUERY, state.documents, { slug: 'styled' })
   assert.deepEqual(article.stylist, { name: 'Published Name', slug: null })
+})
+
+test('Words by disappears for missing or blank names and preserves valid author credits', () => {
+  const render = author => renderToStaticMarkup(React.createElement(WordsByCredit, { author }))
+  for (const author of [undefined, null, {}, { name: null }, { name: '' }, { name: ' \t\n ' }, { name: '', slug: 'person' }]) {
+    assert.equal(render(author), '')
+  }
+  const linked = render({ name: 'JANE DOE', slug: 'jane-doe' })
+  assert.match(linked, /Words by /)
+  assert.match(linked, /href="\/contributors\/jane-doe"/)
+  assert.match(linked, />Jane Doe<\/a>/)
+  const saved = render({ name: 'Jane Doe', slug: null })
+  assert.match(saved, /Words by /)
+  assert.match(saved, />Jane Doe<\/span>/)
+  assert.doesNotMatch(saved, /<a\b/)
 })
 
 test('Styled by renders a linked profile or a saved name, and disappears when empty', () => {
