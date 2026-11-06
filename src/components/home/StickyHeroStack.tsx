@@ -758,7 +758,7 @@ function ArticleSplitContent({
     <div className="flex flex-col h-auto md:h-full w-full min-w-0 items-center md:items-stretch bg-white">
       <div className="flex flex-col md:flex-row md:flex-1 min-h-0 w-full">
         {/* Left: image */}
-        <div className="flex-[1.45] md:flex-1 min-w-0 min-h-[56vh] md:min-h-0 relative pb-6 md:pb-0 md:aspect-[16/9]">
+        <div className="flex-none md:flex-1 min-w-0 min-h-0 relative pb-4 md:pb-0 md:aspect-[16/9]">
           {imageUrl ? (
             <Link href={href} className="relative block aspect-square w-full md:absolute md:inset-y-[12%] md:right-0 md:left-[20%] md:aspect-auto md:h-auto md:w-auto">
               <Image
@@ -774,8 +774,8 @@ function ArticleSplitContent({
             <div className="absolute inset-0 bg-[#1a1a1a]" />
           )}
         </div>
-        {/* Lift mobile text within its existing slot so the CTA stays in place. */}
-        <div className="relative -top-6 md:top-0 flex-[0.65] md:flex-1 min-w-0 flex flex-col items-center md:items-start text-center md:text-left justify-start md:justify-center px-4 md:px-10 lg:px-16 pt-2 pb-1 md:py-12">
+        {/* On mobile, keep the text directly below the square image. */}
+        <div className="flex-none md:flex-1 min-w-0 flex flex-col items-center md:items-start text-center md:text-left justify-start md:justify-center px-4 md:px-10 lg:px-16 pt-2 pb-1 md:py-12">
           {categoryHref && (
             <StoriesPageLink
               className="font-header font-extrabold text-[12px] tracking-[0.25em] uppercase text-[color:var(--neptune-logo-red)] hover:underline underline-offset-2 transition-colors mb-0"

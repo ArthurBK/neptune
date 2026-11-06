@@ -35,13 +35,13 @@ export function ClickableHeroImage({ src, alt }: Props) {
         className="block w-full cursor-zoom-in focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#1A1A1A]"
         aria-label="View image fullscreen"
       >
-        <div className="relative w-full aspect-4/5 bg-[#0a0a0a] md:aspect-3/2 lg:aspect-video">
+        <div className="relative w-full aspect-3/2 bg-[#0a0a0a] lg:aspect-video">
           <Image
             src={src}
             alt={alt}
             fill
             sizes="100vw"
-            className="object-cover"
+            className="object-contain md:object-cover"
             priority
             unoptimized
           />
