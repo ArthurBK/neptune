@@ -939,7 +939,7 @@ function HomeArticleTile({
             {title}
           </h2>
         </Link>
-        {article.author ? (
+        {article.author?.name?.trim() ? (
           <ContributorCredit
             href={article.author.slug ? `/contributors/${article.author.slug}` : undefined}
             className="mt-0.5 block min-w-0 whitespace-normal break-words text-[8px] leading-tight text-[#6B6B6B] underline-offset-2 transition-colors sm:text-[9px] md:text-[11px]"

@@ -111,7 +111,7 @@ export function ArticleCard({
                   {displayTitle}
                 </h3>
               </Link>
-              {author && (
+              {author?.name?.trim() && (
                 <ContributorCredit
                   href={author.slug ? `/contributors/${author.slug}` : undefined}
                   className="block w-full text-left text-[#6B6B6B] underline-offset-2 transition-colors text-base"
@@ -163,7 +163,7 @@ export function ArticleCard({
             </h3>
           </Link>
         </div>
-        {author && (
+        {author?.name?.trim() && (
           <ContributorCredit
             href={author.slug ? `/contributors/${author.slug}` : undefined}
             className="block lg:shrink-0 text-[#6B6B6B] underline-offset-2 transition-colors text-sm"
@@ -216,7 +216,7 @@ export function ArticleCard({
           </Link>
         </div>
       </div>
-      {author && (
+      {author?.name?.trim() && (
         <ContributorCredit
           href={author.slug ? `/contributors/${author.slug}` : undefined}
           className={`block text-[#6B6B6B] underline-offset-2 transition-colors ${isCompact ? 'text-sm' : 'text-base'}`}
