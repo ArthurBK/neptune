@@ -812,7 +812,7 @@ function ArticleSplitContent({
         </div>
       </div>
       {/* Below: Discover All Issues CTA (same as other pages: logo + text, centered, top/bottom border) */}
-      <div className="shrink-0 mt-2 md:mt-auto">
+      <div className="shrink-0 mt-6 md:mt-auto">
         <NewsstandCta compactMobile />
       </div>
     </div>
